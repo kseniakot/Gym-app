@@ -193,3 +193,8 @@
 - CancelWorkout()
 - LogNutrition() - внести текущее значение по питанию за день
 - Show/EditNutrition() - просмотреть/отредактировать текущее питание
+
+
+  ![gym_system](https://github.com/kseniakot/Gym-app/assets/113253599/e5fde64f-81e9-4eee-ae10-859aba4b6e6a)
+
+
