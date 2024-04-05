@@ -6,10 +6,10 @@
        xmlns:view="clr-namespace:Gym.View"
        Shell.FlyoutBehavior="Flyout">
 
-    <!--<Shell.FlyoutFooter>
+    <Shell.FlyoutFooter>
         <Button Text="Log out"
                 Clicked="LogOut_Button"/>
-    </Shell.FlyoutFooter>-->
+    </Shell.FlyoutFooter>
 
     <FlyoutItem Title="TEST">
         <Tab>

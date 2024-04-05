@@ -7,10 +7,10 @@
              Shell.FlyoutBehavior="Flyout"
              Title="AdminShell">
 
-    <!--<Shell.FlyoutFooter>
+    <Shell.FlyoutFooter>
         <Button Text="Log out"
              Clicked="LogOutAdmin_Button"/>
-    </Shell.FlyoutFooter>-->
+    </Shell.FlyoutFooter>
 
     <!--<ShellContent
     Title="Sign In"

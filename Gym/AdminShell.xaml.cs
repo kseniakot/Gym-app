@@ -10,4 +10,12 @@ public partial class AdminShell : Shell
        // Routing.RegisterRoute("AddUserView", typeof(AddUserView));
        // Routing.RegisterRoute("AddBookView", typeof(AddBookView));
     }
+
+    private async void LogOutAdmin_Button(object sender, EventArgs e)
+    {
+        
+        await Shell.Current.GoToAsync("SignInPage");
+        Application.Current.MainPage = new AppShell();
+
+    }
 }
