@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Gym.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Gym"
+    xmlns:view="clr-namespace:Gym.View"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Gym">
+
+    <ShellContent
+     Title="Sign In"
+     ContentTemplate="{DataTemplate view:SignInView}"
+     Route="SignIn" />
+
+    <ShellContent
+     Title="Sign Up"
+     ContentTemplate="{DataTemplate view:SignUpView}"
+     Route="SignUp" />
+</Shell>
