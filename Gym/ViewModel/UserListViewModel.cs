@@ -67,4 +67,17 @@ public partial class UserListViewModel : ObservableObject
         Users = new ObservableCollection<User>(_dbService.GetAllUsers());
     }
 
+    [RelayCommand]
+    private void SearchUser()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            Users = new ObservableCollection<User>(_dbService.GetAllUsers());
+        }
+        else
+        {
+            Users = new ObservableCollection<User>(_dbService.GetAllUsers().Where(user => user.Name.Contains(SearchText)));
+        }
+    }
+
 }

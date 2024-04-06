@@ -5,6 +5,7 @@
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
              x:DataType="viewmodel:UserListViewModel"
              xmlns:model="clr-namespace:Gym.Model"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              Title="UserList">
 
     <ScrollView>
@@ -27,10 +28,16 @@
              Margin="30, 0, 0, 0">
 
                 <SearchBar FontSize="Medium"
-                    Placeholder="Search..."
-                    Text="{Binding SearchText}"
-                 />
-                <!--SearchCommand="{Binding SearchCommand}"-->
+                    Placeholder="Enter email..."
+                    Text="{Binding SearchText, Mode=TwoWay}">
+                    
+                    <SearchBar.Behaviors>
+                    <xct:EventToCommandBehavior EventName="TextChanged"
+                                        Command="{Binding SearchUserCommand}"/>
+                    </SearchBar.Behaviors>
+                    
+                   </SearchBar>
+                   
 
             </Border>
 
