@@ -26,6 +26,12 @@ namespace Gym
             builder.Services.AddTransient<SignInViewModel>();
             builder.Services.AddTransient<SignInView>();
 
+            builder.Services.AddTransient<UserListViewModel>();
+            builder.Services.AddTransient<UserListView>();
+
+            builder.Services.AddTransient<AddUserViewModel>();
+            builder.Services.AddTransient<AddUserView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

@@ -27,7 +27,9 @@ namespace Gym.Services
         // Read
         public List<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+           
+                return _context.Users.Where(user => !(user.Name == "admin")).ToList();
+            
         }
 
         //public User GetUserById(int id)
@@ -53,5 +55,10 @@ namespace Gym.Services
         {
             return _context.Users.Any(u => u.Email == email);
         }
+
+        //public bool IsUserBanned(User user)
+        //{ 
+        //    return _context.BannedUsers.Any(u => u.Id == user.Id);
+        //}
     }
 }

@@ -8,14 +8,13 @@
              Title="AdminShell">
 
     <Shell.FlyoutFooter>
-        <Button Text="Log out"
+        <Button Text="SIGN OUT"
+             TextColor="Black"
+             BackgroundColor="DarkGoldenrod"
              Clicked="LogOutAdmin_Button"/>
     </Shell.FlyoutFooter>
 
-    <!--<ShellContent
-    Title="Sign In"
-    ContentTemplate="{DataTemplate view:SignInPage}"
-    Route="SignIn" />-->
+    
 
     <FlyoutItem Title="TEST">
         <Tab>
@@ -26,7 +25,7 @@
         </Tab>
     </FlyoutItem>
 
-    <!--<FlyoutItem Title="UserList">
+    <FlyoutItem Title="UserList">
         <Tab>
             <ShellContent
            Title="UserList"
@@ -35,7 +34,7 @@
         </Tab>
     </FlyoutItem>
 
-    <FlyoutItem Title="Memberships">
+    <!--<FlyoutItem Title="Memberships">
         <Tab>
             <ShellContent
            Title="Memberships"

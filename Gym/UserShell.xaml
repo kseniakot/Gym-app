@@ -7,7 +7,9 @@
        Shell.FlyoutBehavior="Flyout">
 
     <Shell.FlyoutFooter>
-        <Button Text="Log out"
+        <Button Text="SIGN OUT"
+                TextColor="Black"
+                BackgroundColor="DarkGoldenrod"
                 Clicked="LogOut_Button"/>
     </Shell.FlyoutFooter>
 

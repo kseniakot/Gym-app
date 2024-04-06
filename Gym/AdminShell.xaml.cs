@@ -7,7 +7,7 @@ public partial class AdminShell : Shell
 	{
         InitializeComponent();
         Routing.RegisterRoute("SignInPage", typeof(SignInView));
-       // Routing.RegisterRoute("AddUserView", typeof(AddUserView));
+        Routing.RegisterRoute("AddUserView", typeof(AddUserView));
        // Routing.RegisterRoute("AddBookView", typeof(AddBookView));
     }
 
