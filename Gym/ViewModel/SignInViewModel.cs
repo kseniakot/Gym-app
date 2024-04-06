@@ -32,6 +32,11 @@ namespace Gym.ViewModel;
         {
             await Shell.Current.DisplayAlert("This e-mail is not registered", "Please try another one.", "Ok");
         }
+        else if (_dbService.IsBannedByEmail(User.Email))
+        {
+            User = new();
+            await Shell.Current.DisplayAlert("This user is banned", "No access", "Ok");
+        }
         else
         {
             if (User.Email == "admin" && User.Password == "admin")

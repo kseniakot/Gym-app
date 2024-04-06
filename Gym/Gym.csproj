@@ -88,6 +88,9 @@
 	  <MauiXaml Update="View\AdminMainPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\BannedListView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\SignInView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -38,12 +38,12 @@ public partial class SignUpViewModel : ObservableObject
         {
             User = new();
             await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
-        }
+        } 
         else if (IsUserExist())
         {
             User = new();
             await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
-        }
+        } 
         else
         {
             //await DatabaseService<User>.AddColumnAsync(User);

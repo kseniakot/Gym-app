@@ -45,10 +45,10 @@ namespace Gym.Services
         }
 
         // Delete
-        public void DeleteUser(User user)
+        public async void DeleteUser(User user)
         {
-            _context.Users.Remove(user);
-            _context.SaveChanges();
+           _context.Users.Remove(user);
+           await _context.SaveChangesAsync();
         }
 
         public bool IsUserExist(string email)
@@ -56,9 +56,31 @@ namespace Gym.Services
             return _context.Users.Any(u => u.Email == email);
         }
 
-        //public bool IsUserBanned(User user)
-        //{ 
-        //    return _context.BannedUsers.Any(u => u.Id == user.Id);
-        //}
+        public async void BanUser(User user)
+        {
+            user.IsBanned = true;
+           await _context.SaveChangesAsync();
+        }
+
+        public async void UnbanUser(User user)
+        {
+            user.IsBanned = false;
+           await _context.SaveChangesAsync();
+        }
+
+        public List<User> GetBannedUsers()
+        {
+            return _context.Users.Where(user => user.IsBanned).ToList();
+        }
+
+        public List<User> GetUnbannedUsers()
+        {
+            return _context.Users.Where(user => !user.IsBanned && !(user.Name == "admin")).ToList();
+        }
+
+        public bool IsBannedByEmail(string email)
+        {
+            return _context.Users.Any(u => u.Email == email && u.IsBanned);
+        }
     }
 }

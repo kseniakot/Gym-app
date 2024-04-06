@@ -32,6 +32,9 @@ namespace Gym
             builder.Services.AddTransient<AddUserViewModel>();
             builder.Services.AddTransient<AddUserView>();
 
+            builder.Services.AddTransient<BannedListViewModel>();
+            builder.Services.AddTransient<BannedListView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

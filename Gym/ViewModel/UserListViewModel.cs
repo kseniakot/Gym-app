@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Gym.View;
+using System.Runtime.InteropServices;
 
 namespace Gym.ViewModel;
 
@@ -21,7 +22,7 @@ public partial class UserListViewModel : ObservableObject
     public UserListViewModel(DataBaseService dbService)
     {
         _dbService = dbService;
-        Users = new ObservableCollection<User>(dbService.GetAllUsers());
+        Users = new ObservableCollection<User>(dbService.GetUnbannedUsers());
     }
     [RelayCommand]
     private async Task RemoveUserAsync()
@@ -50,21 +51,15 @@ public partial class UserListViewModel : ObservableObject
     [RelayCommand]
     private async Task BunUser()
     {
-        //if (dbService.IsUserBannedById(_selectedUser.Id))
-        //{
-        //    await dbService.UnbanUser(_selectedUser.Id);
-        //    await Shell.Current.DisplayAlert("Title", "UNBAN", "ok");
-        //}
-        //else
-        //{
-        //    await dbService.BanUser(_selectedUser.Id);
-        //    await Shell.Current.DisplayAlert("Title", "BAN", "ok");
-        //}
+            _dbService.BanUser(SelectedUser);
+        Users.Remove(SelectedUser);
+            await Shell.Current.DisplayAlert("SUCCESS", "The user was banned successfully", "OK");
+        
     }
     [RelayCommand]
     private void LoadData()
     {
-        Users = new ObservableCollection<User>(_dbService.GetAllUsers());
+        Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers());
     }
 
     [RelayCommand]
@@ -72,12 +67,18 @@ public partial class UserListViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            Users = new ObservableCollection<User>(_dbService.GetAllUsers());
+            Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers());
         }
         else
         {
-            Users = new ObservableCollection<User>(_dbService.GetAllUsers().Where(user => user.Name.Contains(SearchText)));
+            Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers().Where(user => user.Name.Contains(SearchText)));
         }
+    }
+
+    [RelayCommand]
+    private async Task TapBanned()
+    {
+        await Shell.Current.GoToAsync(nameof(BannedListView));
     }
 
 }
