@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.AdminShell"
+             xmlns:local="clr-namespace:Gym"
+             xmlns:view="clr-namespace:Gym.View"
+             Shell.FlyoutBehavior="Flyout"
+             Title="AdminShell">
+
+    <Shell.FlyoutFooter>
+        <Button Text="SIGN OUT"
+             TextColor="Black"
+             BackgroundColor="DarkGoldenrod"
+             Clicked="LogOutAdmin_Button"/>
+    </Shell.FlyoutFooter>
+
+    
+
+    <FlyoutItem Title="TEST">
+        <Tab>
+            <ShellContent
+         Title="MAIN"
+         ContentTemplate="{DataTemplate view:AdminMainPage}"
+         Route="AdminMainPage" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="UserList">
+        <Tab>
+            <ShellContent
+           Title="UserList"
+           ContentTemplate="{DataTemplate view:UserListView}"
+           Route="UserListView" />
+        </Tab>
+    </FlyoutItem>
+
+    <!--<FlyoutItem Title="Memberships">
+        <Tab>
+            <ShellContent
+           Title="Memberships"
+           ContentTemplate="{DataTemplate view:BookListView}"
+           Route="BookListView" />
+        </Tab>
+    </FlyoutItem>-->
+
+
+</Shell>

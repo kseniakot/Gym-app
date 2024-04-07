@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.BannedListView"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:BannedListViewModel"
+             xmlns:model="clr-namespace:Gym.Model"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             Title="BLACKLIST">
+
+    <ScrollView>
+        <Grid RowDefinitions="auto, auto, auto, auto"
+    ColumnDefinitions="*, *, *"
+    ColumnSpacing="20"
+    RowSpacing="20">
+
+            <!-- Title -->
+            <Label Grid.Row="0"
+         Grid.ColumnSpan="3"
+         Text="BLACK LIST"
+         FontSize="Header"
+         Margin="0, 10, 0, 0"
+         HorizontalOptions="Center" />
+
+            <!-- Search Bar -->
+            <Border Grid.Row="1"
+          Grid.Column="0"
+          Margin="30, 0, 0, 0">
+
+                <SearchBar FontSize="Medium"
+                 Placeholder="Search..." 
+                 Text="{Binding SearchText, Mode=TwoWay}">
+
+                    <SearchBar.Behaviors>
+                        <xct:EventToCommandBehavior EventName="TextChanged"
+                                     Command="{Binding SearchUserCommand}"/>
+                    </SearchBar.Behaviors>
+
+                </SearchBar>
+
+            </Border>
+
+
+            <!-- User List -->
+            <Border Grid.Row="2"
+          Grid.ColumnSpan="3"
+          Margin="30, 0, 30, 0">
+
+                <ListView HasUnevenRows="True"
+                MinimumHeightRequest="485"
+                MaximumHeightRequest="485"
+                ItemsSource="{Binding Users}"
+                SelectedItem="{Binding SelectedUser}"
+                BackgroundColor="Transparent"
+                VerticalScrollBarVisibility="Never"
+                HorizontalScrollBarVisibility="Never">
+
+                    <ListView.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="3*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Text="Id" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="Name" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="2" Text="Email" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="3" Text="Mobile" FontSize="Medium" HorizontalOptions="Center" />
+                        </Grid>
+                    </ListView.Header>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:User}">
+                            <ViewCell>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Column="0" Text="{Binding Id}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Email}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="3" Text="{Binding PhoneNumber}" FontSize="Medium" VerticalOptions="Center" />
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+
+            </Border>
+
+            <!-- Control Buttons -->
+            <Button Grid.Row="3"
+          Grid.Column="1"
+          Margin="0, 0, 0, 20"
+          Text="UNBAN"
+          TextColor="DarkGoldenrod"
+          Command="{Binding UnbanUserCommand}" />
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
