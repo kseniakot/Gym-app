@@ -17,5 +17,7 @@ namespace Gym.Model
         public string Password { get; set; }
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
+
+        //add membership list
     }
 }

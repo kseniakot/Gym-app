@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.EditMembershipView"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:EditMembershipViewModel"    
+             Title="EditMembership"
+             Shell.FlyoutBehavior="Disabled"
+             Shell.NavBarIsVisible="False">
+
+    <!-- Remove Back Button Behavior -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False"
+                         IsEnabled="False" />
+    </Shell.BackButtonBehavior>
+
+    <ScrollView>
+        <Grid RowDefinitions="auto, auto, auto"
+           ColumnDefinitions="*, *"
+           ColumnSpacing="20"
+           RowSpacing="20">
+
+            <!-- Title -->
+            <Label Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Text="Edit Membership"
+                FontSize="Header"
+                Margin="0, 10, 0, 0"
+                HorizontalOptions="Center" />
+
+            <!-- Entries -->
+            <VerticalStackLayout Grid.Row="1"
+                              Grid.ColumnSpan="2"
+                              Spacing="10"
+                              Margin="100, 0, 100, 0">
+
+                <Border>
+                    <Entry Placeholder="Name"
+                        Text="{Binding Membership.Name}" />
+                </Border>
+                <Border>
+                    <Entry Placeholder="Months"
+                        MaxLength="3"
+                        Text="{Binding Membership.Months}" />
+                </Border>
+                <Border>
+                    <Entry Placeholder="Price"
+                        MaxLength="10"
+                        Text="{Binding Membership.Price}" />
+                </Border>
+
+
+            </VerticalStackLayout>
+
+            <!-- Control Buttons -->
+            <Button Grid.Row="2"
+                 Grid.Column="0"
+                 Margin="100, 0, 0, 20"
+                 Text="Back"
+                 Command="{Binding BackCommand}" 
+                 />
+            <Button Grid.Row="2"
+                 Grid.Column="1"
+                 Margin="0, 0, 100, 20"
+                 Text="Add"
+                 Command="{Binding EditCommand}" />
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
+

@@ -25,23 +25,25 @@
         </Tab>
     </FlyoutItem>
 
-    <FlyoutItem Title="UserList">
+    <FlyoutItem Title="USER LIST">
         <Tab>
             <ShellContent
-           Title="UserList"
+           Title="USER LIST"
            ContentTemplate="{DataTemplate view:UserListView}"
            Route="UserListView" />
         </Tab>
     </FlyoutItem>
+    
+    
 
-    <!--<FlyoutItem Title="Memberships">
+    <FlyoutItem Title="MEMBERSHIP LIST">
         <Tab>
             <ShellContent
-           Title="Memberships"
-           ContentTemplate="{DataTemplate view:BookListView}"
-           Route="BookListView" />
+           Title="MEMBERSHIP LIST"
+           ContentTemplate="{DataTemplate view:MembershipListView}"
+           Route="MembershipListView" />
         </Tab>
-    </FlyoutItem>-->
+    </FlyoutItem>
 
 
 </Shell>

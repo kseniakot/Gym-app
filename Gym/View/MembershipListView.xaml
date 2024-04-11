@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.MembershipListView"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:MembershipListViewModel"
+             xmlns:model="clr-namespace:Gym.Model"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             Title="MembershipList">
+
+
+    <ScrollView>
+        <Grid RowDefinitions="auto, auto, auto, auto"
+   ColumnDefinitions="*, *, *"
+   ColumnSpacing="20"
+   RowSpacing="20">
+
+            <!-- Title -->
+            <Label Grid.Row="0"
+        Grid.ColumnSpan="3"
+        Text="Memberships"
+        FontSize="Header"
+        Margin="0, 10, 0, 0"
+        HorizontalOptions="Center" />
+
+            <!-- Search Bar -->
+            <Border Grid.Row="1"
+         Grid.Column="0"
+         Margin="30, 0, 0, 0">
+
+                <SearchBar FontSize="Medium"
+                Placeholder="Search..." 
+                Text="{Binding SearchText, Mode=TwoWay}">
+
+                    <SearchBar.Behaviors>
+                        <xct:EventToCommandBehavior EventName="TextChanged"
+                                    Command="{Binding SearchMembershipCommand}"/>
+                    </SearchBar.Behaviors>
+
+                </SearchBar>
+
+            </Border>
+
+            <!--<Label Text="BANNED USERS" TextColor="DarkGoldenrod" Grid.Row="1"
+         Grid.Column="2" HorizontalOptions="End" FontSize="Title" Margin="0, 0, 30, 0" >
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer  NumberOfTapsRequired="1" Command="{Binding TapBannedCommand}"  />
+                </Label.GestureRecognizers>
+            </Label>-->
+
+            <!-- User List -->
+            <Border Grid.Row="2"
+         Grid.ColumnSpan="3"
+         Margin="30, 0, 30, 0">
+
+                <ListView HasUnevenRows="True"
+               MinimumHeightRequest="485"
+               MaximumHeightRequest="485"
+               ItemsSource="{Binding Memberships}"
+               SelectedItem="{Binding SelectedMembership}"
+               BackgroundColor="Transparent"
+               VerticalScrollBarVisibility="Never"
+               HorizontalScrollBarVisibility="Never">
+
+                    <ListView.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="3*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Text="Id" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="Name" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="2" Text="Months" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="3" Text="Price" FontSize="Medium" HorizontalOptions="Center" />
+                        </Grid>
+                    </ListView.Header>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:Membership}">
+                            <ViewCell>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="3*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Column="0" Text="{Binding Id}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Months}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="3" Text="{Binding Price}" FontSize="Medium" VerticalOptions="Center" />
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+
+            </Border>
+
+            <!-- Control Buttons -->
+            <Button Grid.Row="3"
+         Grid.Column="0"
+         Margin="20, 0, 0, 20"
+         Text="ADD"
+         TextColor="DarkGoldenrod"
+         Command="{Binding AddMembershipCommand}" />
+            <Button Grid.Row="3"
+         Grid.Column="1"
+         Margin="0, 0, 0, 20"
+         Text="REMOVE"
+         TextColor="DarkGoldenrod"
+         Command="{Binding RemoveMembershipCommand}" />
+            <Button Grid.Row="3"
+         Grid.Column="2"
+         Margin="0, 0, 20, 20"
+         Text="EDIT"
+         TextColor="DarkGoldenrod"
+         Command="{Binding EditMembershipCommand}" />
+
+        </Grid>
+    </ScrollView>
+    
+</ContentPage>

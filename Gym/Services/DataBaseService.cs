@@ -82,5 +82,41 @@ namespace Gym.Services
         {
             return _context.Users.Any(u => u.Email == email && u.IsBanned);
         }
+
+        public List<Membership> GetAllMemberships()
+        {
+            return _context.Memberships.ToList();
+        }
+
+        public void AddMembership(Membership membership)
+        {
+            _context.Memberships.Add(membership);
+            _context.SaveChanges();
+        }
+
+        public void DeleteMembership(Membership membership)
+        {
+            _context.Memberships.Remove(membership);
+            _context.SaveChanges();
+        }  
+        
+        public bool IsMembershipExist(Membership membership)
+        {
+            return _context.Memberships.Any(m => m.Name == membership.Name &&
+                                            m.Price == membership.Price && m.Months == membership.Months);
+        }
+
+       
+
+        public Membership GetMembershipById(int id)
+        {
+            return _context.Memberships.Find(id);
+        }
+
+        public void EditMembership(Membership membership)
+        {
+            _context.Memberships.Update(membership);
+            _context.SaveChanges();
+        }
     }
 }
