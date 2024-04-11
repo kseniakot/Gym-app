@@ -22,14 +22,14 @@
         </Tab>
     </FlyoutItem>
 
-    <!--<FlyoutItem Title="SHOP">
+    <FlyoutItem Title="SHOP">
         <Tab>
             <ShellContent
          Title="SHOP"
-         ContentTemplate="{DataTemplate view:DirectoryView}"
-         Route="DirectoryView" />
+         ContentTemplate="{DataTemplate view:ShopView}"
+         Route="ShopView" />
         </Tab>
-    </FlyoutItem>-->
+    </FlyoutItem>
 
 
 

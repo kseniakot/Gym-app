@@ -70,7 +70,7 @@ public partial class EditMembershipViewModel : ObservableObject
         }
         else if (IsMembershipExist(Membership))
         {
-            Membership = new();
+           // Membership = new();
             await Shell.Current.DisplayAlert("Such membership already exists", "Make some changes or go back", "Ok");
         }
         else

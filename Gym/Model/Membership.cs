@@ -16,5 +16,10 @@ namespace Gym.Model
         public int? Months { get; set; }
         public decimal? Price { get; set; }
         public bool IsActive { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name} - {Price:C}";
+        }
     }
 }

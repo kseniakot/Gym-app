@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.ShopView"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:ShopViewModel"
+             xmlns:model="clr-namespace:Gym.Model"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             Title="SHOP">
+    <ScrollView>
+        <VerticalStackLayout>
+            <Label Text="SELECT SERVICE:" TextColor="DarkGoldenrod" FontSize="Medium"></Label>
+            <Frame HeightRequest="130" BorderColor="DarkGoldenrod">
+                <Picker Title="MEMBERSHIPS" TextColor="AliceBlue" FontSize="Medium" BackgroundColor="Grey" 
+                           ItemsSource="{Binding Memberships}"
+                            SelectedItem="{Binding Source={x:Reference ShopViewModel}, Path=BindingContext.SelectedMembership}" 
+                            />
+            </Frame>
+            <!--<Frame HeightRequest="130" BorderColor="DarkGoldenrod">
+            <Picker Title="FREEZINGS" TextColor="AliceBlue" FontSize="Medium" BackgroundColor="Grey" 
+                    ItemsSource="{Binding Memberships}"
+                     SelectedItem="{Binding Source={x:Reference ShopViewModel}, Path=BindingContext.SelectedMembership}" 
+                     ItemDisplayBinding="{Binding Name}"/>
+        </Frame>-->
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

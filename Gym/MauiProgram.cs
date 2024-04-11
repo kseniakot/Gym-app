@@ -44,6 +44,9 @@ namespace Gym
             builder.Services.AddTransient<BannedListViewModel>();
             builder.Services.AddTransient<BannedListView>();
 
+            builder.Services.AddTransient<ShopViewModel>();
+            builder.Services.AddTransient<ShopView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

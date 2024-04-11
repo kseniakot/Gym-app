@@ -5,13 +5,14 @@ public partial class UserShell : Shell
 {
 	public UserShell()
 	{
-        Routing.RegisterRoute("SignInPage", typeof(SignInView));
+        Routing.RegisterRoute("SignInView", typeof(SignInView));
+        Routing.RegisterRoute("ShopView", typeof(ShopView));
         InitializeComponent();
     }
 
     private async void LogOut_Button(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("SignInPage");
+        await Shell.Current.GoToAsync("SignInView");
         Application.Current.MainPage = new AppShell();
     }
 
