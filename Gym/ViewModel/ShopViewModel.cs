@@ -14,11 +14,22 @@ public partial class ShopViewModel : ObservableObject
     [ObservableProperty]
     private Membership _selectedMembership;
 
+    [ObservableProperty]
+    bool _isPickerVisible;
+   
+
     readonly DataBaseService _dbService;
     public ShopViewModel(DataBaseService dbService)
     {
         _dbService = dbService;
         Memberships = new ObservableCollection<Membership>(dbService.GetAllMemberships());
+        SelectedMembership = Memberships.First();
+    }
+
+    [RelayCommand]
+    private void TogglePicker()
+    {
+        IsPickerVisible = !IsPickerVisible;
     }
 
 }
