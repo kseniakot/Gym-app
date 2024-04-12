@@ -118,5 +118,10 @@ namespace Gym.Services
             _context.Memberships.Update(membership);
             _context.SaveChanges();
         }
+
+        public bool IsPasswordCorrect(string email, string password)
+        {
+            return _context.Users.Any(u => u.Email == email && u.Password == password);
+        }
     }
 }

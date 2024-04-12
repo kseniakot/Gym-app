@@ -37,6 +37,7 @@ namespace Gym.ViewModel;
             User = new();
             await Shell.Current.DisplayAlert("This user is banned", "No access", "Ok");
         }
+        
         else
         {
             if (User.Email == "admin" && User.Password == "admin")
@@ -46,8 +47,15 @@ namespace Gym.ViewModel;
             }
             else
             {
+                if (!_dbService.IsPasswordCorrect(User.Email, User.Password))
+                {
+                    User.Password = ""; 
+                    await Shell.Current.DisplayAlert("Password is incorrect", "Please try again.", "Ok");
+                }
+                else { 
                 //await Shell.Current.GoToAsync("//UserMainPage");
                 Application.Current.MainPage = new UserShell();
+                 }
             }
         }
     }   
