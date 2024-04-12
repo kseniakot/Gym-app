@@ -11,6 +11,13 @@ public partial class SignUpViewModel : ObservableObject
 
     [ObservableProperty]
     private User _user = new();
+
+    //show password
+    [ObservableProperty]
+    bool _isPasswordHidden = true;
+    [ObservableProperty]
+    string _imageSource = "eyeopen.png";
+
     public SignUpViewModel(DataBaseService dbService)
 	{
 		_dbService = dbService;
@@ -53,4 +60,22 @@ public partial class SignUpViewModel : ObservableObject
         }
 
 	}
+
+    [RelayCommand]
+    private void ShowPassword()
+    {
+
+        if (!IsPasswordHidden)
+        {
+            ImageSource = "eyeopen.png";
+
+        }
+        else
+        {
+            ImageSource = "eyeclose.png";
+        }
+        IsPasswordHidden = !IsPasswordHidden;
+    }
+
+
 }

@@ -15,9 +15,30 @@ namespace Gym.ViewModel;
     [ObservableProperty]
     private User _user = new();
 
+    //show password
+    [ObservableProperty]
+    bool _isPasswordHidden = true;
+    [ObservableProperty]
+    string _imageSource = "eyeopen.png";
+
     public SignInViewModel(DataBaseService dbService)
     {
         _dbService = dbService;
+    }
+
+    [RelayCommand]
+    private void ShowPassword()
+    {
+        if (!IsPasswordHidden)
+        {
+            ImageSource = "eyeopen.png";
+
+        }
+        else
+        {
+            ImageSource = "eyeclose.png";
+        }
+        IsPasswordHidden = !IsPasswordHidden;
     }
 
     [RelayCommand]

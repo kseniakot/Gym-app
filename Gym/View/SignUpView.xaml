@@ -24,7 +24,7 @@
 
        </Frame>-->
 
-        <Frame ZIndex="1" CornerRadius="0" BackgroundColor="White"
+        <Frame ZIndex="1" CornerRadius="0" BackgroundColor="Black"
               Grid.Row="1" VerticalOptions="CenterAndExpand"
               Margin="0,0,40,0"
               >
@@ -32,31 +32,34 @@
                 <VerticalStackLayout Spacing="25">
                     <Label Text="SIGN UP" FontSize="28" FontAttributes="Bold" />
 
-                    <Frame Padding="10" BorderColor="Transparent" CornerRadius="0">
+                    <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="user.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Name" Text="{Binding User.Name}" Grid.Column="1" x:Name ="NameEntry"/>
+                            <Entry VerticalOptions="Center" Placeholder="Name" Text="{Binding User.Name}" Grid.Column="1" x:Name ="NameEntry" BackgroundColor="AliceBlue"/>
                         </Grid>
                     </Frame>
 
-                    <Frame Padding="10" BorderColor="Transparent" CornerRadius="0">
+                    <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="email.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Email" Text="{Binding User.Email}" Grid.Column="1" x:Name ="EmailEntry"/>
+                            <Entry VerticalOptions="Center" Placeholder="Email" Text="{Binding User.Email}" Grid.Column="1" x:Name ="EmailEntry"  BackgroundColor="AliceBlue"/>
                         </Grid>
                     </Frame>
 
-                    <Frame Padding="10" BorderColor="Transparent" CornerRadius="0">
+                    <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="mobile.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Mobile Number" Text="{Binding User.PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry"/>
+                            <Entry VerticalOptions="Center" Placeholder="Mobile Number" Text="{Binding User.PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue"/>
                         </Grid>
                     </Frame>
 
-                    <Frame Padding="10" BorderColor="Transparent" CornerRadius="0">
-                        <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                    <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0" BackgroundColor="AliceBlue">
+                        <Grid ColumnDefinitions="25,*,50" ColumnSpacing="10">
+
                             <Image VerticalOptions="Center" Source="password.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Password" Text="{Binding User.Password}" IsPassword="True" Grid.Column="1" x:Name ="PasswordEntry"/>
+                            <Entry VerticalOptions="Center" Placeholder="Password" Text="{Binding User.Password}" IsPassword="{Binding IsPasswordHidden}" Grid.Column="1" x:Name="Password_Entry" TextColor="Black" />
+                            <ImageButton VerticalOptions="Center" Source="{Binding ImageSource}" HeightRequest="25" WidthRequest="50" Grid.Column="2"  Command="{Binding ShowPasswordCommand}" />
+                            
                         </Grid>
                     </Frame>
 
