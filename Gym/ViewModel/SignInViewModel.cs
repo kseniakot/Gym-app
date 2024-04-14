@@ -5,6 +5,7 @@ using Gym.Model;
 using Gym.Services;
 using Gym.View;
 using System.Windows.Input;
+using System.Text.RegularExpressions;
 namespace Gym.ViewModel;
 
     public partial class SignInViewModel : ObservableObject
@@ -48,6 +49,10 @@ namespace Gym.ViewModel;
         if (string.IsNullOrWhiteSpace(User.Email) || string.IsNullOrWhiteSpace(User.Password))
         {
             await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
+        }
+        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*")) 
+        {
+            await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
         }
         else if (!_dbService.IsUserExist(User.Email))
         {

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gym.View.SignUpView"
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              x:DataType="viewmodel:SignUpViewModel"
              Shell.NavBarIsVisible="False"
              Title="SignUpView">
@@ -35,21 +36,25 @@
                     <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="user.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Name" Text="{Binding User.Name}" Grid.Column="1" x:Name ="NameEntry" BackgroundColor="AliceBlue"/>
+                            <Entry VerticalOptions="Center" Placeholder="Name" Text="{Binding User.Name}" Grid.Column="1" x:Name ="NameEntry" BackgroundColor="AliceBlue" TextColor="Black"/>
                         </Grid>
                     </Frame>
 
                     <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="email.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Email" Text="{Binding User.Email}" Grid.Column="1" x:Name ="EmailEntry"  BackgroundColor="AliceBlue"/>
+                            <Entry VerticalOptions="Center" Placeholder="Email" Text="{Binding User.Email}" Grid.Column="1" x:Name ="EmailEntry"  BackgroundColor="AliceBlue" TextColor="Black"/>
                         </Grid>
                     </Frame>
+
+                   
 
                     <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="mobile.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Mobile Number" Text="{Binding User.PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue"/>
+                            <Entry VerticalOptions="Center" Placeholder="Mobile Number: +375(XX)XXXXXXX" Text="{Binding User.PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue" TextColor="Black">
+                               
+                            </Entry>
                         </Grid>
                     </Frame>
 
@@ -58,6 +63,7 @@
 
                             <Image VerticalOptions="Center" Source="password.png" HeightRequest="25" WidthRequest="25" />
                             <Entry VerticalOptions="Center" Placeholder="Password" Text="{Binding User.Password}" IsPassword="{Binding IsPasswordHidden}" Grid.Column="1" x:Name="Password_Entry" TextColor="Black" />
+                           
                             <ImageButton VerticalOptions="Center" Source="{Binding ImageSource}" HeightRequest="25" WidthRequest="50" Grid.Column="2"  Command="{Binding ShowPasswordCommand}" />
                             
                         </Grid>
