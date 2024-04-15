@@ -12,8 +12,8 @@ public partial class SignUpViewModel : ObservableObject
 
     [ObservableProperty]
     private User _user = new();
-    //[ObservableProperty]
-    //private string _phoneNumber = "";
+    [ObservableProperty]
+    private string _phoneNumber = "";
     //show password
     [ObservableProperty]
     bool _isPasswordHidden = true;
@@ -43,7 +43,8 @@ public partial class SignUpViewModel : ObservableObject
     [RelayCommand]
 	private async Task SignUpAsync()
 	{
-      //  User.PhoneNumber = PhoneNumber;
+        PhoneNumber = FormatPhoneNumber(PhoneNumber);
+        User.PhoneNumber = PhoneNumber;
         if (IsAnyNullOrEmpty(User))
         {
            // User = new();
@@ -58,48 +59,37 @@ public partial class SignUpViewModel : ObservableObject
            // User = new();
             await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
         }
-        else if (!Regex.IsMatch(User.PhoneNumber, @"^\+375\(\d{2}\)\d{7}$"))
+        else if (!Regex.IsMatch(User.PhoneNumber, @"^\+375\(\d{2}\)\d{3}-\d{2}-\d{2}"))
         {
            // User = new();
-            await Shell.Current.DisplayAlert("Invalid phone number", "Enter phone number in +375(XX)XXXXXXX format.", "Ok");
+            await Shell.Current.DisplayAlert("Invalid phone number", "Enter phone number in +375(XX)XXX-XX-XX format.", "Ok");
         }
         else
         {
             //await DatabaseService<User>.AddColumnAsync(User);
             _dbService.AddUser(User);
             User = new();
+            PhoneNumber = "";
             await Shell.Current.DisplayAlert("User added successfully", "Press Ok and sign in", "Ok");
             await Shell.Current.GoToAsync("//SignIn");
         }
 
 	}
 
-    //[RelayCommand]
+    private string FormatPhoneNumber(string rawPhoneNumber)
+    {
+        // Remove any non-digit characters
+        var digits = new string(rawPhoneNumber.Where(char.IsDigit).ToArray());
 
-    //private void TextChanged()
-    //{
-    //    if (PhoneNumber.Length == 4)
-    //    {
-    //        PhoneNumber += "(";
-    //    }
-    //    if (PhoneNumber.Length == 9)
-    //    {
-    //        PhoneNumber += ")";
-    //    }
-    //    if (PhoneNumber.Length == 10)
-    //    {
-    //        PhoneNumber += " ";
-    //    }
-    //    if (PhoneNumber.Length == 13)
-    //    {
-    //        PhoneNumber += "-";
-    //    }
-    //    if (PhoneNumber.Length == 14)
-    //    {
-    //        PhoneNumber += "-";
-    //    }
+        // Insert the formatting characters at the correct positions
+        if (digits.Length > 3) digits = digits.Insert(3, "(");
+        if (digits.Length > 6) digits = digits.Insert(6, ")");
+        
+        if (digits.Length > 11) digits = digits.Insert(10, "-");
+        if (digits.Length > 14) digits = digits.Insert(13, "-");
 
-    //}
+        return "+" + digits;
+    }
 
     [RelayCommand]
     private void ShowPassword()
