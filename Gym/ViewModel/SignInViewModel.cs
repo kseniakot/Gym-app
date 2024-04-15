@@ -50,7 +50,7 @@ namespace Gym.ViewModel;
         {
             await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
         }
-        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*")) 
+        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*") && User.Email != "admin") 
         {
             await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
         }
