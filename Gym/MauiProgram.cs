@@ -20,6 +20,12 @@ namespace Gym
                 });
             builder.Services.AddSingleton<DBContext>();
             builder.Services.AddSingleton<DataBaseService>();
+
+           
+            builder.Services.AddSingleton<TokenService>();
+
+            builder.Services.AddSingleton<WebService>();
+
             builder.Services.AddTransient<SignUpViewModel>();
             builder.Services.AddTransient<SignUpView>();
 

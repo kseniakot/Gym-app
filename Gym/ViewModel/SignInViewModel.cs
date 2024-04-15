@@ -4,13 +4,16 @@ using System.Collections.ObjectModel;
 using Gym.Model;
 using Gym.Services;
 using Gym.View;
-using System.Windows.Input;
 using System.Text.RegularExpressions;
+using System.Windows.Input;
+
 namespace Gym.ViewModel;
 
-    public partial class SignInViewModel : ObservableObject
-    {
-    readonly DataBaseService _dbService;
+public partial class SignInViewModel : ObservableObject
+{
+
+    // readonly DataBaseService _dbService;
+    readonly WebService _webService;
 
 
     [ObservableProperty]
@@ -22,9 +25,14 @@ namespace Gym.ViewModel;
     [ObservableProperty]
     string _imageSource = "eyeopen.png";
 
-    public SignInViewModel(DataBaseService dbService)
+    //public SignInViewModel(DataBaseService dbService)
+    //{
+    //    _dbService = dbService;
+    //}
+
+    public SignInViewModel(WebService webService)
     {
-        _dbService = dbService;
+        _webService = webService;
     }
 
     [RelayCommand]
@@ -50,42 +58,41 @@ namespace Gym.ViewModel;
         {
             await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
         }
-        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*") && User.Email != "admin") 
+        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*") && User.Email != "admin")
         {
             await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
         }
-        else if (!_dbService.IsUserExist(User.Email))
-        {
-            await Shell.Current.DisplayAlert("This e-mail is not registered", "Please try another one.", "Ok");
-        }
-        else if (_dbService.IsBannedByEmail(User.Email))
-        {
-            User = new();
-            await Shell.Current.DisplayAlert("This user is banned", "No access", "Ok");
-        }
-        
+
         else
         {
-            if (User.Email == "admin" && User.Password == "admin")
+            try
             {
-                //await Shell.Current.GoToAsync("//AdminMainPage");
-                Application.Current.MainPage = new AdminShell();
-            }
-            else
-            {
-                if (!_dbService.IsPasswordCorrect(User.Email, User.Password))
+                await _webService.LogIn(User);
+
+                if (User.Email == "admin" && User.Password == "admin")
                 {
-                    User.Password = ""; 
-                    await Shell.Current.DisplayAlert("Password is incorrect", "Please try again.", "Ok");
+                    //await Shell.Current.GoToAsync("//AdminMainPage");
+                    Application.Current.MainPage = new AdminShell();
                 }
-                else { 
-                //await Shell.Current.GoToAsync("//UserMainPage");
-                Application.Current.MainPage = new UserShell();
-                 }
+                else
+                {
+                    //await Shell.Current.GoToAsync("//UserMainPage");
+                    Application.Current.MainPage = new UserShell();
+                }
             }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+            }
+
+
         }
-    }   
 
 
+
+    }
 }
+
+
+
 
