@@ -123,7 +123,7 @@ async (int id, DBContext db) =>
 
 
 // ADD USER 
-app.MapPost("/users", [Authorize(Policy = "RequireAdminRole")]
+app.MapPost("/users",
 async (User user, DBContext db) =>
 {
     await db.Users.AddAsync(user);
@@ -191,7 +191,7 @@ app.Map("/", (HttpContext context) =>
 
 
 //ISUSEREXIST
-app.MapGet("/users/exist/{email}", [Authorize(Policy = "RequireAdminRole")]
+app.MapGet("/users/exist/{email}",
     async (string email, DBContext db) =>
 {
     var isExist = await db.Users.AnyAsync(u => u.Email == email);

@@ -4,11 +4,12 @@ using System.Collections.ObjectModel;
 using Gym.Model;
 using Gym.Services;
 using System.Text.RegularExpressions;
+using Gym.Exceptions;
 namespace Gym.ViewModel;
 
 public partial class SignUpViewModel : ObservableObject
 {
-      DataBaseService _dbService;
+      WebService webService;
 
     [ObservableProperty]
     private User _user = new();
@@ -21,9 +22,9 @@ public partial class SignUpViewModel : ObservableObject
     [ObservableProperty]
     string _imageSource = "eyeopen.png";
 
-    public SignUpViewModel(DataBaseService dbService)
+    public SignUpViewModel(WebService webService)
 	{
-		_dbService = dbService;
+		this.webService = webService;
 	}
 
     private static bool IsAnyNullOrEmpty(object user)
@@ -35,9 +36,26 @@ public partial class SignUpViewModel : ObservableObject
             .Any(value => string.IsNullOrWhiteSpace(value));
     }
 
-    private bool IsUserExist()
+
+    private async Task<bool> IsUserExistAsync()
     {
-        return _dbService.IsUserExist(_user.Email);
+        try
+        {
+            return await webService.IsUserExistAsync(User.Email);
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+            return false;
+
+        }
+        catch (Exception)
+        {
+            await Shell.Current.DisplayAlert("Something went wrong", "Please try again", "Ok");
+            return false;
+        }
     }
 
 
@@ -55,24 +73,37 @@ public partial class SignUpViewModel : ObservableObject
         {
             await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
         }
-        else if (IsUserExist())
-        {
-           // User = new();
-            await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
-        }
+       
         else if (!Regex.IsMatch(User.PhoneNumber, @"^\+375\(\d{2}\)\d{3}-\d{2}-\d{2}"))
         {
            // User = new();
             await Shell.Current.DisplayAlert("Invalid phone number", "Enter phone number in +375(XX)XXX-XX-XX format.", "Ok");
         }
+        else if (await IsUserExistAsync())
+        {
+            // User = new();
+            await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
+        }
         else
         {
-            //await DatabaseService<User>.AddColumnAsync(User);
-            _dbService.AddUser(User);
-            User = new();
-            PhoneNumber = "";
-            await Shell.Current.DisplayAlert("User added successfully", "Press Ok and sign in", "Ok");
-            await Shell.Current.GoToAsync("//SignIn");
+            try
+            {
+                await webService.AddUserAsync(User);
+                User = new();
+                PhoneNumber = "";
+                await Shell.Current.DisplayAlert("User added successfully", "Press Ok and sign in", "Ok");
+                await Shell.Current.GoToAsync("//SignIn");
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception)
+            {
+                await Shell.Current.DisplayAlert("Something went wrong", "Please try again", "Ok");
+            }
         }
 
 	}
