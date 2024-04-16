@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using Gym.View;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Gym.Exceptions;
 
 namespace Gym.ViewModel;
 
@@ -19,26 +20,61 @@ public partial class MembershipListViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText;
 
-    readonly DataBaseService _dbService;
-    public MembershipListViewModel(DataBaseService dbService)
+    readonly WebService webService;
+    public MembershipListViewModel(WebService webService)
     {
-        _dbService = dbService;
-        Memberships = new ObservableCollection<Membership>(dbService.GetAllMemberships());
+        this.webService = webService;
+        InitializeAsync();
+       
     }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
+
     [RelayCommand]
     private async Task RemoveMembershipAsync()
     {
         if (SelectedMembership != null)
         {
-            //  await DatabaseService<User>.RemoveColumnAsync(SelectedUser.Id);
-            _dbService.DeleteMembership(SelectedMembership);
-            Memberships.Remove(SelectedMembership);
+            try
+            {
+                await webService.DeleteMembership(SelectedMembership);
+                Memberships.Remove(SelectedMembership);
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
 
-            SelectedMembership = null;
+            }
+            finally
+            {
+                SelectedMembership = null;
+            }
         }
         else
         {
-            await Shell.Current.DisplayAlert("No membership selected", "Please select and try again.", "Ok");
+            await Shell.Current.DisplayAlert("No user selected", "Please select and try again.", "Ok");
         }
     }
 
@@ -49,23 +85,48 @@ public partial class MembershipListViewModel : ObservableObject
         await Shell.Current.GoToAsync(nameof(AddMembershipView));
     }
 
-    
-    [RelayCommand]
-    private void LoadData()
-    {
-        Memberships = new ObservableCollection<Membership>(_dbService.GetAllMemberships());
-    }
 
     [RelayCommand]
-    private void SearchMembership()
+    private async Task LoadData()
+    {
+        await InitializeAsync();
+    }
+    [RelayCommand]
+    private async Task SearchMembershipAsync()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            Memberships = new ObservableCollection<Membership>(_dbService.GetAllMemberships());
+            try
+            {
+                Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
         else
         {
-            Memberships = new ObservableCollection<Membership>(_dbService.GetAllMemberships().Where(membership => membership.Name.Contains(SearchText)));
+            try
+            {
+                Memberships = new ObservableCollection<Membership>((await webService.GetAllMemberships()).Where(membership => membership.Name.Contains(SearchText)));
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
     }
 

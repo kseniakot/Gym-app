@@ -224,5 +224,20 @@ namespace Gym.Services
                 throw new Exception("Something went wrong");
             }
         }
+
+
+        //DELETE MEMBERSHIP
+        public async Task DeleteMembership(Membership membership)
+        {
+            HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/memberships/{membership.Id}");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
     }
 }

@@ -208,7 +208,17 @@ app.MapGet("/memberships",
         return Results.Ok(memberships);
     });
 
+//DELETE MEMBERSHIP BY ID
+app.MapDelete("/memberships/{id:int}",
+       async (int id, DBContext db) =>
+       {
+        var membership = await db.Memberships.FirstOrDefaultAsync(m => m.Id == id);
+        if (membership == null) return Results.NotFound(new { message = "No such membership" });
 
+        db.Memberships.Remove(membership);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    });
 
 
 app.Run();
