@@ -90,7 +90,7 @@ namespace Gym.Services
         }
 
         //ADD USER
-        public async Task AddUser(User user)
+        public async Task AddUserAsync(User user)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync("https://localhost:7062/users", content);
@@ -183,5 +183,23 @@ namespace Gym.Services
                 throw new Exception("Something went wrong");
             }
         }
+
+        //ISUSEREXIST
+        public async Task<bool> IsUserExistAsync(string email)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://localhost:7062/users/exist/{email}");
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }   
     }
 }

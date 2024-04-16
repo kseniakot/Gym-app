@@ -12,9 +12,10 @@ public partial class SignUpViewModel : ObservableObject
 
     [ObservableProperty]
     private User _user = new();
+
     [ObservableProperty]
     private string _phoneNumber = "";
-    //show password
+    //PASSWORD VISIBILITY
     [ObservableProperty]
     bool _isPasswordHidden = true;
     [ObservableProperty]

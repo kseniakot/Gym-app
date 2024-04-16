@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ClockSkew = TimeSpan.Zero,
+            //ClockSkew = TimeSpan.Zero,
             ValidateIssuer = true,
             ValidIssuer = AuthOptions.ISSUER,
             ValidateAudience = true,
@@ -97,7 +97,7 @@ app.MapPost("/login", async (User loginData, DBContext db) =>
             issuer: AuthOptions.ISSUER,
             audience: AuthOptions.AUDIENCE,
             claims: claims,
-            expires: DateTime.Now.AddMinutes(1), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+            expires: DateTime.Now.AddHours(2), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)) ; 
     var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
@@ -188,6 +188,16 @@ app.Map("/", (HttpContext context) =>
         return Results.Json(new { message = "User is NOT authenticated" });
     }
 });
+
+
+//ISUSEREXIST
+app.MapGet("/users/exist/{email}", [Authorize(Policy = "RequireAdminRole")]
+    async (string email, DBContext db) =>
+{
+    var isExist = await db.Users.AnyAsync(u => u.Email == email);
+    return Results.Ok(isExist);
+}
+);
 
 app.Run();
 

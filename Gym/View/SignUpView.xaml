@@ -52,7 +52,7 @@
                     <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
                         <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
                             <Image VerticalOptions="Center" Source="mobile.png" HeightRequest="25" WidthRequest="25" />
-                            <Entry VerticalOptions="Center" Placeholder="Mobile Number: +375(XX)XXXXXXX" Text="{Binding PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue" TextColor="Black">
+                            <Entry VerticalOptions="Center" Placeholder="Mobile Number: +375(XX)XXX-XX-XX"  MaxLength="17" Text="{Binding PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue" TextColor="Black">
                                
                             </Entry>
                         </Grid>

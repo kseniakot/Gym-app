@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gym.View.AddUserView"
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              x:DataType="viewmodel:AddUserViewModel"    
              Title="AddUser"
              Shell.FlyoutBehavior="Disabled"
@@ -34,26 +35,41 @@
                               Spacing="10"
                               Margin="100, 0, 100, 0">
 
-                <Border>
-                    <Entry Placeholder="E-Mail"
-                        Text="{Binding User.Email}" />
-                </Border>
-                <Border>
-                    <Entry Placeholder="Password"
-                        MaxLength="24"
-                        IsPassword="True"
-                        Text="{Binding User.Password}" />
-                </Border>
-                <Border>
-                    <Entry Placeholder="Full Name"
-                        Text="{Binding User.Name}" />
-                </Border>
-                <Border>
-                    <Entry Placeholder="Phone Number"
-                        MaxLength="10"
-                        Text="{Binding User.PhoneNumber}" />
-                </Border>
+                <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
+                    <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                       
+                        <Entry VerticalOptions="Center" Placeholder="Name" Text="{Binding User.Name}" Grid.Column="1" x:Name ="NameEntry" BackgroundColor="AliceBlue" TextColor="Black"/>
+                    </Grid>
+                </Frame>
 
+                <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
+                    <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                       
+                        <Entry VerticalOptions="Center" Placeholder="Email" Text="{Binding User.Email}" Grid.Column="1" x:Name ="EmailEntry"  BackgroundColor="AliceBlue" TextColor="Black"/>
+                    </Grid>
+                </Frame>
+
+
+
+                <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0"  BackgroundColor="AliceBlue">
+                    <Grid ColumnDefinitions="25,*" ColumnSpacing="10">
+                        
+                        <Entry VerticalOptions="Center" Placeholder="Mobile Number: +375(XX)XXX-XX-XX"  MaxLength="17" Text="{Binding PhoneNumber}" Grid.Column="1" x:Name ="MobileNumberEntry" BackgroundColor="AliceBlue" TextColor="Black">
+
+                        </Entry>
+                    </Grid>
+                </Frame>
+
+                <Frame Padding="10" Margin="10" BorderColor="Transparent" CornerRadius="0" BackgroundColor="AliceBlue">
+                    <Grid ColumnDefinitions="25,*,50" ColumnSpacing="10">
+
+                       
+                        <Entry VerticalOptions="Center" Placeholder="Password" Text="{Binding User.Password}" IsPassword="{Binding IsPasswordHidden}" Grid.Column="1" x:Name="Password_Entry" TextColor="Black" />
+
+                        <ImageButton VerticalOptions="Center" Source="{Binding ImageSource}" HeightRequest="25" WidthRequest="50" Grid.Column="2"  Command="{Binding ShowPasswordCommand}" />
+
+                    </Grid>
+                </Frame>
 
             </VerticalStackLayout>
 
