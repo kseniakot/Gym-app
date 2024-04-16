@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Gym.View;
+using Gym.Exceptions;   
 namespace Gym.ViewModel;
 
 public partial class BannedListViewModel : ObservableObject
@@ -16,37 +17,83 @@ public partial class BannedListViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText;
 
-    readonly DataBaseService _dbService;
-    public BannedListViewModel(DataBaseService dbService)
+    readonly WebService webService;
+    public BannedListViewModel(WebService webService)
     {
-        _dbService = dbService;
-        Users = new ObservableCollection<User>(_dbService.GetBannedUsers());
+        this.webService = webService;
+       InitializeAsync();
     }
-    
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Users = new ObservableCollection<User>(await webService.GetBannedUsers());
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
+
+
+
     [RelayCommand]
     private async Task UnbanUser()
     {
-        _dbService.UnbanUser(SelectedUser);
+       await webService.BanUser(SelectedUser.Id);
         Users.Remove(SelectedUser);
         await Shell.Current.DisplayAlert("SUCCESS", "The user was unbanned successfully", "OK");
 
     }
     [RelayCommand]
-    private void LoadData()
+    private async Task LoadData()
     {
-        Users = new ObservableCollection<User>(_dbService.GetBannedUsers());
+        await InitializeAsync();
     }
 
     [RelayCommand]
-    private void SearchUser()
+    private async Task SearchUser()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            Users = new ObservableCollection<User>(_dbService.GetBannedUsers());
+            try
+            {
+                Users = new ObservableCollection<User>(await webService.GetBannedUsers());
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
         else
         {
-            Users = new ObservableCollection<User>(_dbService.GetBannedUsers().Where(user => user.Name.Contains(SearchText)));
+            try
+            {
+                Users = new ObservableCollection<User>((await webService.GetBannedUsers()).Where(user => user.Name.Contains(SearchText)));
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
     }
 
