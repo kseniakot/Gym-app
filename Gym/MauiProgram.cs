@@ -53,6 +53,9 @@ namespace Gym
             builder.Services.AddTransient<ShopViewModel>();
             builder.Services.AddTransient<ShopView>();
 
+            builder.Services.AddTransient<UserMainViewModel>();
+            builder.Services.AddTransient<UserMainPage>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

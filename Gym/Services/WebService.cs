@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Gym.Model;
+using System.IdentityModel.Tokens.Jwt;
+using System.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace Gym.Services
@@ -14,6 +18,7 @@ namespace Gym.Services
     {
         HttpClient client = new HttpClient();
         private readonly TokenService tokenService;
+      
         public WebService(TokenService tokenService)
         {
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -26,9 +31,9 @@ namespace Gym.Services
 
             if (response.IsSuccessStatusCode)
             {
-                _ = tokenService.SaveTokenAsync(await response.Content.ReadAsStringAsync());
+                await tokenService.SaveTokenAsync((await response.Content.ReadAsStringAsync()).Trim('"'));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await tokenService.GetTokenAsync());
-
+              
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
@@ -43,6 +48,28 @@ namespace Gym.Services
                 throw new Exception("Something went wrong");
             }
            
+        }
+
+
+        //DECRYPT TOKEN AND GET USER INFO
+        public async Task<User> GetUserFromToken()
+        {
+          
+            var stream = await tokenService.GetTokenAsync();
+           
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+           
+
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var user = new User()
+            {
+                Email = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Email).Value,
+                Id = int.Parse(tokenS.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value)
+            };
+
+            return user;
         }
     }
 }

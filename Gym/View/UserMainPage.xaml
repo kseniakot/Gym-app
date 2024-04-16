@@ -2,11 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gym.View.UserMainPage"
+              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+              x:DataType="viewmodel:UserMainViewModel"
+              xmlns:model="clr-namespace:Gym.Model"
              Title="UserMainPage">
     <VerticalStackLayout>
         <Label 
-            Text="Welcome to .NET MAUI, User!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        Text="{Binding User.Email, StringFormat='Welcome to .NET MAUI, {0}!'}"
+        VerticalOptions="Center" 
+        HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>
