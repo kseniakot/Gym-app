@@ -40,6 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuer = true,
             ValidIssuer = AuthOptions.ISSUER,
             ValidateAudience = true,
@@ -96,7 +97,7 @@ app.MapPost("/login", async (User loginData, DBContext db) =>
             issuer: AuthOptions.ISSUER,
             audience: AuthOptions.AUDIENCE,
             claims: claims,
-            expires: DateTime.Now.AddHours(2), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+            expires: DateTime.Now.AddMinutes(1), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)) ; 
     var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
@@ -148,10 +149,10 @@ async (int id, DBContext db) =>
 
 
 // GET ALL USERS
-app.MapGet("/users", //[Authorize(Policy = "RequireAdminRole")]
+app.MapGet("/users", [Authorize(Policy = "RequireAdminRole")]
 async (DBContext db) =>
 {
-    var users = await db.Users.ToListAsync();
+    var users = await db.Users.Where(u => u.Email != "admin").ToListAsync();
     return Results.Ok(users);
 });
 
@@ -166,7 +167,7 @@ async (DBContext db) =>
 app.MapGet("/users/unbanned", [Authorize(Policy = "RequireAdminRole")]
     async (DBContext db) =>
     {
-    var users = await db.Users.Where(u => !u.IsBanned).ToListAsync();
+    var users = await db.Users.Where(u => !u.IsBanned && u.Email != "admin").ToListAsync();
     return Results.Ok(users);
 });
 

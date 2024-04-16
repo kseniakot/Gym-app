@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Gym.View;
 using System.Runtime.InteropServices;
-
+using Gym.Exceptions;
 
 namespace Gym.ViewModel;
 
@@ -28,7 +28,18 @@ public partial class UserListViewModel : ObservableObject
 
     private async Task InitializeAsync()
     {
+        try { 
         Users = new ObservableCollection<User>(await webService.GetUnbannedUsers());
+    } catch (SessionExpiredException)
+        {
+        await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+        await Shell.Current.GoToAsync("SignInView");
+        Application.Current.MainPage = new AppShell();
+    }
+    catch (Exception e)
+        {
+        await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+    }
     }
 
 
@@ -41,6 +52,12 @@ public partial class UserListViewModel : ObservableObject
             {
                 await webService.RemoveUser(SelectedUser.Id);
                 Users.Remove(SelectedUser);
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
             }
             catch (Exception e)
             {
@@ -68,19 +85,33 @@ public partial class UserListViewModel : ObservableObject
     [RelayCommand]
     private async Task BunUserAsync()
     {
-        try
+        if (SelectedUser == null)
         {
-            webService.BanUser(SelectedUser.Id);
-            Users.Remove(SelectedUser);
-            await Shell.Current.DisplayAlert("SUCCESS", "The user was banned successfully", "OK");
+            await Shell.Current.DisplayAlert("No user selected", "Please select and try again.", "Ok");
+            return;
         }
-        catch (Exception e)
+        else
         {
-            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
-        }
-        finally
-        {
-            SelectedUser = null;
+            try
+            {
+                webService.BanUser(SelectedUser.Id);
+                Users.Remove(SelectedUser);
+                await Shell.Current.DisplayAlert("SUCCESS", "The user was banned successfully", "OK");
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
+            finally
+            {
+                SelectedUser = null;
+            }
         }
         
     }
@@ -97,11 +128,36 @@ public partial class UserListViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            Users = new ObservableCollection<User>(await webService.GetUnbannedUsers());
+            try
+            {
+                Users = new ObservableCollection<User>(await webService.GetUnbannedUsers());
+            } catch (SessionExpiredException)
+            {
+                   await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
         else
         {
-            Users = new ObservableCollection<User>((await webService.GetUnbannedUsers()).Where(user => user.Name.Contains(SearchText)));
+            try
+            {
+                Users = new ObservableCollection<User>((await webService.GetUnbannedUsers()).Where(user => user.Name.Contains(SearchText)));
+            }
+            catch (SessionExpiredException)
+            {
+                await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                await Shell.Current.GoToAsync("SignInView");
+                Application.Current.MainPage = new AppShell();
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
     }
 

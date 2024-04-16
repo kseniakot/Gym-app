@@ -10,7 +10,7 @@ using Gym.Model;
 using System.IdentityModel.Tokens.Jwt;
 using System.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
-
+using Gym.Exceptions;
 
 namespace Gym.Services
 {
@@ -79,7 +79,11 @@ namespace Gym.Services
         public async Task RemoveUser(int id)
         {
             HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/users/{id}");
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
             {
                 throw new Exception("Something went wrong");
             }
@@ -90,8 +94,11 @@ namespace Gym.Services
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync("https://localhost:7062/users", content);
-
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
             {
                 throw new Exception("Something went wrong");
             }
@@ -101,7 +108,11 @@ namespace Gym.Services
         public async Task BanUser(int id)
         {
             HttpResponseMessage response = await client.PutAsync($"https://localhost:7062/users/ban/{id}", null);
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
             {
                 throw new Exception("Something went wrong");
             }
@@ -118,6 +129,10 @@ namespace Gym.Services
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 return JsonSerializer.Deserialize<List<User>>(content, options);
 
+            } 
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
             }
             else
             {
@@ -137,6 +152,10 @@ namespace Gym.Services
                 return JsonSerializer.Deserialize<List<User>>(content, options);
 
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
             else
             {
                 throw new Exception("Something went wrong");
@@ -154,6 +173,10 @@ namespace Gym.Services
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                  return JsonSerializer.Deserialize<List<User>>(content, options);
                 
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
             }
             else
             {

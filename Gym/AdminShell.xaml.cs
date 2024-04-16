@@ -6,7 +6,7 @@ public partial class AdminShell : Shell
 	public AdminShell()
 	{
         InitializeComponent();
-        Routing.RegisterRoute("SignInPage", typeof(SignInView));
+        Routing.RegisterRoute("SignInView", typeof(SignInView));
       //  Routing.RegisterRoute("SignUpPage", typeof(SignUpView));
         Routing.RegisterRoute("AddUserView", typeof(AddUserView));
         Routing.RegisterRoute("BannedListView", typeof(BannedListView));
@@ -17,7 +17,7 @@ public partial class AdminShell : Shell
     private async void LogOutAdmin_Button(object sender, EventArgs e)
     {
         
-        await Shell.Current.GoToAsync("SignInPage");
+        await Shell.Current.GoToAsync("SignInView");
         Application.Current.MainPage = new AppShell();
 
     }
