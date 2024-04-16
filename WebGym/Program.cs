@@ -190,14 +190,26 @@ app.Map("/", (HttpContext context) =>
 });
 
 
-//ISUSEREXIST
+//IS USER EXIST
 app.MapGet("/users/exist/{email}",
     async (string email, DBContext db) =>
 {
     var isExist = await db.Users.AnyAsync(u => u.Email == email);
     return Results.Ok(isExist);
-}
-);
+});
+
+
+//GET ALL MEMBERSHIPS
+
+app.MapGet("/memberships",
+    async (DBContext db) =>
+    {
+        var memberships = await db.Memberships.ToListAsync();
+        return Results.Ok(memberships);
+    });
+
+
+
 
 app.Run();
 

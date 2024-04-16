@@ -200,6 +200,29 @@ namespace Gym.Services
             {
                 throw new Exception("Something went wrong");
             }
-        }   
+        } 
+        
+
+        //GET ALL MEMBERSHIPS
+        public async Task<List<Membership>> GetAllMemberships()
+        {
+            HttpResponseMessage response = await client.GetAsync("https://localhost:7062/memberships");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<Membership>>(content, options);
+
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
     }
 }

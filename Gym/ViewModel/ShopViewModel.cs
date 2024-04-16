@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using Gym.View;
 using Gym.Model;
 using Gym.Services;
+using Gym.Exceptions;
+using System.Runtime.CompilerServices;
 
 namespace Gym.ViewModel;
 
@@ -18,12 +20,30 @@ public partial class ShopViewModel : ObservableObject
     bool _isPickerVisible;
    
 
-    readonly DataBaseService _dbService;
-    public ShopViewModel(DataBaseService dbService)
+    readonly WebService webService;
+    public ShopViewModel(WebService webService)
     {
-        _dbService = dbService;
-        Memberships = new ObservableCollection<Membership>(dbService.GetAllMemberships());
-        SelectedMembership = Memberships.First();
+        this.webService = webService;
+       InitializeAsync();
+        if (Memberships != null && Memberships.Count > 0) SelectedMembership = Memberships.First();
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
     }
 
     [RelayCommand]
