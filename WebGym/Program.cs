@@ -121,7 +121,7 @@ async (int id, DBContext db) =>
 });
 
 
-// ADD USER BY ID
+// ADD USER 
 app.MapPost("/users", [Authorize(Policy = "RequireAdminRole")]
 async (User user, DBContext db) =>
 {
@@ -133,7 +133,7 @@ async (User user, DBContext db) =>
 
 
 //BAN USER BY ID
-app.MapPut("/users/{id:int}/ban", [Authorize(Policy = "RequireAdminRole")]
+app.MapPut("/users/ban/{id:int}", [Authorize(Policy = "RequireAdminRole")]
 async (int id, DBContext db) =>
 {
    
@@ -148,10 +148,25 @@ async (int id, DBContext db) =>
 
 
 // GET ALL USERS
-app.MapGet("/users", [Authorize(Policy = "RequireAdminRole")]
+app.MapGet("/users", //[Authorize(Policy = "RequireAdminRole")]
 async (DBContext db) =>
 {
     var users = await db.Users.ToListAsync();
+    return Results.Ok(users);
+});
+
+app.MapGet("/users/banned", [Authorize(Policy = "RequireAdminRole")]
+async (DBContext db) =>
+{
+    var users = await db.Users.Where(u => u.IsBanned).ToListAsync();
+    return Results.Ok(users);
+});
+
+
+app.MapGet("/users/unbanned", [Authorize(Policy = "RequireAdminRole")]
+    async (DBContext db) =>
+    {
+    var users = await db.Users.Where(u => !u.IsBanned).ToListAsync();
     return Results.Ok(users);
 });
 

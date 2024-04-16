@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using Gym.View;
 using System.Runtime.InteropServices;
 
+
 namespace Gym.ViewModel;
 
 public partial class UserListViewModel : ObservableObject
@@ -18,25 +19,41 @@ public partial class UserListViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText;
 
-    readonly DataBaseService _dbService;
-    public UserListViewModel(DataBaseService dbService)
+    readonly WebService webService;
+    public UserListViewModel(WebService webService)
     {
-        _dbService = dbService;
-        Users = new ObservableCollection<User>(dbService.GetUnbannedUsers());
+        this.webService = webService;
+        InitializeAsync();
     }
+
+    private async Task InitializeAsync()
+    {
+        Users = new ObservableCollection<User>(await webService.GetUnbannedUsers());
+    }
+
+
     [RelayCommand]
     private async Task RemoveUserAsync()
     {
         if (SelectedUser != null)
         {
-            //  await DatabaseService<User>.RemoveColumnAsync(SelectedUser.Id);
-            _dbService.DeleteUser(SelectedUser);
-            Users.Remove(SelectedUser);
+            try
+            {
+                await webService.RemoveUser(SelectedUser.Id);
+                Users.Remove(SelectedUser);
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
 
-            SelectedUser = null;
+            }
+            finally
+            {
+                SelectedUser = null;
+            }
         }
         else
-        {
+            {
             await Shell.Current.DisplayAlert("No user selected", "Please select and try again.", "Ok");
         }
     }
@@ -49,29 +66,42 @@ public partial class UserListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task BunUser()
+    private async Task BunUserAsync()
     {
-            _dbService.BanUser(SelectedUser);
-        Users.Remove(SelectedUser);
+        try
+        {
+            webService.BanUser(SelectedUser.Id);
+            Users.Remove(SelectedUser);
             await Shell.Current.DisplayAlert("SUCCESS", "The user was banned successfully", "OK");
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+        finally
+        {
+            SelectedUser = null;
+        }
         
     }
+
+
     [RelayCommand]
-    private void LoadData()
+    private async Task LoadData()
     {
-        Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers());
+        await InitializeAsync();
     }
 
     [RelayCommand]
-    private void SearchUser()
+    private async Task SearchUserAsync()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers());
+            Users = new ObservableCollection<User>(await webService.GetUnbannedUsers());
         }
         else
         {
-            Users = new ObservableCollection<User>(_dbService.GetUnbannedUsers().Where(user => user.Name.Contains(SearchText)));
+            Users = new ObservableCollection<User>((await webService.GetUnbannedUsers()).Where(user => user.Name.Contains(SearchText)));
         }
     }
 
