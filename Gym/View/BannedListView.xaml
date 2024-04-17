@@ -4,7 +4,7 @@
              x:Class="Gym.View.BannedListView"
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
              x:DataType="viewmodel:BannedListViewModel"
-             xmlns:model="clr-namespace:Gym.Model"
+              xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
              xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              Title="BLACKLIST">
 

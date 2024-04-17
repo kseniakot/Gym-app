@@ -72,8 +72,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="ModelLibrary">
+	    <HintPath>..\ModelLibrary\obj\Debug\net8.0\ModelLibrary.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="AdminShell.xaml.cs">
 	    <DependentUpon>AdminShell.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
 	  </Compile>
 	  <Compile Update="UserShell.xaml.cs">
 	    <DependentUpon>UserShell.xaml</DependentUpon>
@@ -81,6 +92,13 @@
 	  <Compile Update="View\MembershipListView.xaml.cs">
 	    <DependentUpon>MembershipListView.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
