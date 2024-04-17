@@ -209,8 +209,8 @@ app.MapGet("/memberships",
     });
 
 //DELETE MEMBERSHIP BY ID
-app.MapDelete("/memberships/{id:int}",
-       async (int id, DBContext db) =>
+app.MapDelete("/memberships/{id:int}", [Authorize(Policy = "RequireAdminRole")]
+async (int id, DBContext db) =>
        {
         var membership = await db.Memberships.FirstOrDefaultAsync(m => m.Id == id);
         if (membership == null) return Results.NotFound(new { message = "No such membership" });
@@ -218,6 +218,48 @@ app.MapDelete("/memberships/{id:int}",
         db.Memberships.Remove(membership);
         await db.SaveChangesAsync();
         return Results.NoContent();
+    });
+
+//GET MEMBERSHIP BY ID
+app.MapGet("/memberships/{id:int}",
+       async (int id, DBContext db) =>
+       {
+        var membership = await db.Memberships.FirstOrDefaultAsync(m => m.Id == id);
+        if (membership == null) return Results.NotFound(new { message = "No such membership" });
+
+        return Results.Ok(membership);
+    });
+
+//DOES MEMBERSHIP EXIST
+app.MapPost("/memberships/exist", [Authorize(Policy = "RequireAdminRole")]
+async (Membership membership, DBContext db) =>
+          {
+        var isExist = await db.Memberships.AnyAsync(m => m.Name == membership.Name && m.Price == membership.Price && m.Months == membership.Months);
+        return Results.Ok(isExist);
+    });
+
+
+//ADD MEMBERSHIP
+app.MapPost("/memberships", [Authorize(Policy = "RequireAdminRole")]
+async (Membership membership, DBContext db) =>
+       {
+        await db.Memberships.AddAsync(membership);
+        await db.SaveChangesAsync();
+        return Results.Created($"/api/memberships/{membership.Id}", membership);
+    });
+
+//EDIT MEMBERSHIP
+app.MapPut("/memberships", [Authorize(Policy = "RequireAdminRole")]
+async (Membership membership, DBContext db) =>
+          {
+        var membershipInDb = await db.Memberships.FirstOrDefaultAsync(m => m.Id == membership.Id);
+        if (membershipInDb == null) return Results.NotFound(new { message = "No such membership" });
+
+        membershipInDb.Name = membership.Name;
+        membershipInDb.Price = membership.Price;
+        membershipInDb.Months = membership.Months;
+        await db.SaveChangesAsync();
+        return Results.Ok(membershipInDb);
     });
 
 

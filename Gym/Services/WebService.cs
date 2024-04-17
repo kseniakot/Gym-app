@@ -239,5 +239,68 @@ namespace Gym.Services
                 throw new Exception("Something went wrong");
             }
         }
+
+        //GET MEMBERSHIP BY ID
+        public async Task<Membership> GetMembershipById(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://localhost:7062/memberships/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<Membership>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //DOES MEMBERSHIP EXIST
+        public async Task<bool> DoesMembershipExistAsync(Membership membership)
+        {
+
+            HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync($"https://localhost:7062/memberships/exist", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //EDIT MEMBERSHIP
+        public async Task EditMembership(Membership membership)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"https://localhost:7062/memberships", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new Exception("Membership not found");
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Something went wrong");
+            }
+           
+        }
+
+
     }
 }
