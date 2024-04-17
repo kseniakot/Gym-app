@@ -301,6 +301,21 @@ namespace Gym.Services
            
         }
 
+        //ADD MEMBERSHIP
+        public async Task AddMembership(Membership membership)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync("https://localhost:7062/memberships", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
 
     }
 }
