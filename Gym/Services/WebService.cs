@@ -16,11 +16,12 @@ namespace Gym.Services
 {
     public class WebService
     {
-        HttpClient client = new HttpClient();
+        HttpClient client;
         private readonly TokenService tokenService;
       
-        public WebService(TokenService tokenService)
+        public WebService(TokenService tokenService, HttpClient client)
         {
+            this.client = client;
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             this.tokenService = tokenService;
         }

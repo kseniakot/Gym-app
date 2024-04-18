@@ -22,6 +22,7 @@ namespace Gym
           //  builder.Services.AddSingleton<DataBaseService>();
 
            
+            builder.Services.AddSingleton<HttpClient>();
             builder.Services.AddSingleton<TokenService>();
 
             builder.Services.AddSingleton<WebService>();
