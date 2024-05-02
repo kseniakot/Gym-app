@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Gym.Exceptions;
+using System.Net;
 
 namespace Gym.Services
 {
@@ -21,7 +22,11 @@ namespace Gym.Services
       
         public WebService(TokenService tokenService, HttpClient client)
         {
+
             this.client = client;
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            this.client = new HttpClient(handler);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             this.tokenService = tokenService;
         }
@@ -30,7 +35,8 @@ namespace Gym.Services
         public async Task LogIn(User user)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://localhost:7062/login", content);
+           // HttpResponseMessage response = await client.PostAsync("https://localhost:7062/login", content);
+             HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/login", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -79,7 +85,8 @@ namespace Gym.Services
 
         public async Task RemoveUser(int id)
         {
-            HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/users/{id}");
+            // HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/users/{id}");
+            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/users/{id}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -94,7 +101,7 @@ namespace Gym.Services
         public async Task AddUserAsync(User user)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://localhost:7062/users", content);
+            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/users", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -108,7 +115,7 @@ namespace Gym.Services
         //BAN USER
         public async Task BanUser(int id)
         {
-            HttpResponseMessage response = await client.PutAsync($"https://localhost:7062/users/ban/{id}", null);
+            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/users/ban/{id}", null);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -122,7 +129,7 @@ namespace Gym.Services
         //GET ALL USERS
         public async Task<List<User>> GetUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://localhost:7062/users");
+            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -144,7 +151,7 @@ namespace Gym.Services
         //GET BANNED USERS
         public async Task<List<User>> GetBannedUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://localhost:7062/users/banned");
+            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users/banned");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -166,7 +173,7 @@ namespace Gym.Services
         //GET UNBANNED USERS
         public async Task<List<User>> GetUnbannedUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://localhost:7062/users/unbanned");
+            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users/unbanned");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -188,7 +195,7 @@ namespace Gym.Services
         //ISUSEREXIST
         public async Task<bool> IsUserExistAsync(string email)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://localhost:7062/users/exist/{email}");
+            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/users/exist/{email}");
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -207,7 +214,7 @@ namespace Gym.Services
         //GET ALL MEMBERSHIPS
         public async Task<List<Membership>> GetAllMemberships()
         {
-            HttpResponseMessage response = await client.GetAsync("https://localhost:7062/memberships");
+            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/memberships");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -230,7 +237,7 @@ namespace Gym.Services
         //DELETE MEMBERSHIP
         public async Task DeleteMembership(Membership membership)
         {
-            HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/memberships/{membership.Id}");
+            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/memberships/{membership.Id}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -244,7 +251,7 @@ namespace Gym.Services
         //GET MEMBERSHIP BY ID
         public async Task<Membership> GetMembershipById(int id)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://localhost:7062/memberships/{id}");
+            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -266,7 +273,7 @@ namespace Gym.Services
         {
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"https://localhost:7062/memberships/exist", content);
+            HttpResponseMessage response = await client.PostAsync($"https://192.168.56.1:7062/memberships/exist", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -286,7 +293,7 @@ namespace Gym.Services
         public async Task EditMembership(Membership membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync($"https://localhost:7062/memberships", content);
+            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/memberships", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -306,7 +313,7 @@ namespace Gym.Services
         public async Task AddMembership(Membership membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://localhost:7062/memberships", content);
+            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/memberships", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
