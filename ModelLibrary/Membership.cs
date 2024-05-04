@@ -10,11 +10,10 @@ namespace Gym.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
         public int? Months { get; set; }
         public decimal? Price { get; set; }
-        public bool IsActive { get; set; }
+
+        public List<MembershipInstance> MembershipInstances { get; set; } = new List<MembershipInstance>();
     }
 }

@@ -38,7 +38,37 @@
                     </ListView.ItemTemplate>
                 </ListView>
          </VerticalStackLayout>
-            
+
+            <VerticalStackLayout>
+                <Button Text="FREEZES" FontSize="Subtitle" BackgroundColor="Grey" TextColor="White"
+            Command="{Binding TogglePickerCommand}" />
+
+                <ListView IsVisible="{Binding IsPickerVisible}"
+             ItemsSource="{Binding Freezes}"
+             SelectedItem="{Binding SelectedFreeze}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:Freeze}">
+                            <ViewCell>
+                                <StackLayout>
+
+
+                                    <StackLayout Orientation="Vertical">
+
+                                        <Label Text="{Binding Name}" FontSize="Large"/>
+                                        <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
+
+                                    </StackLayout>
+
+                                    <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </VerticalStackLayout>
+
+
+
             <!--<Frame HeightRequest="130" BorderColor="DarkGoldenrod">
             <Picker Title="FREEZINGS" TextColor="AliceBlue" FontSize="Medium" BackgroundColor="Grey" 
                     ItemsSource="{Binding Memberships}"

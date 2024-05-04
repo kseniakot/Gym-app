@@ -324,6 +324,28 @@ namespace Gym.Services
             }
         }
 
+        //GET ALL FREEZES
+        public async Task<List<Freeze>> GetAllFreezes()
+        {
+            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/freezes");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<Freeze>>(content, options);
+
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
 
     }
 }

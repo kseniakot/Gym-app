@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder();
 
 //Connect Database
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection));
+builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection, options => options.MigrationsAssembly("WebGym")));
 
 
 
@@ -206,6 +206,14 @@ app.MapGet("/memberships",
     {
         var memberships = await db.Memberships.ToListAsync();
         return Results.Ok(memberships);
+    });
+
+//GET ALL FREEZES
+app.MapGet("/freezes",
+       async (DBContext db) =>
+       {
+        var freezes = await db.Freezes.ToListAsync();
+        return Results.Ok(freezes);
     });
 
 //DELETE MEMBERSHIP BY ID

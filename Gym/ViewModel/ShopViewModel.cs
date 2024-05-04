@@ -13,8 +13,16 @@ public partial class ShopViewModel : ObservableObject
 {
     [ObservableProperty]
     private ObservableCollection<Membership> _memberships;
+
+    [ObservableProperty]
+    private ObservableCollection<Freeze> _freezes;
+
     [ObservableProperty]
     private Membership _selectedMembership;
+
+
+    [ObservableProperty]
+    private Freeze _selectedFreeze;
 
     [ObservableProperty]
     bool _isPickerVisible;
@@ -26,6 +34,8 @@ public partial class ShopViewModel : ObservableObject
         this.webService = webService;
        InitializeAsync();
         if (Memberships != null && Memberships.Count > 0) SelectedMembership = Memberships.First();
+        if (Freezes != null && Freezes.Count > 0) SelectedFreeze = Freezes.First();
+
     }
 
     private async Task InitializeAsync()
@@ -33,6 +43,7 @@ public partial class ShopViewModel : ObservableObject
         try
         {
             Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+            Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
         }
         catch (SessionExpiredException)
         {
