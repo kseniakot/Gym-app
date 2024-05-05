@@ -19,27 +19,31 @@ namespace Gym.Model
         public DbSet<MembershipInstance> MembershipInstances { get; set; } = null!;
         public DbSet<Freeze> Freezes { get; set; } = null!;
         public DbSet<FreezeInstance> FreezeInstances { get; set; } = null!;
+        public DbSet<UsedFreeze> UsedFreezes { get; set; } = null!;
 
         public DBContext(DbContextOptions<DBContext> options)
         : base(options)
         {
-            Database.EnsureCreated();   // создаем базу данных при первом обращении
+           // Database.EnsureCreated();   // создаем базу данных при первом обращении
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<MembershipInstance>()
-                 .HasOne(m => m.Member)
-                 .WithMany(m => m.UserMemberships)
-                 .HasForeignKey(m => m.MemberId);
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<MembershipInstance>()
+        //         .HasOne(m => m.Member)
+        //         .WithMany(m => m.UserMemberships)
+        //         .HasForeignKey(m => m.MemberId);
 
-            modelBuilder.Entity<MembershipInstance>()
-                .HasOne(m => m.Membership)
-                .WithMany(m => m.MembershipInstances)
-                .HasForeignKey(m => m.MembershipId);
+        //    modelBuilder.Entity<MembershipInstance>()
+        //        .HasOne(m => m.Membership)
+        //        .WithMany(m => m.MembershipInstances)
+        //        .HasForeignKey(m => m.MembershipId);
 
-         //   modelBuilder.Entity<User>().UseTphMappingStrategy();
-        }
+        //    modelBuilder.Entity<Freeze>()
+        //        .
+
+
+        //}
 
     }
 }

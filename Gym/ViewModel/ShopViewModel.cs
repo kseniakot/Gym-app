@@ -6,6 +6,8 @@ using Gym.Model;
 using Gym.Services;
 using Gym.Exceptions;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
+
 
 namespace Gym.ViewModel;
 
@@ -25,8 +27,11 @@ public partial class ShopViewModel : ObservableObject
     private Freeze _selectedFreeze;
 
     [ObservableProperty]
-    bool _isPickerVisible;
-   
+    bool _isMembershipPickerVisible;
+
+    [ObservableProperty]
+    bool _isFreezePickerVisible;
+
 
     readonly WebService webService;
     public ShopViewModel(WebService webService)
@@ -58,9 +63,30 @@ public partial class ShopViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void TogglePicker()
+    private void ToggleMembershipPicker()
     {
-        IsPickerVisible = !IsPickerVisible;
+        IsMembershipPickerVisible = !IsMembershipPickerVisible;
+       
     }
 
+    [RelayCommand]
+    private void ToggleFreezePicker()
+    {
+       
+        IsFreezePickerVisible = !IsFreezePickerVisible;
+    }
+
+
+
+    [RelayCommand]
+    private async Task ViewMembershipAsync()
+    {
+       if (SelectedMembership == null) return;
+        await Shell.Current.GoToAsync($"MembershipView?MembershipId={SelectedMembership.Id}");
+        Debug.WriteLine(SelectedMembership.Id);
+           // SelectedMembership = null;
+        
+       
+
+    }
 }

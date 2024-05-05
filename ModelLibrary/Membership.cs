@@ -14,6 +14,9 @@ namespace Gym.Model
         public int? Months { get; set; }
         public decimal? Price { get; set; }
 
+        public Freeze Freeze { get; set; } = null!;
+        public int? FreezeId { get; set; } 
+
         public List<MembershipInstance> MembershipInstances { get; set; } = new List<MembershipInstance>();
     }
 }

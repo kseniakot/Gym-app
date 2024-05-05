@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="ShopViewPage"
              x:Class="Gym.View.ShopView"
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
              x:DataType="viewmodel:ShopViewModel"
               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
              xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              Title="SHOP">
+
     <ScrollView>
         <VerticalStackLayout>
             <Label Text="SELECT SERVICE:" TextColor="DarkGoldenrod" FontSize="Medium"></Label>
            
                 <VerticalStackLayout>
                     <Button Text="MEMBERSHIPS" FontSize="Subtitle" BackgroundColor="Grey" TextColor="White"
-                     Command="{Binding TogglePickerCommand}" />
+                     Command="{Binding ToggleMembershipPickerCommand}" />
 
-                <ListView IsVisible="{Binding IsPickerVisible}"
+                <ListView IsVisible="{Binding IsMembershipPickerVisible}"
                       ItemsSource="{Binding Memberships}"
                       SelectedItem="{Binding SelectedMembership}">  
                     <ListView.ItemTemplate>
@@ -24,12 +26,15 @@
                                 <StackLayout>
                                    
 
-                                        <StackLayout Orientation="Vertical">
+                                        <VerticalStackLayout>
 
                                         <Label Text="{Binding Name}" FontSize="Large"/>
                                             <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
-
-                                        </StackLayout>
+                                        <VerticalStackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.ViewMembershipCommand, Source={x:Reference Name=ShopViewPage}}" 
+                                                     CommandParameter="{Binding .}" />
+                                        </VerticalStackLayout.GestureRecognizers>
+                                    </VerticalStackLayout>
                                    
                                     <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
                                 </StackLayout>
@@ -41,9 +46,9 @@
 
             <VerticalStackLayout>
                 <Button Text="FREEZES" FontSize="Subtitle" BackgroundColor="Grey" TextColor="White"
-            Command="{Binding TogglePickerCommand}" />
+            Command="{Binding ToggleFreezePickerCommand}" />
 
-                <ListView IsVisible="{Binding IsPickerVisible}"
+                <ListView IsVisible="{Binding IsFreezePickerVisible}"
              ItemsSource="{Binding Freezes}"
              SelectedItem="{Binding SelectedFreeze}">
                     <ListView.ItemTemplate>
@@ -52,12 +57,12 @@
                                 <StackLayout>
 
 
-                                    <StackLayout Orientation="Vertical">
+                                    <VerticalStackLayout>
 
                                         <Label Text="{Binding Name}" FontSize="Large"/>
                                         <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
 
-                                    </StackLayout>
+                                    </VerticalStackLayout>
 
                                     <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
                                 </StackLayout>

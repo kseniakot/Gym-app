@@ -11,6 +11,7 @@ namespace Gym.Model
         public int Id { get; set; }
         public string Name { get; set; }
         public int Days { get; set; }
+        public int MinDays { get; set; }
         public decimal Price { get; set; }
 
         public List<FreezeInstance> FreezeInstances { get; set; }
