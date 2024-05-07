@@ -35,16 +35,22 @@
                               Margin="100, 0, 100, 0">
 
                 <Border>
-                    <Entry Placeholder="Name"
+                    <Entry Placeholder="NAME"
                         Text="{Binding Membership.Name}" />
                 </Border>
                 <Border>
-                    <Entry Placeholder="Months"
+                    <Entry Placeholder="MONTH"
                         MaxLength="3"
                         Text="{Binding Membership.Months}" />
                 </Border>
                 <Border>
-                    <Entry Placeholder="Price"
+                    <Picker Title="FREEZE"
+                     ItemsSource="{Binding Freezes}"
+                     SelectedItem="{Binding SelectedFreeze}" 
+                     ItemDisplayBinding="{Binding Name}"/>
+                </Border>
+                <Border>
+                    <Entry Placeholder="PRICE"
                         MaxLength="10"
                         Text="{Binding Membership.Price}" />
                 </Border>

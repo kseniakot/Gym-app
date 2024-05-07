@@ -44,6 +44,12 @@
                         Text="{Binding Membership.Months}" />
                 </Border>
                 <Border>
+                    <Picker Title="FREEZE"
+                      ItemsSource="{Binding Freezes}"
+                      SelectedItem="{Binding SelectedFreeze,  Mode=TwoWay }" 
+                      ItemDisplayBinding="{Binding Name}"/>
+                </Border>
+                <Border>
                     <Entry Placeholder="Price"
                         MaxLength="10"
                         Text="{Binding Membership.Price}" />

@@ -69,12 +69,14 @@
                                 <ColumnDefinition Width="3*" />
                                 <ColumnDefinition Width="3*" />
                                 <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="3*"/>
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Column="0" Text="Id" FontSize="Medium" HorizontalOptions="Center" />
                             <Label Grid.Column="1" Text="Name" FontSize="Medium" HorizontalOptions="Center" />
                             <Label Grid.Column="2" Text="Months" FontSize="Medium" HorizontalOptions="Center" />
                             <Label Grid.Column="3" Text="Price" FontSize="Medium" HorizontalOptions="Center" />
+                            <Label Grid.Column="4" Text="Freeze" FontSize="Medium" HorizontalOptions="Center" />
                         </Grid>
                     </ListView.Header>
 
@@ -85,14 +87,16 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="3*" />
-                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="3*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Column="0" Text="{Binding Id}" FontSize="Medium" VerticalOptions="Center" />
-                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="Medium" VerticalOptions="Center" />
-                                    <Label Grid.Column="2" Text="{Binding Months}" FontSize="Medium" VerticalOptions="Center" />
-                                    <Label Grid.Column="3" Text="{Binding Price}" FontSize="Medium" VerticalOptions="Center" />
+                                    <Label Grid.Column="0" Text="{Binding Id}" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}"  FontSize="Medium" VerticalOptions="Center" HorizontalOptions="Start" />
+                                    <Label Grid.Column="2" Text="{Binding Months}"  FontSize="Medium" VerticalOptions="Center" HorizontalOptions="Start"/>
+                                    <Label Grid.Column="3" Text="{Binding Price}" FontSize="Medium" VerticalOptions="Center"  HorizontalOptions="Start"/>
+                                    <Label Grid.Column="4" Text="{Binding Freeze.Name}" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="End" />
                                 </Grid>
                             </ViewCell>
                         </DataTemplate>

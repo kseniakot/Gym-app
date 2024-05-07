@@ -4,20 +4,60 @@ using CommunityToolkit.Mvvm.Input;
 using Gym.Services;
 using System.Diagnostics;
 using Gym.Exceptions;
+using System.Collections.ObjectModel;
 namespace Gym.ViewModel;
 
 public partial class EditMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
     private Membership? _membership;
+    [ObservableProperty]
+    private ObservableCollection<Freeze> _freezes;
+    // [ObservableProperty]
+    private Freeze _selectedFreeze;
+
+    public Freeze SelectedFreeze
+    {
+        get { return _selectedFreeze; }
+        set
+        {
+            _selectedFreeze = value;
+            //Membership.Freeze = value;
+            Membership.FreezeId = value.Id;
+
+            //Debug.WriteLine(Membership.Freeze.Id);
+        }
+    }
 
     private int _membershipId;
     readonly WebService webService;
     public EditMembershipViewModel(WebService webService)
     {
        this.webService = webService;
-        
+        InitializeAsync();
+
     }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
+           
+            //Freezes.Insert(0, new Freeze { Id = 0, Name = "None" });
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
+
     public int MembershipId
     {
         get { return _membershipId; }

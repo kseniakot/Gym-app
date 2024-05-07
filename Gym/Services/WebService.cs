@@ -108,7 +108,7 @@ namespace Gym.Services
             }
             else if (!response.IsSuccessStatusCode)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception(response.StatusCode.ToString());
             }
         }
 
@@ -320,7 +320,7 @@ namespace Gym.Services
             }
             else if (!response.IsSuccessStatusCode)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception(response.StatusCode.ToString());
             }
         }
 

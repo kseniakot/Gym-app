@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Gym.Model
@@ -13,6 +14,8 @@ namespace Gym.Model
         public int Days { get; set; }
         public int MinDays { get; set; }
         public decimal Price { get; set; }
+        [JsonIgnore]
+        public List<Membership>? Memberships { get; set; }
 
         public List<FreezeInstance> FreezeInstances { get; set; }
     }

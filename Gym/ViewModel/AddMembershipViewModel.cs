@@ -3,16 +3,57 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Services;
 using Gym.Exceptions;
+///using Org.Apache.Http.Authentication;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 namespace Gym.ViewModel;
 
 public partial class AddMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
     private Membership _membership = new();
+    [ObservableProperty]
+
+    private ObservableCollection<Freeze> _freezes;
+    // [ObservableProperty]
+    private Freeze _selectedFreeze;
+
+    public Freeze SelectedFreeze
+    {
+        get { return _selectedFreeze; }
+        set
+        {
+            _selectedFreeze = value;
+            //Membership.Freeze = value;
+            Membership.FreezeId = value.Id;
+
+            //Debug.WriteLine(Membership.Freeze.Id);
+        }
+    }
     readonly WebService webService;
     public AddMembershipViewModel(WebService webService)
     {
         this.webService = webService;
+        InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
+            //Freezes.Insert(0, new Freeze { Id = 0, Name = "None" });
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
     }
 
     private static bool IsAnyNullOrEmpty(object membership)
@@ -40,9 +81,9 @@ public partial class AddMembershipViewModel : ObservableObject
             return false;
 
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            await Shell.Current.DisplayAlert("Something went wrong", "Please try again", "Ok");
+            await Shell.Current.DisplayAlert("Something went wrong",e.Message, "Ok");
             return false;
         }
     }
@@ -56,6 +97,7 @@ public partial class AddMembershipViewModel : ObservableObject
     [RelayCommand]
     private async Task AddAsync()
     {
+     
         if (IsAnyNullOrEmpty(Membership))
         {
             Membership = new();

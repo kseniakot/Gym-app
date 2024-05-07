@@ -19,7 +19,7 @@ namespace Gym.Model
         public DbSet<MembershipInstance> MembershipInstances { get; set; } = null!;
         public DbSet<Freeze> Freezes { get; set; } = null!;
         public DbSet<FreezeInstance> FreezeInstances { get; set; } = null!;
-        public DbSet<UsedFreeze> UsedFreezes { get; set; } = null!;
+        public DbSet<FreezeActive> ActiveFreezes { get; set; } = null!;
 
         public DBContext(DbContextOptions<DBContext> options)
         : base(options)

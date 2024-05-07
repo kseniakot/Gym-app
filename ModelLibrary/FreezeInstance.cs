@@ -13,10 +13,9 @@ namespace Gym.Model
         public Member Member { get; set; } = null!;
         public int FreezeId { get; set; }
         public Freeze Freeze { get; set; } = null!;
-        //public int MembershipInstanceId { get; set; }
-        //public MembershipInstance MembershipInstance { get; set; }
-        //public DateTime StartDate { get; set; }
-        //public DateTime EndDate { get; set; }
+        public int MembershipInstanceId { get; set; }
+        public MembershipInstance MembershipInstance { get; set; } = null!;
+
 
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebGym.Options;
 using System.Data;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder();
@@ -22,8 +23,7 @@ var builder = WebApplication.CreateBuilder();
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection, options => options.MigrationsAssembly("WebGym")));
 
-
-
+    
 
 //Add Authorization and Authentication
 builder.Services.AddAuthorization(options =>
@@ -204,7 +204,9 @@ app.MapGet("/users/exist/{email}",
 app.MapGet("/memberships",
     async (DBContext db) =>
     {
-        var memberships = await db.Memberships.ToListAsync();
+        var memberships = await db.Memberships
+        .Include(m => m.Freeze)
+        .ToListAsync();
         return Results.Ok(memberships);
     });
 
@@ -232,8 +234,10 @@ async (int id, DBContext db) =>
 app.MapGet("/memberships/{id:int}",
        async (int id, DBContext db) =>
        {
-        var membership = await db.Memberships.FirstOrDefaultAsync(m => m.Id == id);
-        if (membership == null) return Results.NotFound(new { message = "No such membership" });
+           var membership = await db.Memberships
+               .Include(m => m.Freeze) // Include the Freeze related to the Membership
+               .FirstOrDefaultAsync(m => m.Id == id);
+           if (membership == null) return Results.NotFound(new { message = "No such membership" });
 
         return Results.Ok(membership);
     });
@@ -242,7 +246,7 @@ app.MapGet("/memberships/{id:int}",
 app.MapPost("/memberships/exist", [Authorize(Policy = "RequireAdminRole")]
 async (Membership membership, DBContext db) =>
           {
-        var isExist = await db.Memberships.AnyAsync(m => m.Name == membership.Name && m.Price == membership.Price && m.Months == membership.Months);
+        var isExist = await db.Memberships.AnyAsync(m => m.Name == membership.Name && m.Price == membership.Price && m.Months == membership.Months && m.FreezeId == membership.FreezeId);
         return Results.Ok(isExist);
     });
 
@@ -266,9 +270,12 @@ async (Membership membership, DBContext db) =>
         membershipInDb.Name = membership.Name;
         membershipInDb.Price = membership.Price;
         membershipInDb.Months = membership.Months;
+        membershipInDb.FreezeId = membership.FreezeId;
         await db.SaveChangesAsync();
         return Results.Ok(membershipInDb);
     });
+
+
 
 
 app.Run();

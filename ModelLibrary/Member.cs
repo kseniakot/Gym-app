@@ -8,6 +8,7 @@ namespace Gym.Model
 {
     public class Member : User
     {
-        public List<MembershipInstance> UserMemberships { get; set; }
+        public List<MembershipInstance>? UserMemberships { get; set; }
+        public List<FreezeInstance>? UserFreezes { get; set;}
     }
 }
