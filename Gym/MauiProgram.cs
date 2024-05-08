@@ -57,6 +57,9 @@ namespace Gym
             builder.Services.AddTransient<MembershipViewModel>();
             builder.Services.AddTransient<MembershipView>();
 
+            builder.Services.AddTransient<BuyMembershipViewModel>();
+            builder.Services.AddTransient<BuyMembershipView>();
+
             builder.Services.AddTransient<UserMainViewModel>();
             builder.Services.AddTransient<UserMainPage>();
 

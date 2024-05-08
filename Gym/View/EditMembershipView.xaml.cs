@@ -31,8 +31,8 @@ public partial class EditMembershipView : ContentPage
         InitializeComponent();
         BindingContext = _editMembershipViewModel;
         
-        Debug.WriteLine("EditMembershipView");
-        Debug.WriteLine(MembershipId);
+        //Debug.WriteLine("EditMembershipView");
+        //Debug.WriteLine(MembershipId);
     }
 
 

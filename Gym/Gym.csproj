@@ -123,6 +123,9 @@
 	  <MauiXaml Update="View\BannedListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\BuyMembershipView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\EditMembershipView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

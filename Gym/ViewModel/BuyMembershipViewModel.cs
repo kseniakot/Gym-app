@@ -1,24 +1,19 @@
-using Gym.Model;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using Gym.Model;
 using Gym.Services;
-using System.Diagnostics;
 using Gym.Exceptions;
-//using Java.Util;
+using CommunityToolkit.Mvvm.Input;
+
 namespace Gym.ViewModel;
 
-public partial class MembershipViewModel : ObservableObject
+public partial class BuyMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
     private Membership? _membership;
-
+    [ObservableProperty]
+    private string _promoCode;
     private int _membershipId;
     readonly WebService webService;
-    public MembershipViewModel(WebService webService)
-    {
-        this.webService = webService;
-
-    }
 
     public int MembershipId
     {
@@ -26,13 +21,21 @@ public partial class MembershipViewModel : ObservableObject
         set
         {
             _membershipId = value;
-            Debug.WriteLine($"MembershipId set to {_membershipId}");
             OnPropertyChanged(nameof(MembershipId));
 
             // Load the Membership when the MembershipId is set
             LoadMembership();
         }
     }
+
+
+    public BuyMembershipViewModel(WebService webService)
+    {
+        this.webService = webService;
+
+    }
+
+
 
     private async Task LoadMembership()
     {
@@ -54,11 +57,8 @@ public partial class MembershipViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task PurchaseAsync()
+    private async Task CancelAsync()
     {
-            await Shell.Current.GoToAsync($"BuyMembershipView?MembershipId={Membership?.Id}");
-          
+        await Shell.Current.GoToAsync("//ShopView");
     }
-
-
 }

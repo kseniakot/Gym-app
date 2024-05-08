@@ -8,6 +8,7 @@ public partial class UserShell : Shell
         Routing.RegisterRoute("SignInView", typeof(SignInView));
         Routing.RegisterRoute("ShopView", typeof(ShopView));
         Routing.RegisterRoute("MembershipView", typeof(MembershipView));
+        Routing.RegisterRoute("BuyMembershipView", typeof(BuyMembershipView));
         InitializeComponent();
     }
 
