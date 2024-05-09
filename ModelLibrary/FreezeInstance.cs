@@ -9,8 +9,8 @@ namespace Gym.Model
     public class FreezeInstance
     {
         public int Id { get; set; }
-        public int MemberId { get; set; }
-        public Member Member { get; set; } = null!;
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
         public int FreezeId { get; set; }
         public Freeze Freeze { get; set; } = null!;
         public int MembershipInstanceId { get; set; }

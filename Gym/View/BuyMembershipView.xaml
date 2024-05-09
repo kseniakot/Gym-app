@@ -33,7 +33,7 @@
         <Label Text="Payment by card" FontSize="Body" TextColor="Black"></Label>
         <Label Text="The purchase will be paid in full by card" FontSize="Small" TextColor="Grey"/>
         <Label Text="{Binding Membership.Price, StringFormat='Pay by card: {0} Br'}" FontSize="Small" TextColor="LightGray" />
-        <Button Text="PAY"></Button>
+        <Button Text="PAY" Command="{Binding PayCommand}"></Button>
     </VerticalStackLayout>
 
    

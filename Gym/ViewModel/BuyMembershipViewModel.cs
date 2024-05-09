@@ -61,4 +61,25 @@ public partial class BuyMembershipViewModel : ObservableObject
     {
         await Shell.Current.GoToAsync("//ShopView");
     }
+
+
+    [RelayCommand]
+    private async Task PayAsync()
+    {
+        try
+        {
+            await webService.BuyMembership(Membership);
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
+
 }

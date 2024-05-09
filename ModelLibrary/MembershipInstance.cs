@@ -11,13 +11,13 @@ namespace Gym.Model
         public int Id { get; set; }
         public int MembershipId { get; set; }
         public Membership Membership { get; set; } = null!;
-        public int MemberId { get; set; }
-        public Member Member { get; set; } = null!;
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
 
-        public DateTime? PurchaseDate { get; set; }
+        public DateTime? PurchaseDate { get; set; } = DateTime.Now.ToUniversalTime();
         public DateTime? StartDate { get; set; }
 
-        public FreezeActive ActiveFreeze { get; set; }
-        public bool IsActive { get; set; }
+        public FreezeActive? ActiveFreeze { get; set; }
+        public bool IsActive { get; set; } = false;
     }
 }

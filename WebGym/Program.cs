@@ -80,7 +80,11 @@ app.MapPost("/login", async (User loginData, DBContext db) =>
     var claims = new List<Claim>()
     {
         new Claim(ClaimTypes.NameIdentifier, person.Id.ToString()),
-        new Claim(ClaimTypes.Email, person.Email)
+        new Claim(ClaimTypes.Email, person.Email),
+        new Claim(ClaimTypes.Name, person.Name),
+        new Claim(ClaimTypes.MobilePhone, person.PhoneNumber),
+        new Claim("IsBanned", person.IsBanned.ToString()),
+        new Claim("Password", person.Password)
     };
 
     if (person.Email == "admin")
@@ -147,6 +151,17 @@ async (int id, DBContext db) =>
     return Results.Ok(user);
 });
 
+// BUY MEMBERSHIP
+app.MapPut("/memberships/buy", 
+    async (User user, DBContext dbContext) =>
+{
+    dbContext.Users.Update(user);
+    await dbContext.SaveChangesAsync();
+
+   
+    return Results.Ok();
+});
+
 
 // GET ALL USERS
 app.MapGet("/users", [Authorize(Policy = "RequireAdminRole")]
@@ -197,6 +212,14 @@ app.MapGet("/users/exist/{email}",
     var isExist = await db.Users.AnyAsync(u => u.Email == email);
     return Results.Ok(isExist);
 });
+
+//IS USER A MEMBER
+app.MapGet("/users/member/{email}",
+       async (string email, DBContext db) =>
+       {
+        var isMember = await db.Members.AnyAsync(u => u.Email == email);
+        return Results.Ok(isMember);
+    });
 
 
 //GET ALL MEMBERSHIPS

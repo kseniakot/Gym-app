@@ -3,6 +3,7 @@ using System;
 using Gym.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebGym.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240508171450_Migration3")]
+    partial class Migration3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,19 +90,19 @@ namespace WebGym.Migrations
                     b.Property<int>("FreezeId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("MembershipInstanceId")
+                    b.Property<int>("MemberId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("MembershipInstanceId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FreezeId");
 
-                    b.HasIndex("MembershipInstanceId");
+                    b.HasIndex("MemberId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("MembershipInstanceId");
 
                     b.ToTable("FreezeInstances");
                 });
@@ -143,6 +146,9 @@ namespace WebGym.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("MemberId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("MembershipId")
                         .HasColumnType("integer");
 
@@ -152,14 +158,11 @@ namespace WebGym.Migrations
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("MembershipId");
+                    b.HasIndex("MemberId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("MembershipId");
 
                     b.ToTable("MembershipInstances");
                 });
@@ -231,23 +234,23 @@ namespace WebGym.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Gym.Model.Member", "Member")
+                        .WithMany("UserFreezes")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Gym.Model.MembershipInstance", "MembershipInstance")
                         .WithMany()
                         .HasForeignKey("MembershipInstanceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Gym.Model.User", "User")
-                        .WithMany("UserFreezes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Freeze");
 
-                    b.Navigation("MembershipInstance");
+                    b.Navigation("Member");
 
-                    b.Navigation("User");
+                    b.Navigation("MembershipInstance");
                 });
 
             modelBuilder.Entity("Gym.Model.Membership", b =>
@@ -261,21 +264,21 @@ namespace WebGym.Migrations
 
             modelBuilder.Entity("Gym.Model.MembershipInstance", b =>
                 {
+                    b.HasOne("Gym.Model.Member", "Member")
+                        .WithMany("UserMemberships")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Gym.Model.Membership", "Membership")
                         .WithMany("MembershipInstances")
                         .HasForeignKey("MembershipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Gym.Model.User", "User")
-                        .WithMany("UserMemberships")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Member");
 
                     b.Navigation("Membership");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Gym.Model.Freeze", b =>
@@ -295,7 +298,7 @@ namespace WebGym.Migrations
                     b.Navigation("ActiveFreeze");
                 });
 
-            modelBuilder.Entity("Gym.Model.User", b =>
+            modelBuilder.Entity("Gym.Model.Member", b =>
                 {
                     b.Navigation("UserFreezes");
 

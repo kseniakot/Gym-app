@@ -75,8 +75,16 @@ namespace Gym.Services
             var user = new User()
             {
                 Email = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Email).Value,
-                Id = int.Parse(tokenS.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value)
+                Id = int.Parse(tokenS.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value),
+                Password = tokenS.Claims.First(claim => claim.Type == "Password").Value,
+                Name = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Name).Value,
+                PhoneNumber = tokenS.Claims.First(claim => claim.Type == ClaimTypes.MobilePhone).Value,
+                IsBanned = bool.Parse(tokenS.Claims.First(claim => claim.Type == "IsBanned").Value),
+                UserMemberships = new List<MembershipInstance>(),
+                UserFreezes = new List<FreezeInstance>()
+               
             };
+            Debug.WriteLine("User from token: " + user.Email);
 
             return user;
         }
@@ -248,6 +256,8 @@ namespace Gym.Services
             }
         }
 
+  
+
         //GET MEMBERSHIP BY ID
         public async Task<Membership> GetMembershipById(int id)
         {
@@ -321,6 +331,33 @@ namespace Gym.Services
             else if (!response.IsSuccessStatusCode)
             {
                 throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        //BUY MEMBERSHIP
+        public async Task BuyMembership(Membership membership)
+        {
+           // Debug.WriteLine("Buying membership");
+            var user = await GetUserFromToken();
+
+
+
+            var membershipInstance = new MembershipInstance
+            {
+                MembershipId = membership.Id,
+                UserId = user.Id,
+            };
+
+            user?.UserMemberships?.Add(membershipInstance);
+
+            HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync("https://192.168.56.1:7062/memberships/buy", content);
+
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Debug.WriteLine(response.StatusCode);
+                throw new Exception("Failed to buy membership");
             }
         }
 
