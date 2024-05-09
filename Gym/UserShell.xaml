@@ -31,6 +31,15 @@
         </Tab>
     </FlyoutItem>
 
+    <FlyoutItem Title="PROFILE">
+        <Tab>
+            <ShellContent
+      Title="SHOP"
+      ContentTemplate="{DataTemplate view:ProfileView}"
+      Route="ProfileView" />
+        </Tab>
+    </FlyoutItem>
+
 
 
 </Shell>

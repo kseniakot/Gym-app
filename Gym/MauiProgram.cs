@@ -3,6 +3,7 @@ using Gym.Services;
 using Gym.ViewModel;
 using Gym.View;
 using Gym.Model;
+using Syncfusion.Maui.Core.Hosting;
 
 namespace Gym
 {
@@ -13,6 +14,7 @@ namespace Gym
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .ConfigureSyncfusionCore()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -62,6 +64,9 @@ namespace Gym
 
             builder.Services.AddTransient<UserMainViewModel>();
             builder.Services.AddTransient<UserMainPage>();
+
+            builder.Services.AddTransient<ProfileViewModel>();
+            builder.Services.AddTransient<ProfileView>();
 
 #if DEBUG
             builder.Logging.AddDebug();

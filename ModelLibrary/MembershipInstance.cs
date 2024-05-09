@@ -14,7 +14,7 @@ namespace Gym.Model
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
-        public DateTime? PurchaseDate { get; set; } = DateTime.Now.ToUniversalTime();
+        public DateTime? PurchaseDate { get; set; } = DateTime.Today.ToUniversalTime();
         public DateTime? StartDate { get; set; }
 
         public FreezeActive? ActiveFreeze { get; set; }

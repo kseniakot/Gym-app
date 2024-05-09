@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:ProfileViewModel"   
+             xmlns:avatarview="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             x:Class="Gym.View.ProfileView"
+             Title="PROFILE">
+   
+    <ContentPage.Content>
+        
+        <Grid HorizontalOptions="Center" VerticalOptions="Center" RowSpacing="30">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+           
+            <avatarview:SfAvatarView 
+		    ContentType="Custom"
+		    ImageSource="{Binding MyImageSource}"
+		    VerticalOptions="Center"
+		    HorizontalOptions="Center"   
+		    HeightRequest="100"
+		    WidthRequest="100"
+		    CornerRadius="50" />
+
+            <Button Grid.Row="2"
+                    Text="Select Image"
+                    Command="{Binding SelectImageCommand}" />
+
+            <Grid Grid.Row="1" ColumnSpacing="30" RowSpacing="15" >
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--<Image  Source="user.png" HeightRequest="25" VerticalOptions="Center"/>
+                <Image Grid.Row="1" Source="call.png" HeightRequest="22" VerticalOptions="Center"/>
+                <Image Grid.Row="2" Source="mail.png" HeightRequest="20"  VerticalOptions="Center" />-->
+
+                <Label VerticalOptions="Start" Grid.Column="1" Text="Name" TextColor="Gray" FontSize="12"/>
+                <Label VerticalOptions="End" Grid.Column="1" Text="Scarlett Jhonsan" FontAttributes="Bold"/>
+                <Label VerticalOptions="Start"  Grid.Row="1" Grid.Column="1" Text="Phone" TextColor="Gray" FontSize="12"/>
+                <Label VerticalOptions="End" Grid.Row="1" Grid.Column="1" Text="+44 5674 4432" FontAttributes="Bold"/>
+                <Label VerticalOptions="Start" Grid.Row="2" Grid.Column="1" Text="Mail" TextColor="Gray" FontSize="12"/>
+                <Label VerticalOptions="End" Grid.Row="2" Grid.Column="1" Text="scarlettjhonsan99@gmail.com" FontAttributes="Bold"/>
+
+            </Grid>
+        </Grid>
+        </ContentPage.Content>
+</ContentPage>

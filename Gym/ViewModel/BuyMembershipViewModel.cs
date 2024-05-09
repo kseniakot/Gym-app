@@ -69,6 +69,7 @@ public partial class BuyMembershipViewModel : ObservableObject
         try
         {
             await webService.BuyMembership(Membership);
+            await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
         }
         catch (SessionExpiredException)
         {
