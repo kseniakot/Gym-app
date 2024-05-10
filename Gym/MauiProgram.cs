@@ -68,6 +68,12 @@ namespace Gym
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<ProfileView>();
 
+            builder.Services.AddTransient<ActivateMembershipViewModel>();
+            builder.Services.AddTransient<ActivateMembershipView>();
+
+            builder.Services.AddTransient<FreezeMembershipViewModel>();
+            builder.Services.AddTransient<FreezeMembershipView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

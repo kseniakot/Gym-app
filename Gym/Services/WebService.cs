@@ -27,6 +27,7 @@ namespace Gym.Services
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
             this.client = new HttpClient(handler);
+
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             this.tokenService = tokenService;
         }
@@ -84,7 +85,7 @@ namespace Gym.Services
                 UserFreezes = new List<FreezeInstance>()
                
             };
-            Debug.WriteLine("User from token: " + user.Email);
+            //Debug.WriteLine("User from token: " + user.Email);
 
             return user;
         }
@@ -241,6 +242,88 @@ namespace Gym.Services
             }
         }
 
+        //GET ACTIVE MEMBERSHIPS BY USER ID
+        public async Task<List<MembershipInstance>> GetActiveMembershipsByUserId(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/active/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<MembershipInstance>>(content, options);
+
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //GET NOT ACTIVE MEMBERSHIPS BY USER ID
+        public async Task<List<MembershipInstance>> GetNotActiveMembershipsByUserId(int id)
+        {
+            {
+                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/notactive/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    return JsonSerializer.Deserialize<List<MembershipInstance>>(content, options);
+
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    throw new SessionExpiredException();
+                }
+                else
+                {
+                    throw new Exception("Something went wrong");
+                }
+            }
+        }
+        // DOES ACTIVE MEMBERSHIP EXIST BY USER ID
+        public async Task<bool> DoesActiveMembershipExist(int userId)
+        {
+           
+                
+                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/user/memberships/exist/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return bool.Parse(await response.Content.ReadAsStringAsync());
+                }
+                else
+                {
+                    throw new Exception($"Failed to check if active membership exists. Status code: {response.StatusCode}");
+                }
+            
+        }
+
+        // ACTIVATE MEMBERSHIP
+        public async Task<MembershipInstance> ActivateMembershipInstance(int id)
+        {
+            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/membershipinstances/activate/{id}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<MembershipInstance>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
 
         //DELETE MEMBERSHIP
         public async Task DeleteMembership(Membership membership)
@@ -267,6 +350,27 @@ namespace Gym.Services
                 string content = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 return JsonSerializer.Deserialize<Membership>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //GET MEMBERSHIP INSTANCE BY ID
+
+        public async Task<MembershipInstance> GetMembershipInstanceById(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/membershipinstances/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<MembershipInstance>(content, options);
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

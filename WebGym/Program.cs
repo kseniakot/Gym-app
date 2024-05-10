@@ -233,6 +233,29 @@ app.MapGet("/memberships",
         return Results.Ok(memberships);
     });
 
+//GET USER ACTIVE MEMBERSHIPS
+app.MapGet("/memberships/active/{id:int}",
+       async (int id, DBContext db) =>
+       {
+           var today = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+           var activeMemberships = await db.MembershipInstances
+        .Include(m => m.Membership)
+        .Where(m => m.UserId == id && m.Status == Status.Active)
+        .ToListAsync();
+        return Results.Ok(activeMemberships);
+    });
+
+//GET USER INACTIVE MEMBERSHIPS
+app.MapGet("/memberships/notactive/{id:int}",
+          async (int id, DBContext db) =>
+          {
+        var notActiveMemberships = await db.MembershipInstances
+        .Include(m => m.Membership)
+        .Where(m => m.UserId == id && m.Status == Status.Inactive)
+        .ToListAsync();
+        return Results.Ok(notActiveMemberships);
+    });
+
 //GET ALL FREEZES
 app.MapGet("/freezes",
        async (DBContext db) =>
@@ -263,6 +286,22 @@ app.MapGet("/memberships/{id:int}",
            if (membership == null) return Results.NotFound(new { message = "No such membership" });
 
         return Results.Ok(membership);
+    });
+
+//GET MEMBERSHIP INSTANCE BY ID
+
+app.MapGet("/membershipinstances/{id:int}",
+    async (int id, DBContext db) =>
+    {
+        var membershipInstance = await db.MembershipInstances
+            .Include(mi => mi.Membership)
+            .ThenInclude(m => m.Freeze)
+            .Include(mi => mi.ActiveFreeze)
+            .Include(mi => mi.User) // Include the User related to the MembershipInstance
+            .FirstOrDefaultAsync(mi => mi.Id == id);
+        if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
+
+        return Results.Ok(membershipInstance);
     });
 
 //DOES MEMBERSHIP EXIST
@@ -297,6 +336,61 @@ async (Membership membership, DBContext db) =>
         await db.SaveChangesAsync();
         return Results.Ok(membershipInDb);
     });
+
+// DOES ACTIVE MEMBERSHIP EXIST BY USER ID
+app.MapGet("/user/memberships/exist/{id:int}",
+          async (int id, DBContext db) =>
+          {
+           var isExist = await db.MembershipInstances.AnyAsync(m => m.UserId == id && m.Status == Status.Active);
+           return Results.Ok(isExist);
+       });
+
+
+//ACTIVATE MEMBERSHIP BY ID
+app.MapPut("/membershipinstances/activate/{id:int}",
+       async (int id, DBContext db) =>
+       {
+           
+           var membershipInstance = await db.MembershipInstances
+       .Include(mi => mi.Membership)
+       .ThenInclude(m => m.Freeze) // Include the Freeze related to the Membership
+       .Include(mi => mi.User) // Include the User related to the MembershipInstance
+       .FirstOrDefaultAsync(mi => mi.Id == id);
+           if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
+
+        membershipInstance.StartDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+        membershipInstance.EndDate = membershipInstance.StartDate.Value.AddMonths(membershipInstance.Membership.Months.Value);
+           membershipInstance.Status = Status.Active;
+           FreezeActive freezeActive = new FreezeActive
+           {
+               DaysLeft = membershipInstance.Membership.Freeze.Days,
+               MembershipInstanceId = membershipInstance.Id,
+               //MembershipInstance = membershipInstance
+           };
+           db.ActiveFreezes.Add(freezeActive);
+
+           await db.SaveChangesAsync();
+           return Results.Ok(membershipInstance);
+    });
+
+// FREEZE MEMBERSHIP BY ID
+app.MapPut("/membershipinstances/freeze/{id:int}",
+          async (int id, DBContext db) =>
+          {
+           var membershipInstance = await db.MembershipInstances
+       .Include(mi => mi.Membership)
+       .Include(mi => mi.ActiveFreeze) // Include the Freeze related to the Membership
+       .Include(mi => mi.User) // Include the User related to the MembershipInstance
+       .FirstOrDefaultAsync(mi => mi.Id == id);
+           if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
+
+       
+        await db.SaveChangesAsync();
+        return Results.Ok(membershipInstance);
+    });
+
+
+// REMOVE EXPIRED MEMBERSHIPS
 
 
 

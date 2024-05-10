@@ -4,33 +4,40 @@
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
              x:DataType="viewmodel:ProfileViewModel"   
              xmlns:avatarview="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+              xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+              x:Name="ProfileViewPage"
              x:Class="Gym.View.ProfileView"
              Title="PROFILE">
    
     <ContentPage.Content>
-        
-        <Grid HorizontalOptions="Center" VerticalOptions="Center" RowSpacing="30">
+        <ScrollView>
+            <Grid HorizontalOptions="Center" VerticalOptions="Center" RowSpacing="30">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
            
-            <avatarview:SfAvatarView 
-		    ContentType="Custom"
-		    ImageSource="{Binding MyImageSource}"
+            <Image 
+                Grid.Row="0"
+		    Source="{Binding MyImageSource}"
 		    VerticalOptions="Center"
 		    HorizontalOptions="Center"   
 		    HeightRequest="100"
 		    WidthRequest="100"
-		    CornerRadius="50" />
+		     />
 
-            <Button Grid.Row="2"
-                    Text="Select Image"
-                    Command="{Binding SelectImageCommand}" />
+            <Button Grid.Row="1"
+                    WidthRequest="200"
+                    Text="CHANGE PHOTO"
+                    Command="{Binding SelectImageCommand}"
+                    />
 
-            <Grid Grid.Row="1" ColumnSpacing="30" RowSpacing="15" >
+            <Grid Grid.Row="2" ColumnSpacing="30" RowSpacing="15" >
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35"/>
@@ -49,13 +56,79 @@
                 <Image Grid.Row="2" Source="mail.png" HeightRequest="20"  VerticalOptions="Center" />-->
 
                 <Label VerticalOptions="Start" Grid.Column="1" Text="Name" TextColor="Gray" FontSize="12"/>
-                <Label VerticalOptions="End" Grid.Column="1" Text="Scarlett Jhonsan" FontAttributes="Bold"/>
+                <Label VerticalOptions="End" Grid.Column="1" Text="{Binding User.Name}" FontAttributes="Bold"/>
                 <Label VerticalOptions="Start"  Grid.Row="1" Grid.Column="1" Text="Phone" TextColor="Gray" FontSize="12"/>
-                <Label VerticalOptions="End" Grid.Row="1" Grid.Column="1" Text="+44 5674 4432" FontAttributes="Bold"/>
+                <Label VerticalOptions="End" Grid.Row="1" Grid.Column="1" Text="{Binding User.PhoneNumber}" FontAttributes="Bold"/>
                 <Label VerticalOptions="Start" Grid.Row="2" Grid.Column="1" Text="Mail" TextColor="Gray" FontSize="12"/>
-                <Label VerticalOptions="End" Grid.Row="2" Grid.Column="1" Text="scarlettjhonsan99@gmail.com" FontAttributes="Bold"/>
+                <Label VerticalOptions="End" Grid.Row="2" Grid.Column="1" Text="{Binding User.Email}" FontAttributes="Bold"/>
+                </Grid>
+                <BoxView Grid.Row="4" HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                <Frame  Grid.Row="3">
+                    <Label Text="MEMBERSHIPS" FontSize="Medium" FontAttributes="Bold" HorizontalOptions="Center"/>
+                </Frame>
+                <Grid
+                        Grid.Row="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-            </Grid>
+                        <ListView Grid.Row="0" 
+             ItemsSource="{Binding ActiveMemberships}"
+             SelectedItem="{Binding SelectedMembership}">
+                            
+                                <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
+                                <ViewCell>
+                                    <StackLayout>
+
+
+                                        <VerticalStackLayout>
+
+                                            <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
+                                            <Label Text="{Binding EndDate, StringFormat='ACTIVE UNTIL: {0}'}" FontSize="Small" TextColor="LightGray" />
+                                            <VerticalStackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding BindingContext.FreezeMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
+                                            CommandParameter="{Binding .}" />
+                                            </VerticalStackLayout.GestureRecognizers>
+                                        </VerticalStackLayout>
+
+                                        <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <ListView Grid.Row="1" 
+                    ItemsSource="{Binding NotActiveMemberships}"
+                    SelectedItem="{Binding SelectedMembership}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
+                            <ViewCell>
+                                <StackLayout>
+
+
+                                    <VerticalStackLayout>
+
+                                        <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
+                                        <Label Text="NOT ACTIVE" FontSize="Small" TextColor="LightGray" />
+                                        <VerticalStackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.ActivateMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
+                               CommandParameter="{Binding .}" />
+                                        </VerticalStackLayout.GestureRecognizers>
+                                    </VerticalStackLayout>
+
+                                    <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                    </Grid>
+                    <!--</ScrollView>-->
+           
         </Grid>
+        </ScrollView>
         </ContentPage.Content>
+    
 </ContentPage>

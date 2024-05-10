@@ -1,19 +1,23 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Gym.Model;
 using Gym.Services;
 using Gym.Exceptions;
-using CommunityToolkit.Mvvm.Input;
-
+using System.Diagnostics;
 namespace Gym.ViewModel;
 
-public partial class BuyMembershipViewModel : ObservableObject
+public partial class ActivateMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
-    private Membership? _membership;
-    [ObservableProperty]
-    private string _promoCode;
+    private MembershipInstance? _membership;
     private int _membershipId;
     readonly WebService webService;
+    public ActivateMembershipViewModel(WebService webService)
+    {
+        this.webService = webService;
+      //  InitializeAsync();
+
+    }
 
     public int MembershipId
     {
@@ -28,20 +32,11 @@ public partial class BuyMembershipViewModel : ObservableObject
         }
     }
 
-
-    public BuyMembershipViewModel(WebService webService)
-    {
-        this.webService = webService;
-
-    }
-
-
-
     private async Task LoadMembership()
     {
         try
         {
-            Membership = await webService.GetMembershipById(MembershipId);
+            Membership = await webService.GetMembershipInstanceById(MembershipId);
         }
         catch (SessionExpiredException)
         {
@@ -59,18 +54,33 @@ public partial class BuyMembershipViewModel : ObservableObject
     [RelayCommand]
     private async Task CancelAsync()
     {
-        await Shell.Current.GoToAsync("//ShopView");
+        await Shell.Current.GoToAsync("//ProfileView");
     }
 
-
     [RelayCommand]
-    private async Task PayAsync()
+    private async Task ActivateAsync()
     {
         try
         {
-            await webService.BuyMembership(Membership);
-            await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
-            await CancelAsync();
+            
+            if (!(await webService.DoesActiveMembershipExist((await webService.GetUserFromToken()).Id)))
+            {
+                await webService.ActivateMembershipInstance(MembershipId);
+                await Shell.Current.DisplayAlert("Success", "Membership activated", "Ok");
+             }
+            else
+        {
+                await Shell.Current.DisplayAlert("Warning", "You already have one ACTIVE membership", "Ok");
+                bool answer = await Shell.Current.DisplayAlert("Question", "Activate anyway?", "Yes", "No");
+                if (answer)
+                {
+                    await webService.ActivateMembershipInstance(MembershipId);
+                    await Shell.Current.DisplayAlert("Success", "Membership activated", "Ok");
+                }
+               
+            }
+        await Shell.Current.GoToAsync("//ProfileView");
+           
         }
         catch (SessionExpiredException)
         {
@@ -83,5 +93,6 @@ public partial class BuyMembershipViewModel : ObservableObject
             await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
         }
     }
+
 
 }

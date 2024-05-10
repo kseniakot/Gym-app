@@ -10,6 +10,8 @@ public partial class UserShell : Shell
         Routing.RegisterRoute("MembershipView", typeof(MembershipView));
         Routing.RegisterRoute("BuyMembershipView", typeof(BuyMembershipView));
         Routing.RegisterRoute("ProfileView", typeof(ProfileView));
+        Routing.RegisterRoute("ActivateMembershipView", typeof(ActivateMembershipView));
+        Routing.RegisterRoute("FreezeMembershipView", typeof(FreezeMembershipView));
         InitializeComponent();
     }
 

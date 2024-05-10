@@ -14,7 +14,7 @@
             <Label Text="SELECT SERVICE:" TextColor="DarkGoldenrod" FontSize="Medium"></Label>
            
                 <VerticalStackLayout>
-                    <Button Text="MEMBERSHIPS" FontSize="Subtitle" BackgroundColor="Grey" TextColor="White"
+                <Button Text="MEMBERSHIPS" FontSize="Subtitle"  BorderColor="DarkGoldenrod" TextColor="White" BackgroundColor="Black"
                      Command="{Binding ToggleMembershipPickerCommand}" />
 
                 <ListView IsVisible="{Binding IsMembershipPickerVisible}"
@@ -28,7 +28,7 @@
 
                                         <VerticalStackLayout>
 
-                                        <Label Text="{Binding Name}" FontSize="Large"/>
+                                        <Label Text="{Binding Name}" FontSize="Medium"/>
                                             <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
                                         <VerticalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding BindingContext.ViewMembershipCommand, Source={x:Reference Name=ShopViewPage}}" 
@@ -45,7 +45,7 @@
          </VerticalStackLayout>
 
             <VerticalStackLayout>
-                <Button Text="FREEZES" FontSize="Subtitle" BackgroundColor="Grey" TextColor="White"
+                <Button Text="FREEZES" FontSize="Subtitle" BorderColor="DarkGoldenrod" TextColor="White" BackgroundColor="Black"
             Command="{Binding ToggleFreezePickerCommand}" />
 
                 <ListView IsVisible="{Binding IsFreezePickerVisible}"
@@ -59,7 +59,7 @@
 
                                     <VerticalStackLayout>
 
-                                        <Label Text="{Binding Name}" FontSize="Large"/>
+                                        <Label Text="{Binding Name}" FontSize="Medium"/>
                                         <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
 
                                     </VerticalStackLayout>

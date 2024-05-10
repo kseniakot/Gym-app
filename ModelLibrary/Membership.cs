@@ -16,8 +16,8 @@ namespace Gym.Model
         public decimal? Price { get; set; }
         public int? FreezeId { get; set; }
        
-        public Freeze? Freeze { get; set; } 
-        
+        public Freeze? Freeze { get; set; }
+        [JsonIgnore]
         public List<MembershipInstance> MembershipInstances { get; set; } = new List<MembershipInstance>();
     }
 }

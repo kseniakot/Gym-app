@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.FreezeMembershipView"
+              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:FreezeMembershipViewModel"    
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             Shell.FlyoutBehavior="Disabled"
+            
+             Title="FREEZE">
+
+
+    <!-- Remove Back Button Behavior -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False"
+                         IsEnabled="False" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Cancel" Command="{Binding CancelCommand}"/>
+    </ContentPage.ToolbarItems>
+
+    <VerticalStackLayout>
+
+        <VerticalStackLayout>
+
+            <Label Text="{Binding Membership.Membership.Name}" FontSize="Large"/>
+            <Label Text="ACTIVE" FontSize="Medium" />
+            <HorizontalStackLayout>
+                <Label Text="{Binding Membership.StartDate, StringFormat='ACTIVE WITH: {0}'}" FontSize="Medium" />
+                <Label Text="{Binding Membership.EndDate, StringFormat=' TO {0}'}" FontSize="Medium" />
+                
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Label Text="START FREEZE" FontSize="Medium" />
+                <DatePicker  MinimumDate="{x:Static sys:DateTime.Today}" MaximumDate="{Binding MaximumDate}"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Label Text="END FREEZE" FontSize="Medium" />
+                <DatePicker MinimumDate="{x:Static sys:DateTime.Today}"  MaximumDate="{Binding MaximumDate}" />
+                </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+        <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="Center" />
+
+
+
+        <Button Text="FREEZE" Command="{Binding FreezeCommand}"></Button>
+    </VerticalStackLayout>
+
+
+</ContentPage>

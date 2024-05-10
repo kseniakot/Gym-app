@@ -1,19 +1,29 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Gym.Model;
 using Gym.Services;
 using Gym.Exceptions;
-using CommunityToolkit.Mvvm.Input;
-
+using System.Diagnostics;
 namespace Gym.ViewModel;
 
-public partial class BuyMembershipViewModel : ObservableObject
+public partial class FreezeMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
-    private Membership? _membership;
-    [ObservableProperty]
-    private string _promoCode;
+    private MembershipInstance? _membership;
     private int _membershipId;
     readonly WebService webService;
+    public FreezeMembershipViewModel(WebService webService)
+    {
+        this.webService = webService;
+        //  InitializeAsync();
+    
+       
+
+    }
+
+    [ObservableProperty]
+    private DateTime _maximumDate;
+   
 
     public int MembershipId
     {
@@ -28,20 +38,13 @@ public partial class BuyMembershipViewModel : ObservableObject
         }
     }
 
-
-    public BuyMembershipViewModel(WebService webService)
-    {
-        this.webService = webService;
-
-    }
-
-
-
     private async Task LoadMembership()
     {
         try
         {
-            Membership = await webService.GetMembershipById(MembershipId);
+           // Debug.WriteLine("MembershipId: " + MembershipId);
+            Membership = await webService.GetMembershipInstanceById(MembershipId);
+            MaximumDate = DateTime.Today.AddDays(Membership.ActiveFreeze.DaysLeft);
         }
         catch (SessionExpiredException)
         {
@@ -59,18 +62,17 @@ public partial class BuyMembershipViewModel : ObservableObject
     [RelayCommand]
     private async Task CancelAsync()
     {
-        await Shell.Current.GoToAsync("//ShopView");
+        await Shell.Current.GoToAsync("//ProfileView");
     }
 
-
     [RelayCommand]
-    private async Task PayAsync()
+    private async Task FreezeAsync()
     {
         try
         {
-            await webService.BuyMembership(Membership);
-            await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
-            await CancelAsync();
+          //  await webService.FreezeMembershipInstance(MembershipId);
+            await Shell.Current.DisplayAlert("Success", "Membership is frozen", "Ok");
+            await Shell.Current.GoToAsync("//ProfileView");
         }
         catch (SessionExpiredException)
         {
@@ -83,5 +85,6 @@ public partial class BuyMembershipViewModel : ObservableObject
             await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
         }
     }
+
 
 }
