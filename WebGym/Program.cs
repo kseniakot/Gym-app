@@ -33,6 +33,9 @@ builder.Services.AddAuthorization(options =>
 
 });
 
+builder.Configuration.AddUserSecrets<Program>();
+var authOptions = new AuthOptions();
+builder.Configuration.GetSection("AuthOptions").Bind(authOptions);
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,11 +46,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             //ClockSkew = TimeSpan.Zero,
             ValidateIssuer = true,
-            ValidIssuer = AuthOptions.ISSUER,
+            ValidIssuer = authOptions.Issuer,
             ValidateAudience = true,
-            ValidAudience = AuthOptions.AUDIENCE,
+            ValidAudience = authOptions.Audience,
             ValidateLifetime = true,
-            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            IssuerSigningKey = authOptions.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true
         };
     });
@@ -103,11 +106,11 @@ app.MapPost("/login", async (User loginData, DBContext db, IPasswordHasher<User>
 
     // Create JWT-token
     var jwt = new JwtSecurityToken(
-            issuer: AuthOptions.ISSUER,
-            audience: AuthOptions.AUDIENCE,
+            issuer: authOptions.Issuer,
+            audience: authOptions.Audience,
             claims: claims,
             expires: DateTime.Now.AddHours(2), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            signingCredentials: new SigningCredentials(authOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
     var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
     return Results.Json(encodedJwt); // return token
