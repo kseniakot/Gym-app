@@ -27,17 +27,23 @@
             <Label Text="{Binding Membership.Membership.Name}" FontSize="Large"/>
             <Label Text="ACTIVE" FontSize="Medium" />
             <HorizontalStackLayout>
-                <Label Text="{Binding Membership.StartDate, StringFormat='ACTIVE WITH: {0}'}" FontSize="Medium" />
+                <Label Text="{Binding Membership.StartDate, StringFormat=' ACTIVE WITH: {0}'}" FontSize="Medium" />
                 <Label Text="{Binding Membership.EndDate, StringFormat=' TO {0}'}" FontSize="Medium" />
                 
             </HorizontalStackLayout>
             <HorizontalStackLayout>
-                <Label Text="START FREEZE" FontSize="Medium" />
-                <DatePicker  MinimumDate="{x:Static sys:DateTime.Today}" MaximumDate="{Binding MaximumDate}"/>
+                <Label Text="FREEZE REMAINING:  " FontSize="Small" />
+                <Label Text="{Binding FreezeDaysLeft}" FontSize="Small" />
+                <Label Text="{Binding Membership.Membership.Freeze.Days, StringFormat=' OF {0} DAYS'}" FontSize="Small" />
+
             </HorizontalStackLayout>
             <HorizontalStackLayout>
-                <Label Text="END FREEZE" FontSize="Medium" />
-                <DatePicker MinimumDate="{x:Static sys:DateTime.Today}"  MaximumDate="{Binding MaximumDate}" />
+                <Label IsVisible="{Binding IsDatePickerVisible}" Text="START FREEZE" FontSize="Medium" />
+                <DatePicker IsVisible="{Binding IsDatePickerVisible}" Date="{Binding SelectedDateFrom}" MinimumDate="{x:Static sys:DateTime.Today}" MaximumDate="{Binding MaximumDate}"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout>
+                <Label IsVisible="{Binding IsDatePickerVisible}" Text="END FREEZE" FontSize="Medium" />
+                <DatePicker IsVisible="{Binding IsDatePickerVisible}" Date="{Binding SelectedDateTo}" MinimumDate="{x:Static sys:DateTime.Today}"  MaximumDate="{Binding MaximumDate}" />
                 </HorizontalStackLayout>
 
         </VerticalStackLayout>

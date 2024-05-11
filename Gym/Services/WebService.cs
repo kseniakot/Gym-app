@@ -215,7 +215,7 @@ namespace Gym.Services
             }
             else
             {
-                throw new Exception("Something went wrong");
+                throw new Exception((response.StatusCode.ToString()));
             }
         } 
         
@@ -264,7 +264,7 @@ namespace Gym.Services
             }
         }
 
-        //GET NOT ACTIVE MEMBERSHIPS BY USER ID
+        //GET INACTIVE MEMBERSHIPS BY USER ID
         public async Task<List<MembershipInstance>> GetNotActiveMembershipsByUserId(int id)
         {
             {
@@ -287,6 +287,31 @@ namespace Gym.Services
                 }
             }
         }
+
+        // GET FROZEN MEMBERSHIPS BY USER ID
+        public async Task<List<MembershipInstance>> GetFrozenMembershipsByUserId(int id)
+        {
+            {
+                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/frozen/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    return JsonSerializer.Deserialize<List<MembershipInstance>>(content, options);
+
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    throw new SessionExpiredException();
+                }
+                else
+                {
+                    throw new Exception(response.StatusCode.ToString());
+                }
+            }
+        }
+
         // DOES ACTIVE MEMBERSHIP EXIST BY USER ID
         public async Task<bool> DoesActiveMembershipExist(int userId)
         {
@@ -438,6 +463,35 @@ namespace Gym.Services
             }
         }
 
+        // FREEEZE MEMBERSHIP
+        public async Task FreezeMembership(MembershipInstance membership)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/memberships/freeze", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        // CANCEL FREEZE
+        public async Task CancelFreeze(int membershipId)
+        {
+            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/memberships/cancel/freeze/{membershipId}");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
         //BUY MEMBERSHIP
         public async Task BuyMembership(Membership membership)
         {
@@ -486,6 +540,7 @@ namespace Gym.Services
                 throw new Exception("Something went wrong");
             }
         }
+
 
 
     }

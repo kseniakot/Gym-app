@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.CancelFreezeView"
+              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             x:DataType="viewmodel:CancelFreezeViewModel"    
+             Shell.FlyoutBehavior="Disabled"
+            
+             Title="CANCEL FREEZE">
+
+
+    <!-- Remove Back Button Behavior -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False"
+                         IsEnabled="False" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Cancel" Command="{Binding CancelCommand}"/>
+    </ContentPage.ToolbarItems>
+
+    <VerticalStackLayout>
+
+        <VerticalStackLayout>
+
+            <Label Text="{Binding Membership.Membership.Name}" FontSize="Large"/>
+            <Label Text="{Binding Membership.ActiveFreeze.EndDate, StringFormat='FROZEN UNTIL: {0}'}" FontSize="Small" TextColor="LightGray" />
+          
+
+
+
+        </VerticalStackLayout>
+        <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="Center" />
+
+
+
+        <Button Text="CANCEL FREEZE" Command="{Binding ActivateCommand}"></Button>
+    </VerticalStackLayout>
+
+
+</ContentPage>

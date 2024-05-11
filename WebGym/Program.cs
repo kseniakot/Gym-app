@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using WebGym.Options;
 using System.Data;
 using System.Text.Json.Serialization;
+using WebGym.Services;
 
 
 var builder = WebApplication.CreateBuilder();
@@ -22,8 +23,8 @@ var builder = WebApplication.CreateBuilder();
 //Connect Database
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection, options => options.MigrationsAssembly("WebGym")));
+builder.Services.AddHostedService<CleanupService>();
 
-    
 
 //Add Authorization and Authentication
 builder.Services.AddAuthorization(options =>
@@ -256,6 +257,18 @@ app.MapGet("/memberships/notactive/{id:int}",
         return Results.Ok(notActiveMemberships);
     });
 
+// GET USER FROZEN MEMBERSHIPS
+app.MapGet("/memberships/frozen/{id:int}",
+             async (int id, DBContext db) =>
+             {
+        var frozenMemberships = await db.MembershipInstances
+        .Include(m => m.Membership)
+        .Include(m => m.ActiveFreeze)
+        .Where(m => m.UserId == id && m.Status == Status.Frozen)
+        .ToListAsync();
+        return Results.Ok(frozenMemberships);
+    });
+
 //GET ALL FREEZES
 app.MapGet("/freezes",
        async (DBContext db) =>
@@ -358,7 +371,7 @@ app.MapPut("/membershipinstances/activate/{id:int}",
        .FirstOrDefaultAsync(mi => mi.Id == id);
            if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
 
-        membershipInstance.StartDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+        membershipInstance.StartDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
         membershipInstance.EndDate = membershipInstance.StartDate.Value.AddMonths(membershipInstance.Membership.Months.Value);
            membershipInstance.Status = Status.Active;
            FreezeActive freezeActive = new FreezeActive
@@ -373,21 +386,77 @@ app.MapPut("/membershipinstances/activate/{id:int}",
            return Results.Ok(membershipInstance);
     });
 
-// FREEZE MEMBERSHIP BY ID
-app.MapPut("/membershipinstances/freeze/{id:int}",
-          async (int id, DBContext db) =>
-          {
-           var membershipInstance = await db.MembershipInstances
-       .Include(mi => mi.Membership)
-       .Include(mi => mi.ActiveFreeze) // Include the Freeze related to the Membership
-       .Include(mi => mi.User) // Include the User related to the MembershipInstance
-       .FirstOrDefaultAsync(mi => mi.Id == id);
-           if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
+// FREEZE MEMBERSHIP 
 
-       
-        await db.SaveChangesAsync();
-        return Results.Ok(membershipInstance);
-    });
+app.MapPost("/memberships/freeze", 
+async (MembershipInstance updatedMembership, DBContext db) =>
+{
+
+    var existingMembership = await db.MembershipInstances
+        .Include(m => m.ActiveFreeze) 
+        .FirstOrDefaultAsync(m => m.Id == updatedMembership.Id);
+
+    if (existingMembership == null)
+    {
+        return Results.NotFound(new { message = "No such membership instance" });
+    }
+
+    // Update the properties of the existing membership with the properties of the updated membership
+    existingMembership.ActiveFreeze.StartDate = updatedMembership.ActiveFreeze.StartDate;
+    existingMembership.ActiveFreeze.EndDate = updatedMembership.ActiveFreeze.EndDate;
+    existingMembership.ActiveFreeze.DaysLeft = updatedMembership.ActiveFreeze.DaysLeft;
+    existingMembership.Status = updatedMembership.Status;
+    existingMembership.EndDate = updatedMembership.EndDate;
+
+    // Save the changes to the database
+    await db.SaveChangesAsync();
+
+    return Results.Ok(existingMembership);
+
+});
+
+// CANCEL FREEZE
+app.MapDelete("/memberships/cancel/freeze/{id:int}", 
+    async(int id, DBContext db) =>
+{
+    var membershipInstance = await db.MembershipInstances
+        .Include(m => m.ActiveFreeze)
+        .FirstOrDefaultAsync(m => m.Id == id);
+
+    if (membershipInstance == null) return Results.NotFound(new { message = "No such membership instance" });
+    int delta = (membershipInstance.ActiveFreeze.EndDate - DateTime.Today.ToUniversalTime()).Value.Days;
+
+    TimeSpan duration = TimeSpan.FromDays(delta);
+    membershipInstance.EndDate = membershipInstance.EndDate.Value - duration;
+    membershipInstance.ActiveFreeze.DaysLeft += delta;
+    membershipInstance.Status = Status.Active;
+    db.SaveChanges();
+
+    return Results.Ok(membershipInstance);
+
+});
+
+// REMOVE EXPIRED FREEZES
+//app.MapDelete("/freezes/remove",
+//       async (DBContext db) =>
+//       {
+//        var today = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+//        var expiredFreezes = await db.ActiveFreezes
+//            .Include(f => f.MembershipInstance)
+//            .Where(f => f.EndDate < today)
+//            .ToListAsync();
+//           foreach (var freeze in expiredFreezes)
+//           {
+//               freeze.MembershipInstance.Status = Status.Active;
+//               //db.ActiveFreezes.Remove(freeze);
+//           }
+//        //db.ActiveFreezes.RemoveRange(expiredFreezes);
+//        await db.SaveChangesAsync();
+
+//        return Results.Ok(expiredFreezes);
+//    });
+
+
 
 
 // REMOVE EXPIRED MEMBERSHIPS

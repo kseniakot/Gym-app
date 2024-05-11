@@ -12,7 +12,7 @@ namespace Gym.Model
         public int Id { get; set; }
         public DateTime? StartDate { get; set; } = null;
         public DateTime? EndDate { get; set; } = null;
-        public int DaysLeft { get; set; }
+        public int DaysLeft { get; set; }   
         [JsonIgnore]
         public int MembershipInstanceId { get; set; }
         [JsonIgnore]

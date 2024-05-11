@@ -21,6 +21,8 @@ public partial class ProfileViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<MembershipInstance> _notActiveMemberships;
     [ObservableProperty]
+    private ObservableCollection<MembershipInstance> _frozenMemberships;
+    [ObservableProperty]
     private MembershipInstance _selectedMembership;
 
     readonly WebService webService;
@@ -41,6 +43,7 @@ public partial class ProfileViewModel : ObservableObject
         {
             ActiveMemberships = new ObservableCollection<MembershipInstance>(await webService.GetActiveMembershipsByUserId(User.Id));
             NotActiveMemberships = new ObservableCollection<MembershipInstance>(await webService.GetNotActiveMembershipsByUserId(User.Id));
+            FrozenMemberships = new ObservableCollection<MembershipInstance>(await webService.GetFrozenMembershipsByUserId(User.Id));
         }
         catch (SessionExpiredException)
         {
@@ -96,5 +99,15 @@ public partial class ProfileViewModel : ObservableObject
 
         await Shell.Current.GoToAsync($"FreezeMembershipView?MembershipId={SelectedMembership.Id}");
        
+    }
+
+    [RelayCommand]
+    private async Task DefrostMembershipAsync()
+    {
+        if (SelectedMembership == null) return;
+        Debug.WriteLine("FreezeMembershipAsync" + SelectedMembership.Id);
+
+        await Shell.Current.GoToAsync($"CancelFreezeView?MembershipId={SelectedMembership.Id}");
+
     }
 }

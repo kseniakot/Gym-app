@@ -23,7 +23,16 @@ public partial class FreezeMembershipViewModel : ObservableObject
 
     [ObservableProperty]
     private DateTime _maximumDate;
-   
+
+    [ObservableProperty]
+    private DateTime _selectedDateFrom = DateTime.Today.ToUniversalTime();
+    [ObservableProperty]
+    private DateTime _selectedDateTo = DateTime.Today.ToUniversalTime();
+
+    [ObservableProperty]
+    bool _isDatePickerVisible = true;
+    [ObservableProperty]
+    int _FreezeDaysLeft;
 
     public int MembershipId
     {
@@ -44,7 +53,13 @@ public partial class FreezeMembershipViewModel : ObservableObject
         {
            // Debug.WriteLine("MembershipId: " + MembershipId);
             Membership = await webService.GetMembershipInstanceById(MembershipId);
-            MaximumDate = DateTime.Today.AddDays(Membership.ActiveFreeze.DaysLeft);
+            FreezeDaysLeft = Membership.ActiveFreeze.DaysLeft;
+            MaximumDate = DateTime.Today.AddDays(FreezeDaysLeft);
+            if (MaximumDate == DateTime.Today)
+            {
+                IsDatePickerVisible = false;
+            }
+            
         }
         catch (SessionExpiredException)
         {
@@ -68,21 +83,47 @@ public partial class FreezeMembershipViewModel : ObservableObject
     [RelayCommand]
     private async Task FreezeAsync()
     {
-        try
+        if (!IsDatePickerVisible)
         {
-          //  await webService.FreezeMembershipInstance(MembershipId);
-            await Shell.Current.DisplayAlert("Success", "Membership is frozen", "Ok");
-            await Shell.Current.GoToAsync("//ProfileView");
+            await Shell.Current.DisplayAlert("Error", "You used all your freeze days :(", "Ok");
         }
-        catch (SessionExpiredException)
+        else
         {
-            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
-            await Shell.Current.GoToAsync("SignInView");
-            Application.Current.MainPage = new AppShell();
-        }
-        catch (Exception e)
-        {
-            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            int MinDays = Membership.Membership.Freeze.MinDays;
+            if ((SelectedDateTo - SelectedDateFrom).Days < MinDays)
+            {
+                await Shell.Current.DisplayAlert("Error", "You cannot freeze membership for less than " + MinDays + " days", "Ok");
+            }
+            else
+            {
+                try
+                {
+                    Membership.ActiveFreeze.StartDate = SelectedDateFrom.ToUniversalTime(); ;
+                    Membership.ActiveFreeze.EndDate = SelectedDateTo.ToUniversalTime();
+
+                    Membership.ActiveFreeze.DaysLeft -= (SelectedDateTo - SelectedDateFrom).Days;
+                    Membership.Status = Status.Frozen;
+                    Membership.EndDate += (SelectedDateTo.ToUniversalTime() - SelectedDateFrom.ToUniversalTime());
+
+
+
+
+
+                    await webService.FreezeMembership(Membership);
+                    await Shell.Current.DisplayAlert("Success", "Membership is frozen", "Ok");
+                    await Shell.Current.GoToAsync("//ProfileView");
+                }
+                catch (SessionExpiredException)
+                {
+                    await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+                    await Shell.Current.GoToAsync("SignInView");
+                    Application.Current.MainPage = new AppShell();
+                }
+                catch (Exception e)
+                {
+                    await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+                }
+            }
         }
     }
 

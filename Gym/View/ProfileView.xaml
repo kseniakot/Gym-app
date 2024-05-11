@@ -71,7 +71,8 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
                         <ListView Grid.Row="0" 
              ItemsSource="{Binding ActiveMemberships}"
@@ -124,7 +125,34 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                    </Grid>
+
+                    <ListView Grid.Row="2" 
+ItemsSource="{Binding FrozenMemberships}"
+SelectedItem="{Binding SelectedMembership}">
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
+                                <ViewCell>
+                                    <StackLayout>
+
+
+                                        <VerticalStackLayout>
+
+                                            <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
+                                            <Label Text="{Binding ActiveFreeze.EndDate, StringFormat='FROZEN UNTIL: {0}'}" FontSize="Small" TextColor="LightGray" />
+                                            <VerticalStackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding BindingContext.DefrostMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
+                               CommandParameter="{Binding .}" />
+                                            </VerticalStackLayout.GestureRecognizers>
+                                        </VerticalStackLayout>
+
+                                        <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
                     <!--</ScrollView>-->
            
         </Grid>

@@ -74,6 +74,9 @@ namespace Gym
             builder.Services.AddTransient<FreezeMembershipViewModel>();
             builder.Services.AddTransient<FreezeMembershipView>();
 
+            builder.Services.AddTransient<CancelFreezeViewModel>();
+            builder.Services.AddTransient<CancelFreezeView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
