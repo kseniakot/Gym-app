@@ -44,7 +44,7 @@
                 </ListView>
          </VerticalStackLayout>
 
-            <VerticalStackLayout>
+            <!--<VerticalStackLayout>
                 <Button Text="FREEZES" FontSize="Subtitle" BorderColor="DarkGoldenrod" TextColor="White" BackgroundColor="Black"
             Command="{Binding ToggleFreezePickerCommand}" />
 
@@ -70,7 +70,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-            </VerticalStackLayout>
+            </VerticalStackLayout>-->
 
 
 

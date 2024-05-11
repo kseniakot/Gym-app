@@ -16,21 +16,21 @@ public partial class ShopViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<Membership> _memberships;
 
-    [ObservableProperty]
-    private ObservableCollection<Freeze> _freezes;
+    //[ObservableProperty]
+    //private ObservableCollection<Freeze> _freezes;
 
     [ObservableProperty]
     private Membership _selectedMembership;
 
 
-    [ObservableProperty]
-    private Freeze _selectedFreeze;
+    //[ObservableProperty]
+    //private Freeze _selectedFreeze;
 
     [ObservableProperty]
     bool _isMembershipPickerVisible;
 
-    [ObservableProperty]
-    bool _isFreezePickerVisible;
+    //[ObservableProperty]
+    //bool _isFreezePickerVisible;
 
 
     readonly WebService webService;
@@ -39,7 +39,7 @@ public partial class ShopViewModel : ObservableObject
         this.webService = webService;
        InitializeAsync();
         if (Memberships != null && Memberships.Count > 0) SelectedMembership = Memberships.First();
-        if (Freezes != null && Freezes.Count > 0) SelectedFreeze = Freezes.First();
+       // if (Freezes != null && Freezes.Count > 0) SelectedFreeze = Freezes.First();
 
     }
 
@@ -48,7 +48,7 @@ public partial class ShopViewModel : ObservableObject
         try
         {
             Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
-            Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
+           // Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
         }
         catch (SessionExpiredException)
         {
@@ -69,12 +69,12 @@ public partial class ShopViewModel : ObservableObject
        
     }
 
-    [RelayCommand]
-    private void ToggleFreezePicker()
-    {
+    //[RelayCommand]
+    //private void ToggleFreezePicker()
+    //{
        
-        IsFreezePickerVisible = !IsFreezePickerVisible;
-    }
+    //    IsFreezePickerVisible = !IsFreezePickerVisible;
+    //}
 
 
 
