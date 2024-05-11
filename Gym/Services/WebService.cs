@@ -364,7 +364,21 @@ namespace Gym.Services
             }
         }
 
-  
+        // DELETE FREEZE
+        public async Task DeleteFreeze(Freeze freeze)
+        {
+            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/freezes/{freeze.Id}");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+
 
         //GET MEMBERSHIP BY ID
         public async Task<Membership> GetMembershipById(int id)
@@ -383,6 +397,26 @@ namespace Gym.Services
             else
             {
                 throw new Exception("Something went wrong");
+            }
+        }
+
+        //GET FREEZE BY ID
+        public async Task<Freeze> GetFreezeById(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/freezes/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<Freeze>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
             }
         }
 
@@ -428,6 +462,27 @@ namespace Gym.Services
             }
         }
 
+        //DOES FREEZE EXIST
+        public async Task<bool> DoesFreezeExistAsync(Freeze freeze)
+        {
+
+            HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync($"https://192.168.56.1:7062/freezes/exist", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
         //EDIT MEMBERSHIP
         public async Task EditMembership(Membership membership)
         {
@@ -448,11 +503,46 @@ namespace Gym.Services
            
         }
 
+        // EDIT FREEZE
+        public async Task EditFreeze(Freeze freeze)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/freezes", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new Exception("Freeze not found");
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+
+        }
+
         //ADD MEMBERSHIP
         public async Task AddMembership(Membership membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/memberships", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        // ADD FREEZE
+        public async Task AddFreeze(Freeze freeze)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/freezes", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();

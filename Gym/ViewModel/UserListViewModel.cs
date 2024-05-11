@@ -146,7 +146,7 @@ public partial class UserListViewModel : ObservableObject
         {
             try
             {
-                Users = new ObservableCollection<User>((await webService.GetUnbannedUsers()).Where(user => user.Name.Contains(SearchText)));
+                Users = new ObservableCollection<User>((await webService.GetUnbannedUsers()).Where(user => user.Name.ToLower().Contains(SearchText.ToLower())));
             }
             catch (SessionExpiredException)
             {

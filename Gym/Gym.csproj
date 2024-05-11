@@ -91,6 +91,9 @@
 	  <Compile Update="UserShell.xaml.cs">
 	    <DependentUpon>UserShell.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="View\AddFreezeView.xaml.cs">
+	    <DependentUpon>AddFreezeView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="View\CancelFreezeView.xaml.cs">
 	    <DependentUpon>CancelFreezeView.xaml</DependentUpon>
 	  </Compile>
@@ -119,6 +122,9 @@
 	  <MauiXaml Update="View\ActivateMembershipView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\AddFreezeView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\AddMembershipView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -137,7 +143,13 @@
 	  <MauiXaml Update="View\CancelFreezeView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\EditFreezeView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\EditMembershipView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\FreezeListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\FreezeMembershipView.xaml">

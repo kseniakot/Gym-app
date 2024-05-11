@@ -10,29 +10,29 @@ using Gym.Exceptions;
 
 namespace Gym.ViewModel;
 
-public partial class MembershipListViewModel : ObservableObject
+public partial class FreezeListViewModel : ObservableObject
 {
     [ObservableProperty]
-    private Membership _selectedMembership;
+    private Freeze _selectedFreeze;
     [ObservableProperty]
-    private ObservableCollection<Membership> _memberships;
+    private ObservableCollection<Freeze> _Freezes;
 
     [ObservableProperty]
     private string _searchText;
 
     readonly WebService webService;
-    public MembershipListViewModel(WebService webService)
+    public FreezeListViewModel(WebService webService)
     {
         this.webService = webService;
         InitializeAsync();
-       
+
     }
 
     private async Task InitializeAsync()
     {
         try
         {
-            Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+            Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
         }
         catch (SessionExpiredException)
         {
@@ -47,14 +47,14 @@ public partial class MembershipListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task RemoveMembershipAsync()
+    private async Task RemoveFreezeAsync()
     {
-        if (SelectedMembership != null)
+        if (SelectedFreeze != null)
         {
             try
             {
-                await webService.DeleteMembership(SelectedMembership);
-                Memberships.Remove(SelectedMembership);
+                await webService.DeleteFreeze(SelectedFreeze);
+                Freezes.Remove(SelectedFreeze);
             }
             catch (SessionExpiredException)
             {
@@ -69,7 +69,7 @@ public partial class MembershipListViewModel : ObservableObject
             }
             finally
             {
-                SelectedMembership = null;
+                SelectedFreeze = null;
             }
         }
         else
@@ -80,9 +80,9 @@ public partial class MembershipListViewModel : ObservableObject
 
 
     [RelayCommand]
-    private async Task AddMembershipAsync()
+    private async Task AddFreezeAsync()
     {
-        await Shell.Current.GoToAsync(nameof(AddMembershipView));
+        await Shell.Current.GoToAsync(nameof(AddFreezeView));
     }
 
 
@@ -92,13 +92,13 @@ public partial class MembershipListViewModel : ObservableObject
         await InitializeAsync();
     }
     [RelayCommand]
-    private async Task SearchMembershipAsync()
+    private async Task SearchFreezeAsync()
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
             try
             {
-                Memberships = new ObservableCollection<Membership>(await webService.GetAllMemberships());
+                Freezes = new ObservableCollection<Freeze>(await webService.GetAllFreezes());
             }
             catch (SessionExpiredException)
             {
@@ -115,7 +115,7 @@ public partial class MembershipListViewModel : ObservableObject
         {
             try
             {
-                Memberships = new ObservableCollection<Membership>((await webService.GetAllMemberships()).Where(membership => membership.Name.ToLower().Contains(SearchText.ToLower())));
+                Freezes = new ObservableCollection<Freeze>((await webService.GetAllFreezes()).Where(Freeze => Freeze.Name.ToLower().Contains(SearchText.ToLower())));
             }
             catch (SessionExpiredException)
             {
@@ -131,21 +131,22 @@ public partial class MembershipListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task EditMembershipAsync()
+    private async Task EditFreezeAsync()
     {
-        if (SelectedMembership == null)
+        if (SelectedFreeze == null)
         {
-            await Shell.Current.DisplayAlert("No membership selected", "Please select and try again.", "Ok");
-           
+            await Shell.Current.DisplayAlert("No Freeze selected", "Please select and try again.", "Ok");
+
         }
-        else {
-            //var navigationParameter = new ShellNavigationQueryParameters
-            //{
-            //    { "MembershipId", SelectedMembership.Id }
-            //};
-            await Shell.Current.GoToAsync($"EditMembershipView?MembershipId={SelectedMembership.Id}");
-            SelectedMembership = null;
-         }
+        else
+        {
+            var navigationParameter = new ShellNavigationQueryParameters
+            {
+                { "FreezeId", SelectedFreeze.Id }
+            };
+            await Shell.Current.GoToAsync($"EditFreezeView?FreezeId={SelectedFreeze.Id}");
+            SelectedFreeze = null;
+        }
     }
 
 }

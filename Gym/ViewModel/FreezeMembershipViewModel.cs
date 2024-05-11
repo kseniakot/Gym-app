@@ -89,7 +89,7 @@ public partial class FreezeMembershipViewModel : ObservableObject
         }
         else
         {
-            int MinDays = Membership.Membership.Freeze.MinDays;
+            int MinDays = Membership.Membership.Freeze.MinDays.Value;
             if ((SelectedDateTo - SelectedDateFrom).Days < MinDays)
             {
                 await Shell.Current.DisplayAlert("Error", "You cannot freeze membership for less than " + MinDays + " days", "Ok");

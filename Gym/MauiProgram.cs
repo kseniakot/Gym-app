@@ -41,14 +41,23 @@ namespace Gym
             builder.Services.AddTransient<MembershipListViewModel>();
             builder.Services.AddTransient<MembershipListView>();
 
+            builder.Services.AddTransient<FreezeListViewModel>();
+            builder.Services.AddTransient<FreezeListView>();
+
             builder.Services.AddTransient<AddUserViewModel>();
             builder.Services.AddTransient<AddUserView>();
 
             builder.Services.AddTransient<AddMembershipViewModel>();
             builder.Services.AddTransient<AddMembershipView>();
 
+            builder.Services.AddTransient<AddFreezeViewModel>();
+            builder.Services.AddTransient<AddFreezeView>();
+
             builder.Services.AddTransient<EditMembershipViewModel>();
             builder.Services.AddTransient<EditMembershipView>();
+
+            builder.Services.AddTransient<EditFreezeViewModel>();
+            builder.Services.AddTransient<EditFreezeView>();
 
             builder.Services.AddTransient<BannedListViewModel>();
             builder.Services.AddTransient<BannedListView>();

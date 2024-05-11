@@ -53,7 +53,7 @@ namespace WebGym.Services
                         membershipInstance.Status = Status.Active;
                         FreezeActive freezeActive = new FreezeActive
                         {
-                            DaysLeft = membershipInstance.Membership.Freeze.Days,
+                            DaysLeft = membershipInstance.Membership.Freeze.Days.Value,
                             MembershipInstanceId = membershipInstance.Id,
                            
                         };

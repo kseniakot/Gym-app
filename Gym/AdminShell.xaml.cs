@@ -11,7 +11,10 @@ public partial class AdminShell : Shell
         Routing.RegisterRoute("AddUserView", typeof(AddUserView));
         Routing.RegisterRoute("BannedListView", typeof(BannedListView));
         Routing.RegisterRoute("AddMembershipView", typeof(AddMembershipView));
+        Routing.RegisterRoute("AddFreezeView", typeof(AddFreezeView));
         Routing.RegisterRoute("EditMembershipView", typeof(EditMembershipView));
+        Routing.RegisterRoute("EditFreezeView", typeof(EditFreezeView));
+
     }
 
     private async void LogOutAdmin_Button(object sender, EventArgs e)

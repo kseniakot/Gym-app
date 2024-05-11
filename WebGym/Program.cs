@@ -289,6 +289,18 @@ async (int id, DBContext db) =>
         return Results.NoContent();
     });
 
+//DELETE FREEZE BY ID
+app.MapDelete("/freezes/{id:int}", [Authorize(Policy = "RequireAdminRole")]
+async (int id, DBContext db) =>
+{
+    var freeze = await db.Freezes.FirstOrDefaultAsync(m => m.Id == id);
+    if (freeze == null) return Results.NotFound(new { message = "No such freeze" });
+
+    db.Freezes.Remove(freeze);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 //GET MEMBERSHIP BY ID
 app.MapGet("/memberships/{id:int}",
        async (int id, DBContext db) =>
@@ -299,6 +311,17 @@ app.MapGet("/memberships/{id:int}",
            if (membership == null) return Results.NotFound(new { message = "No such membership" });
 
         return Results.Ok(membership);
+    });
+
+//GET FREEZE BY ID
+app.MapGet("/freezes/{id:int}",
+       async (int id, DBContext db) =>
+       {
+        var freeze = await db.Freezes
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (freeze == null) return Results.NotFound(new { message = "No such freeze" });
+
+        return Results.Ok(freeze);
     });
 
 //GET MEMBERSHIP INSTANCE BY ID
@@ -325,6 +348,14 @@ async (Membership membership, DBContext db) =>
         return Results.Ok(isExist);
     });
 
+//DOES FREEZE EXIST
+app.MapPost("/freezes/exist", [Authorize(Policy = "RequireAdminRole")]
+async (Freeze freeze, DBContext db) =>
+{
+    var isExist = await db.Freezes.AnyAsync(m => m.Name == freeze.Name && m.Price == freeze.Price && m.Days == freeze.Days);
+    return Results.Ok(isExist);
+});
+
 
 //ADD MEMBERSHIP
 app.MapPost("/memberships", [Authorize(Policy = "RequireAdminRole")]
@@ -334,6 +365,15 @@ async (Membership membership, DBContext db) =>
         await db.SaveChangesAsync();
         return Results.Created($"/api/memberships/{membership.Id}", membership);
     });
+
+//ADD FREEZE
+app.MapPost("/freezes", [Authorize(Policy = "RequireAdminRole")]
+async (Freeze freeze, DBContext db) =>
+{
+    await db.Freezes.AddAsync(freeze);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/memberships/{freeze.Id}", freeze);
+});
 
 //EDIT MEMBERSHIP
 app.MapPut("/memberships", [Authorize(Policy = "RequireAdminRole")]
@@ -349,6 +389,21 @@ async (Membership membership, DBContext db) =>
         await db.SaveChangesAsync();
         return Results.Ok(membershipInDb);
     });
+
+// EDTI FREEZE
+app.MapPut("/freezes", [Authorize(Policy = "RequireAdminRole")]
+async (Freeze freeze, DBContext db) =>
+{
+    var freezeInDb = await db.Freezes.FirstOrDefaultAsync(m => m.Id == freeze.Id);
+    if (freezeInDb == null) return Results.NotFound(new { message = "No such membership" });
+
+    freezeInDb.Name = freeze.Name;
+    freezeInDb.Price = freeze.Price;
+    freezeInDb.Days = freeze.Days;
+    freezeInDb.MinDays = freeze.MinDays;
+    await db.SaveChangesAsync();
+    return Results.Ok(freezeInDb);
+});
 
 // DOES ACTIVE MEMBERSHIP EXIST BY USER ID
 app.MapGet("/user/memberships/exist/{id:int}",
@@ -376,7 +431,7 @@ app.MapPut("/membershipinstances/activate/{id:int}",
            membershipInstance.Status = Status.Active;
            FreezeActive freezeActive = new FreezeActive
            {
-               DaysLeft = membershipInstance.Membership.Freeze.Days,
+               DaysLeft = membershipInstance.Membership.Freeze.Days.Value,
                MembershipInstanceId = membershipInstance.Id,
                //MembershipInstance = membershipInstance
            };

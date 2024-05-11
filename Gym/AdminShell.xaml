@@ -45,5 +45,14 @@
         </Tab>
     </FlyoutItem>
 
+    <FlyoutItem Title="FREEZE LIST">
+        <Tab>
+            <ShellContent
+        Title="FREEZE LIST"
+        ContentTemplate="{DataTemplate view:FreezeListView}"
+        Route="MembershipListView" />
+        </Tab>
+    </FlyoutItem>
+
 
 </Shell>
