@@ -17,4 +17,10 @@
      Title="Sign Up"
      ContentTemplate="{DataTemplate view:SignUpView}"
      Route="SignUp" />
+
+    <ShellContent
+        Title="ForgotPassword"
+        ContentTemplate="{DataTemplate view:ForgotPasswordView}"
+        Route="ForgotPassword" />
+
 </Shell>

@@ -49,7 +49,12 @@
                 <Button CornerRadius="0" HeightRequest="60" Text="SIGN IN" FontSize="20" FontAttributes="Bold"
                      Command="{Binding SignInCommand}" TextColor="Black" BackgroundColor="DarkGoldenrod"/>
                 <!--Lest create borderless entry -->
-                <Label FontAttributes="Bold" Text="Forgot Password?" TextColor="Gray" HorizontalTextAlignment="Center" />
+                <Label FontAttributes="Bold" Text="Forgot Password?" TextColor="Gray" HorizontalTextAlignment="Center" >
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer  NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped_For_Password"/>
+                    </Label.GestureRecognizers>
+                </Label>
+              
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
                     <Label  FontAttributes="Bold" TextColor="Gray" Text="Don't have account?" VerticalTextAlignment="Center" />
                     <Label  Text="SIGN UP" FontSize="18" 

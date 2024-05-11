@@ -18,4 +18,9 @@ public partial class SignInView : ContentPage
     {
         await Shell.Current.GoToAsync("//SignUp");
     }
+
+    private async void TapGestureRecognizer_Tapped_For_Password(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//ForgotPassword");
+    }
 }

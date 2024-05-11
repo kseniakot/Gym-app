@@ -498,31 +498,17 @@ app.MapDelete("/memberships/cancel/freeze/{id:int}",
 
 });
 
-// REMOVE EXPIRED FREEZES
-//app.MapDelete("/freezes/remove",
-//       async (DBContext db) =>
-//       {
-//        var today = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
-//        var expiredFreezes = await db.ActiveFreezes
-//            .Include(f => f.MembershipInstance)
-//            .Where(f => f.EndDate < today)
-//            .ToListAsync();
-//           foreach (var freeze in expiredFreezes)
-//           {
-//               freeze.MembershipInstance.Status = Status.Active;
-//               //db.ActiveFreezes.Remove(freeze);
-//           }
-//        //db.ActiveFreezes.RemoveRange(expiredFreezes);
-//        await db.SaveChangesAsync();
+// RESET PASSWORD
 
-//        return Results.Ok(expiredFreezes);
-//    });
+app.MapGet("/users/resetpassword",
+    async (HttpContext context) =>
+    {
+        context.Response.ContentType = "text/html";
+        await context.Response.SendFileAsync(Path.Combine(app.Environment.ContentRootPath, "html", "password.html"));
+    });
+    
 
-
-
-
-// REMOVE EXPIRED MEMBERSHIPS
-
+   
 
 
 

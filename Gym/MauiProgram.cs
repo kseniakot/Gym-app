@@ -35,6 +35,9 @@ namespace Gym
             builder.Services.AddTransient<SignInViewModel>();
             builder.Services.AddTransient<SignInView>();
 
+            builder.Services.AddTransient<ForgotPasswordViewModel>();
+            builder.Services.AddTransient<ForgotPasswordView>();
+
             builder.Services.AddTransient<UserListViewModel>();
             builder.Services.AddTransient<UserListView>();
 
