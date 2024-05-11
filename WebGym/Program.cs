@@ -24,7 +24,7 @@ var builder = WebApplication.CreateBuilder();
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection, options => options.MigrationsAssembly("WebGym")));
 builder.Services.AddHostedService<CleanupService>();
-
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 //Add Authorization and Authentication
 builder.Services.AddAuthorization(options =>
@@ -67,17 +67,22 @@ app.UseAuthorization();
 // APP
 
 // LOG IN
-app.MapPost("/login", async (User loginData, DBContext db) =>
+app.MapPost("/login", async (User loginData, DBContext db, IPasswordHasher<User> passwordHasher) =>
 {
-  
-    // находим пользователя 
-    User? person = await db.Users.FirstOrDefaultAsync(p => p.Email == loginData.Email && p.Password == loginData.Password);
-    // если пользователь не найден, отправляем статусный код 401
+    // Find the user
+    User? person = await db.Users.FirstOrDefaultAsync(p => p.Email == loginData.Email);
+    // If the user is not found, return 401 Unauthorized
     if (person is null) return Results.Unauthorized();
     if (person.IsBanned) return Results.Problem("This user is banned", statusCode: 403); //forbidden
 
+    var verificationResult = passwordHasher.VerifyHashedPassword(person, person.Password, loginData.Password);
+    if (verificationResult == PasswordVerificationResult.Failed)
+    {
+        return Results.Problem("Wrong password", statusCode: 403);
+    }
 
-    //set claims
+
+    // Set claims
     var claims = new List<Claim>()
     {
         new Claim(ClaimTypes.NameIdentifier, person.Id.ToString()),
@@ -85,7 +90,6 @@ app.MapPost("/login", async (User loginData, DBContext db) =>
         new Claim(ClaimTypes.Name, person.Name),
         new Claim(ClaimTypes.MobilePhone, person.PhoneNumber),
         new Claim("IsBanned", person.IsBanned.ToString()),
-        new Claim("Password", person.Password)
     };
 
     if (person.Email == "admin")
@@ -95,15 +99,15 @@ app.MapPost("/login", async (User loginData, DBContext db) =>
     else
     {
         claims.Add(new Claim(ClaimTypes.Role, "user"));
-    
     }
-    // создаем JWT-токен
+
+    // Create JWT-token
     var jwt = new JwtSecurityToken(
             issuer: AuthOptions.ISSUER,
             audience: AuthOptions.AUDIENCE,
             claims: claims,
             expires: DateTime.Now.AddHours(2), //DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)) ; 
+            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
     var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
     return Results.Json(encodedJwt); // return token
@@ -129,11 +133,11 @@ async (int id, DBContext db) =>
 
 // ADD USER 
 app.MapPost("/users",
-async (User user, DBContext db) =>
+async (User user, DBContext db, IPasswordHasher<User> passwordHasher) =>
 {
+    user.Password = passwordHasher.HashPassword(user, user.Password);
     await db.Users.AddAsync(user);
     await db.SaveChangesAsync();
-    // return Results.Json(user);
     return Results.Created($"/api/users/{user.Id}", user); // return 201
 });
 
