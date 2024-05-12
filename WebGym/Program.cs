@@ -512,7 +512,7 @@ app.MapGet("/users/resetpassword/{token}",
         var token = WebUtility.UrlDecode(context.Request.RouteValues["token"].ToString());
         token = token.Replace('-', '+').Replace('_', '/') + new string('=', (4 - token.Length % 4) % 4);
         using var sha256 = SHA256.Create();
-        Console.WriteLine("Tooken   " + token);
+      //  Console.WriteLine("Tooken   " + token);
        
         if (string.IsNullOrEmpty(token))
         {
@@ -529,7 +529,7 @@ app.MapGet("/users/resetpassword/{token}",
         catch (FormatException)
         {
             // Handle the case where the token is not a valid Base64 string
-            Console.WriteLine("Invalid token" + hashedToken);
+          //  Console.WriteLine("Invalid token" + hashedToken);
             return Results.Problem("Invalid token", statusCode: 400);
            
         }
@@ -539,8 +539,8 @@ app.MapGet("/users/resetpassword/{token}",
         {
             // Token not found
             //context.Response.StatusCode = 400;
-            //await context.Response.WriteAsync("Invalid token");
-            Console.WriteLine("Invalid token2" + hashedToken);
+           // await context.Response.WriteAsync("Invalid token");
+            //Console.WriteLine("Invalid token2" + hashedToken);
             return Results.Problem("Invalid token", statusCode: 400);
         }
 
@@ -549,6 +549,7 @@ app.MapGet("/users/resetpassword/{token}",
         // Check if the token has expired
         if (user.ResetTokenCreationTime.Value.AddHours(24) < DateTime.UtcNow)
         {
+           // await context.Response.WriteAsync("Token has expired");
             return Results.Problem("Token has expired", statusCode: 400);
         }
 
@@ -588,11 +589,14 @@ app.MapPost("/users/resetpassword",
         user.ResetToken = hashedToken;
         user.ResetTokenCreationTime = DateTime.UtcNow;
         await db.SaveChangesAsync();
-        Console.WriteLine("Tooken initial hash   " + hashedToken);
-        Console.WriteLine("Tooken initial   " + token);
+      
         EmailService emailService = new EmailService();
         await emailService.SendEmailAsync(email, "Reset Password",
-            $"Go to this link to reset password: <a href='http://192.168.56.1:5119/users/resetpassword/{WebUtility.UrlEncode(token)}'>link</a>");
+            $"Hello!<br><br> This message was sent to you since<br><br> you've been trying to reset" +
+$"<br><br>your password in your gym profile.<br><br> " +
+$"Go to this link to reset password: <a href='http://192.168.56.1:5119/users/resetpassword/{WebUtility.UrlEncode(token)}'>CREATE NEW PASSWORD</a>" +
+$"<br><br><br> Or ignore this message if this is a mistake.<br><br>" +
+$"<br><br>With respect, your gym admin!");
         return Results.Ok();
     }
 
@@ -625,24 +629,13 @@ app.MapPost("users/new-password", async (HttpContext context, DBContext db, IPas
     {
         // Token not found
         //context.Response.StatusCode = 400;
-        Console.WriteLine("Invalid token" + hashedToken);
+       // Console.WriteLine("Invalid token" + hashedToken);
         return Results.Problem("Invalid token", statusCode: 400);
     }
-    Console.WriteLine();
-    Console.WriteLine();
-    Console.WriteLine("PASSWORD   " + password);
-
-    Console.WriteLine();
-    Console.WriteLine();
+    
     user.Password = passwordHasher.HashPassword(user, password);
 
-    Console.WriteLine();
-    Console.WriteLine();
-    Console.WriteLine("PASSWORD new  " + user.Password);
-
-    Console.WriteLine();
-    Console.WriteLine();
-
+   
     user.ResetToken = null;
     user.ResetTokenCreationTime = null;
     db.Users.Update(user);

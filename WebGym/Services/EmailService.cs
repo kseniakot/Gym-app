@@ -12,7 +12,7 @@ namespace WebGym.Services
 
             using var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Администрация сайта", "ksu_kotovaa@mail.ru"));
+            emailMessage.From.Add(new MailboxAddress("Администрация зала", "reset.gym@mail.ru"));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -26,7 +26,7 @@ namespace WebGym.Services
                 using (var client = new SmtpClient())
                 {
                     await client.ConnectAsync("smtp.mail.ru", 465, true);
-                    await client.AuthenticateAsync("ksu_kotovaa@mail.ru", "ye6AAjRBCG0eT7nyffXr");
+                    await client.AuthenticateAsync("reset.gym@mail.ru", "kPrk5actB2s4RevjQGRP");
                     await client.SendAsync(emailMessage);
 
                     await client.DisconnectAsync(true);

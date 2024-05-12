@@ -30,12 +30,15 @@ public partial class AddUserViewModel : ObservableObject
 
     private static bool IsAnyNullOrEmpty(object user)
     {
+        var propertiesToCheck = new[] { "Name", "PhoneNumber", "Email", "Password" };
+
         return user.GetType()
             .GetProperties()
-            .Where(pt => pt.PropertyType == typeof(string))
-            .Select(v => (string)v.GetValue(user))
-            .Any(value => string.IsNullOrWhiteSpace(value));
+            .Where(pt => propertiesToCheck.Contains(pt.Name) && (pt.PropertyType == typeof(string)))
+            .Select(v => v.GetValue(user))
+            .Any(value => value == null || string.IsNullOrWhiteSpace(value.ToString()));
     }
+
 
     private async Task<bool> IsUserExistAsync()
     {

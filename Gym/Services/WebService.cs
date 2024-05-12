@@ -636,6 +636,10 @@ namespace Gym.Services
         //RESET PASSWORD
         public async Task ResetPassword(string email)
         {
+            if(!(await IsUserExistAsync(email)))
+            {
+                throw new Exception("User with this email does not exist");
+            }
             HttpContent content = new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync($"{socket}/users/resetpassword", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
