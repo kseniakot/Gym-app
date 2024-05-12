@@ -633,6 +633,21 @@ namespace Gym.Services
             }
         }
 
+        //RESET PASSWORD
+        public async Task ResetPassword(string email)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(email), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users/resetpassword", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
 
 
     }

@@ -16,6 +16,10 @@ using WebGym.Options;
 using System.Data;
 using System.Text.Json.Serialization;
 using WebGym.Services;
+using System.Net;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder();
@@ -81,7 +85,7 @@ app.MapPost("/login", async (User loginData, DBContext db, IPasswordHasher<User>
     var verificationResult = passwordHasher.VerifyHashedPassword(person, person.Password, loginData.Password);
     if (verificationResult == PasswordVerificationResult.Failed)
     {
-        return Results.Problem("Wrong password", statusCode: 403);
+        return Results.Problem("Wrong password", statusCode: 401);
     }
 
 
@@ -498,17 +502,157 @@ app.MapDelete("/memberships/cancel/freeze/{id:int}",
 
 });
 
+
+
 // RESET PASSWORD
 
-app.MapGet("/users/resetpassword",
-    async (HttpContext context) =>
+app.MapGet("/users/resetpassword/{token}",
+    async (DBContext db, HttpContext context) =>
     {
+        var token = WebUtility.UrlDecode(context.Request.RouteValues["token"].ToString());
+        token = token.Replace('-', '+').Replace('_', '/') + new string('=', (4 - token.Length % 4) % 4);
+        using var sha256 = SHA256.Create();
+        Console.WriteLine("Tooken   " + token);
+       
+        if (string.IsNullOrEmpty(token))
+        {
+            // Handle the case where the token is null or empty
+            return Results.Problem("Token is missing", statusCode: 400);
+        }
+        string hashedToken="";
+        try
+        { 
+            byte[] tokenData = Convert.FromBase64String(token);
+            byte[] hashedTokenData = sha256.ComputeHash(tokenData);
+             hashedToken = Convert.ToBase64String(hashedTokenData);
+        }
+        catch (FormatException)
+        {
+            // Handle the case where the token is not a valid Base64 string
+            Console.WriteLine("Invalid token" + hashedToken);
+            return Results.Problem("Invalid token", statusCode: 400);
+           
+        }
+        // Console.WriteLine("Tooken   "+hashedToken);
+        User? user = await db.Users.FirstOrDefaultAsync(u => u.ResetToken == hashedToken);
+        if (user == null)
+        {
+            // Token not found
+            //context.Response.StatusCode = 400;
+            //await context.Response.WriteAsync("Invalid token");
+            Console.WriteLine("Invalid token2" + hashedToken);
+            return Results.Problem("Invalid token", statusCode: 400);
+        }
+
+        
+
+        // Check if the token has expired
+        if (user.ResetTokenCreationTime.Value.AddHours(24) < DateTime.UtcNow)
+        {
+            return Results.Problem("Token has expired", statusCode: 400);
+        }
+
+
+
         context.Response.ContentType = "text/html";
         await context.Response.SendFileAsync(Path.Combine(app.Environment.ContentRootPath, "html", "password.html"));
-    });
-    
+        return Results.Ok();
 
+
+    });
+
+app.MapPost("/users/resetpassword",
+    async (HttpContext context, DBContext db) =>
+    {
+        string email = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        email = email.Trim('"');
+        Console.WriteLine(email);
+        User? user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            // User not found
+            return Results.Problem("User not found", statusCode: 404);
+        }
+
+        // Generate a random token
+        using var rng = new RNGCryptoServiceProvider();
+        byte[] tokenData = new byte[32];
+        rng.GetBytes(tokenData);
+        string token = Convert.ToBase64String(tokenData);
+        token = token.TrimEnd('=').Replace('+', '-').Replace('/', '_');
+
+        // Hash the token and store it in the database
+        using var sha256 = SHA256.Create();
+        byte[] hashedTokenData = sha256.ComputeHash(tokenData);
+        string hashedToken = Convert.ToBase64String(hashedTokenData);
+        user.ResetToken = hashedToken;
+        user.ResetTokenCreationTime = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+        Console.WriteLine("Tooken initial hash   " + hashedToken);
+        Console.WriteLine("Tooken initial   " + token);
+        EmailService emailService = new EmailService();
+        await emailService.SendEmailAsync(email, "Reset Password",
+            $"Go to this link to reset password: <a href='http://192.168.56.1:5119/users/resetpassword/{WebUtility.UrlEncode(token)}'>link</a>");
+        return Results.Ok();
+    }
+
+    );
+
+
+
+
+app.MapPost("users/new-password", async (HttpContext context, DBContext db, IPasswordHasher<User> passwordHasher) =>
+{
    
+    var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+    var doc = JsonDocument.Parse(requestBody);
+    var password = doc.RootElement.GetProperty("password").GetString();
+    var token = doc.RootElement.GetProperty("token").GetString();
+
+    token = WebUtility.UrlDecode(token);
+    token = token.Replace('-', '+').Replace('_', '/') + new string('=', (4 - token.Length % 4) % 4);
+
+    using var sha256 = SHA256.Create();
+    byte[] tokenData = Convert.FromBase64String(token);
+    byte[] hashedTokenData = sha256.ComputeHash(tokenData);
+    string hashedToken = Convert.ToBase64String(hashedTokenData);
+
+   // Console.WriteLine("Tooken   " + hashedToken);
+    
+    User? user = await db.Users.FirstOrDefaultAsync(u => u.ResetToken == hashedToken);
+    if (user == null)
+    {
+        // Token not found
+        //context.Response.StatusCode = 400;
+        Console.WriteLine("Invalid token" + hashedToken);
+        return Results.Problem("Invalid token", statusCode: 400);
+    }
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine("PASSWORD   " + password);
+
+    Console.WriteLine();
+    Console.WriteLine();
+    user.Password = passwordHasher.HashPassword(user, password);
+
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine("PASSWORD new  " + user.Password);
+
+    Console.WriteLine();
+    Console.WriteLine();
+
+    user.ResetToken = null;
+    user.ResetTokenCreationTime = null;
+    db.Users.Update(user);
+    await db.SaveChangesAsync();
+
+    return Results.Ok();
+});
+
+
+
 
 
 

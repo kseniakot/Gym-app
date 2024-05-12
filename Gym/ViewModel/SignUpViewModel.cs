@@ -62,29 +62,29 @@ public partial class SignUpViewModel : ObservableObject
     [RelayCommand]
 	private async Task SignUpAsync()
 	{
-        //PhoneNumber = FormatPhoneNumber(PhoneNumber);
+        PhoneNumber = FormatPhoneNumber(PhoneNumber);
         User.PhoneNumber = PhoneNumber;
-        //if (IsAnyNullOrEmpty(User))
-        //{
-        //   // User = new();
-        //    await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
-        //}
-        //else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"))
-        //{
-        //    await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
-        //}
-       
-        //else if (!Regex.IsMatch(User.PhoneNumber, @"^\+375\(\d{2}\)\d{3}-\d{2}-\d{2}"))
-        //{
-        //   // User = new();
-        //    await Shell.Current.DisplayAlert("Invalid phone number", "Enter phone number in +375(XX)XXX-XX-XX format.", "Ok");
-        //}
-        //else if (await IsUserExistAsync())
-        //{
-        //    // User = new();
-        //    await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
-        //}
-        //else
+        if (IsAnyNullOrEmpty(User))
+        {
+            // User = new();
+            await Shell.Current.DisplayAlert("There is an empty field", "Please fill it out and try again.", "Ok");
+        }
+        else if (!Regex.IsMatch(User.Email, @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"))
+        {
+            await Shell.Current.DisplayAlert("Invalid e-mail", "Please try again.", "Ok");
+        }
+
+        else if (!Regex.IsMatch(User.PhoneNumber, @"^\+375\(\d{2}\)\d{3}-\d{2}-\d{2}"))
+        {
+            // User = new();
+            await Shell.Current.DisplayAlert("Invalid phone number", "Enter phone number in +375(XX)XXX-XX-XX format.", "Ok");
+        }
+        else if (await IsUserExistAsync())
+        {
+            // User = new();
+            await Shell.Current.DisplayAlert("This e-mail is already in use", "Please try another one.", "Ok");
+        }
+        else
         {
             try
             {
