@@ -19,7 +19,9 @@ namespace Gym.Services
     {
         HttpClient client;
         private readonly TokenService tokenService;
-      
+        string socket = "http://192.168.56.1:5119";
+
+
         public WebService(TokenService tokenService, HttpClient client)
         {
 
@@ -37,7 +39,7 @@ namespace Gym.Services
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
            // HttpResponseMessage response = await client.PostAsync("https://localhost:7062/login", content);
-             HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/login", content);
+             HttpResponseMessage response = await client.PostAsync($"{socket}/login", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -77,7 +79,7 @@ namespace Gym.Services
             {
                 Email = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Email).Value,
                 Id = int.Parse(tokenS.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value),
-                Password = tokenS.Claims.First(claim => claim.Type == "Password").Value,
+                //Password = tokenS.Claims.First(claim => claim.Type == "Password").Value,
                 Name = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Name).Value,
                 PhoneNumber = tokenS.Claims.First(claim => claim.Type == ClaimTypes.MobilePhone).Value,
                 IsBanned = bool.Parse(tokenS.Claims.First(claim => claim.Type == "IsBanned").Value),
@@ -95,7 +97,7 @@ namespace Gym.Services
         public async Task RemoveUser(int id)
         {
             // HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7062/users/{id}");
-            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/users/{id}");
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/users/{id}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -110,7 +112,7 @@ namespace Gym.Services
         public async Task AddUserAsync(User user)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/users", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -124,7 +126,7 @@ namespace Gym.Services
         //BAN USER
         public async Task BanUser(int id)
         {
-            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/users/ban/{id}", null);
+            HttpResponseMessage response = await client.PutAsync($"{socket}/users/ban/{id}", null);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -138,7 +140,7 @@ namespace Gym.Services
         //GET ALL USERS
         public async Task<List<User>> GetUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/users");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -160,7 +162,7 @@ namespace Gym.Services
         //GET BANNED USERS
         public async Task<List<User>> GetBannedUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users/banned");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/users/banned");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -182,7 +184,7 @@ namespace Gym.Services
         //GET UNBANNED USERS
         public async Task<List<User>> GetUnbannedUsers()
         {
-            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/users/unbanned");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/users/unbanned");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -204,7 +206,7 @@ namespace Gym.Services
         //ISUSEREXIST
         public async Task<bool> IsUserExistAsync(string email)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/users/exist/{email}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/users/exist/{email}");
             if (response.IsSuccessStatusCode)
             {
                 return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -223,7 +225,7 @@ namespace Gym.Services
         //GET ALL MEMBERSHIPS
         public async Task<List<Membership>> GetAllMemberships()
         {
-            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/memberships");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/memberships");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -245,7 +247,7 @@ namespace Gym.Services
         //GET ACTIVE MEMBERSHIPS BY USER ID
         public async Task<List<MembershipInstance>> GetActiveMembershipsByUserId(int id)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/active/{id}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/memberships/active/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -268,7 +270,7 @@ namespace Gym.Services
         public async Task<List<MembershipInstance>> GetNotActiveMembershipsByUserId(int id)
         {
             {
-                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/notactive/{id}");
+                HttpResponseMessage response = await client.GetAsync($"{socket}/memberships/notactive/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync();
@@ -292,7 +294,7 @@ namespace Gym.Services
         public async Task<List<MembershipInstance>> GetFrozenMembershipsByUserId(int id)
         {
             {
-                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/frozen/{id}");
+                HttpResponseMessage response = await client.GetAsync($"{socket}/memberships/frozen/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync();
@@ -317,7 +319,7 @@ namespace Gym.Services
         {
            
                 
-                HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/user/memberships/exist/{userId}");
+                HttpResponseMessage response = await client.GetAsync($"{socket}/user/memberships/exist/{userId}");
                 if (response.IsSuccessStatusCode)
                 {
                     return bool.Parse(await response.Content.ReadAsStringAsync());
@@ -332,7 +334,7 @@ namespace Gym.Services
         // ACTIVATE MEMBERSHIP
         public async Task<MembershipInstance> ActivateMembershipInstance(int id)
         {
-            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/membershipinstances/activate/{id}", null);
+            HttpResponseMessage response = await client.PutAsync($"{socket}/membershipinstances/activate/{id}", null);
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -353,7 +355,7 @@ namespace Gym.Services
         //DELETE MEMBERSHIP
         public async Task DeleteMembership(Membership membership)
         {
-            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/memberships/{membership.Id}");
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/memberships/{membership.Id}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -367,7 +369,7 @@ namespace Gym.Services
         // DELETE FREEZE
         public async Task DeleteFreeze(Freeze freeze)
         {
-            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/freezes/{freeze.Id}");
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/freezes/{freeze.Id}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -383,7 +385,7 @@ namespace Gym.Services
         //GET MEMBERSHIP BY ID
         public async Task<Membership> GetMembershipById(int id)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/memberships/{id}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/memberships/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -403,7 +405,7 @@ namespace Gym.Services
         //GET FREEZE BY ID
         public async Task<Freeze> GetFreezeById(int id)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/freezes/{id}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/freezes/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -424,7 +426,7 @@ namespace Gym.Services
 
         public async Task<MembershipInstance> GetMembershipInstanceById(int id)
         {
-            HttpResponseMessage response = await client.GetAsync($"https://192.168.56.1:7062/membershipinstances/{id}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/membershipinstances/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -446,7 +448,7 @@ namespace Gym.Services
         {
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"https://192.168.56.1:7062/memberships/exist", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/memberships/exist", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -467,7 +469,7 @@ namespace Gym.Services
         {
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync($"https://192.168.56.1:7062/freezes/exist", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/freezes/exist", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -487,7 +489,7 @@ namespace Gym.Services
         public async Task EditMembership(Membership membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/memberships", content);
+            HttpResponseMessage response = await client.PutAsync($"{socket}/memberships", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -507,7 +509,7 @@ namespace Gym.Services
         public async Task EditFreeze(Freeze freeze)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync($"https://192.168.56.1:7062/freezes", content);
+            HttpResponseMessage response = await client.PutAsync($"{socket}/freezes", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -527,7 +529,7 @@ namespace Gym.Services
         public async Task AddMembership(Membership membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/memberships", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/memberships", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -542,7 +544,7 @@ namespace Gym.Services
         public async Task AddFreeze(Freeze freeze)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(freeze), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/freezes", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/freezes", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -557,7 +559,7 @@ namespace Gym.Services
         public async Task FreezeMembership(MembershipInstance membership)
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(membership), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("https://192.168.56.1:7062/memberships/freeze", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/memberships/freeze", content);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -571,7 +573,7 @@ namespace Gym.Services
         // CANCEL FREEZE
         public async Task CancelFreeze(int membershipId)
         {
-            HttpResponseMessage response = await client.DeleteAsync($"https://192.168.56.1:7062/memberships/cancel/freeze/{membershipId}");
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/memberships/cancel/freeze/{membershipId}");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
@@ -599,7 +601,7 @@ namespace Gym.Services
             user?.UserMemberships?.Add(membershipInstance);
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync("https://192.168.56.1:7062/memberships/buy", content);
+            HttpResponseMessage response = await client.PutAsync($"{socket}/memberships/buy", content);
 
 
             if (!response.IsSuccessStatusCode)
@@ -612,7 +614,7 @@ namespace Gym.Services
         //GET ALL FREEZES
         public async Task<List<Freeze>> GetAllFreezes()
         {
-            HttpResponseMessage response = await client.GetAsync("https://192.168.56.1:7062/freezes");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/freezes");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
