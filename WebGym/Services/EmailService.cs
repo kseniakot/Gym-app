@@ -12,7 +12,7 @@ namespace WebGym.Services
 
             using var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Администрация зала", "reset.gym@mail.ru"));
+            emailMessage.From.Add(new MailboxAddress("Gym Admin", "reset.gym@mail.ru"));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
