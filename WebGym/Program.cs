@@ -669,7 +669,7 @@ app.MapPost("/users/resetpassword",
         await emailService.SendEmailAsync(email, "Reset Password",
             $"Hello!<br><br> This message was sent to you since<br><br> you've been trying to reset" +
             $"<br><br>your password in your gym profile.<br><br> " +
-            $"Go to this link to reset password: <a href='http://192.168.56.1:5119/users/resetpassword/{WebUtility.UrlEncode(token)}'>CREATE NEW PASSWORD</a>" +
+            $"Go to this link to reset password: <a href='https://stirred-lightly-cattle.ngrok-free.app/users/resetpassword/{WebUtility.UrlEncode(token)}'>CREATE NEW PASSWORD</a>" +
             $"<br><br><br> Or ignore this message if this is a mistake.<br><br>" +
             $"<br><br>With respect, your gym admin!");
         return Results.Ok();

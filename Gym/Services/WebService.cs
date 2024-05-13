@@ -21,8 +21,9 @@ namespace Gym.Services
     {
         HttpClient client;
         private readonly TokenService tokenService;
-        string socket = "http://192.168.56.1:5119";
-
+        // string socket = "http://192.168.56.1:5119";
+        // string socket = "http://localhost:5119";
+        string socket = "https://stirred-lightly-cattle.ngrok-free.app";
 
         public WebService(TokenService tokenService, HttpClient client)
         {
@@ -639,7 +640,7 @@ namespace Gym.Services
 
             HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
             HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
-
+            /////
 
 
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
