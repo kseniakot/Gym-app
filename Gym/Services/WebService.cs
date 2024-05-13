@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Gym.Exceptions;
 using System.Net;
+using Microsoft.Maui.Controls;
+
 
 namespace Gym.Services
 {
@@ -610,6 +612,31 @@ namespace Gym.Services
                 throw new Exception("Failed to buy membership");
             }
         }
+
+        //WORK WITH PAYMENTS
+        public async Task MakePayment(int membershipId)
+        {
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?membershipId={membershipId}", null);
+            string content = await response.Content.ReadAsStringAsync();
+             JsonDocument doc = JsonDocument.Parse(content);
+            Debug.WriteLine(content);
+
+
+            // Get the confirmation_url from the JSON
+             string url = doc.RootElement.GetProperty("confirmation_url").GetString();
+             await Launcher.OpenAsync(new Uri(url));
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+     
+
 
         //GET ALL FREEZES
         public async Task<List<Freeze>> GetAllFreezes()

@@ -20,6 +20,7 @@ using System.Net;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using System.Net.Http.Headers;
 
 
 var builder = WebApplication.CreateBuilder();
@@ -178,6 +179,73 @@ app.MapPut("/memberships/buy",
    
     return Results.Ok();
 });
+
+//PAYMENT
+app.MapPost("/users/payment", 
+       async (int membershipId, DBContext dbContext) =>
+       {
+        // GET MEMBERSHIP
+        var membership = await dbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
+           // CREATE REQUEST
+               var client = new HttpClient();
+
+               var byteArray = Encoding.ASCII.GetBytes("385708:test_QjpJqSgi_4o7cPSsSDe667iS9sUBdafzKvBLjmGmdvU");
+               client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+                var content = new StringContent(
+                    $@"{{
+                    ""amount"": {{
+                    ""value"": {membership.Price},
+                    ""currency"": ""RUB""
+                    }},
+                    ""capture"": true,
+                    ""confirmation"": {{
+                    ""type"": ""redirect"",
+                        ""return_url"": ""https://support.google.com/mail/answer/6304825?hl=en&co=GENIE.Platform%3DDesktop""
+                    }}
+                    }}", Encoding.UTF8);
+
+               content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+               var request = new HttpRequestMessage
+               {
+                   Method = HttpMethod.Post,
+                   RequestUri = new Uri("https://api.yookassa.ru/v3/payments"),
+                   Headers =
+            {
+                { "Idempotence-Key", DateTime.Now.ToString() },
+            },
+                   Content = content
+               };
+           // SEND REQUEST
+           try { 
+               var response = await client.SendAsync(request);
+               string content_link = await response.Content.ReadAsStringAsync();
+               JsonDocument doc = JsonDocument.Parse(content_link);
+               string url = doc.RootElement.GetProperty("confirmation").GetProperty("confirmation_url").GetString();
+
+
+               if (response.IsSuccessStatusCode)
+               {
+                   return Results.Ok(new { confirmation_url = url });
+               }
+               else
+               {
+                   //Console.WriteLine(request.ToString());
+                   //Console.WriteLine("Error: " + response.StatusCode);
+                   return Results.Problem("Error occurred while making the payment.");
+               }
+
+           }
+
+           catch (Exception ex)
+           {
+               //Console.WriteLine();
+               //Console.WriteLine("PROBLEM!!!");
+               //Console.WriteLine(ex.Message);
+               return Results.Problem(ex.Message);
+           }
+       });
 
 
 // GET ALL USERS
@@ -637,6 +705,9 @@ app.MapPost("users/new-password", async (HttpContext context, DBContext db, IPas
 
     return Results.Ok();
 });
+
+
+
 
 
 
