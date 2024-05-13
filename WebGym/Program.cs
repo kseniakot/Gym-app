@@ -201,7 +201,7 @@ app.MapPost("/users/payment",
                     ""capture"": true,
                     ""confirmation"": {{
                     ""type"": ""redirect"",
-                        ""return_url"": ""https://support.google.com/mail/answer/6304825?hl=en&co=GENIE.Platform%3DDesktop""
+                        ""return_url"": ""http://192.168.56.1:5119/users/resetpassword/""
                     }}
                     }}", Encoding.UTF8);
 
@@ -227,6 +227,7 @@ app.MapPost("/users/payment",
 
                if (response.IsSuccessStatusCode)
                {
+                   Console.WriteLine("Success: " + url);
                    return Results.Ok(new { confirmation_url = url });
                }
                else
@@ -246,6 +247,23 @@ app.MapPost("/users/payment",
                return Results.Problem(ex.Message);
            }
        });
+
+////CHECK PAYMENT STATUS
+//app.MapPost("/payment/notification", async (PaymentNotification notification, DBContext dbContext) =>
+//{
+//    // Check the status of the payment
+//    if (notification.Object.Status == "succeeded")
+//    {
+//        Console.WriteLine("Payment was successful");
+//    }
+//    else
+//    {
+//        Console.WriteLine("Payment was not successful");
+//    }
+
+//    // Always return a 200 OK response to acknowledge receipt of the notification
+//    return Results.Ok();
+//});
 
 
 // GET ALL USERS

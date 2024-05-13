@@ -625,11 +625,28 @@ namespace Gym.Services
             // Get the confirmation_url from the JSON
              string url = doc.RootElement.GetProperty("confirmation_url").GetString();
              await Launcher.OpenAsync(new Uri(url));
+
+
+            //JUST FOR TESTING
+            User user = await GetUserFromToken();
+            var membershipInstance = new MembershipInstance
+            {
+                MembershipId = membershipId,
+                UserId = user.Id,
+            };
+
+            user?.UserMemberships?.Add(membershipInstance);
+
+            HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+            HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
+
+
+
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
             }
-            else if (!response.IsSuccessStatusCode)
+            else if (!response.IsSuccessStatusCode || !response2.IsSuccessStatusCode)
             {
                 throw new Exception(response.StatusCode.ToString());
             }
