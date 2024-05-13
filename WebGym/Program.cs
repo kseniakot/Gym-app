@@ -29,6 +29,7 @@ string connection = builder.Configuration.GetConnectionString("DefaultConnection
 builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection, options => options.MigrationsAssembly("WebGym")));
 builder.Services.AddHostedService<CleanupService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddTransient<EmailService>();
 
 //Add Authorization and Authentication
 builder.Services.AddAuthorization(options =>
@@ -167,7 +168,11 @@ async (int id, DBContext db) =>
 app.MapPut("/memberships/buy", 
     async (User user, DBContext dbContext) =>
 {
-    dbContext.Users.Update(user);
+    var userInDb = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+    if (userInDb == null) return Results.NotFound(new { message = "No such user" });
+    userInDb.UserMemberships = user.UserMemberships;
+
+    dbContext.Users.Update(userInDb);
     await dbContext.SaveChangesAsync();
 
    
@@ -553,7 +558,7 @@ app.MapGet("/users/resetpassword/{token}",
     });
 
 app.MapPost("/users/resetpassword",
-    async (HttpContext context, DBContext db) =>
+    async (HttpContext context, DBContext db, EmailService emailService) =>
     {
         string email = await new StreamReader(context.Request.Body).ReadToEndAsync();
         email = email.Trim('"');
@@ -573,7 +578,7 @@ app.MapPost("/users/resetpassword",
         var hashedToken = TokenGenerator.HashToken(token);
         await TokenGenerator.SaveUserToken(user, hashedToken, db);
       
-        EmailService emailService = new EmailService();
+       // EmailService emailService = new EmailService();
 
         await emailService.SendEmailAsync(email, "Reset Password",
             $"Hello!<br><br> This message was sent to you since<br><br> you've been trying to reset" +

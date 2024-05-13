@@ -7,6 +7,12 @@ namespace WebGym.Services
 {
     public class EmailService
     {
+        private readonly IConfiguration _configuration;
+
+        public EmailService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public async Task SendEmailAsync(string email, string subject, string message)
         {
 
@@ -26,7 +32,7 @@ namespace WebGym.Services
                 using (var client = new SmtpClient())
                 {
                     await client.ConnectAsync("smtp.mail.ru", 465, true);
-                    await client.AuthenticateAsync("reset.gym@mail.ru", "kPrk5actB2s4RevjQGRP");
+                    await client.AuthenticateAsync("reset.gym@mail.ru", _configuration["Password"]);
                     await client.SendAsync(emailMessage);
 
                     await client.DisconnectAsync(true);
