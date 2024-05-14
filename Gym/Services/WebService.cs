@@ -615,12 +615,12 @@ namespace Gym.Services
         }
 
         //WORK WITH PAYMENTS
-        public async Task MakePayment(int membershipId)
+        public async Task MakePayment(int userId, int membershipId)
         {
-            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?membershipId={membershipId}", null);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?userId={userId}&membershipId={membershipId}", null);
             string content = await response.Content.ReadAsStringAsync();
              JsonDocument doc = JsonDocument.Parse(content);
-            Debug.WriteLine(content);
+           // Debug.WriteLine(content);
 
 
             // Get the confirmation_url from the JSON
@@ -629,17 +629,17 @@ namespace Gym.Services
 
 
             //JUST FOR TESTING
-            User user = await GetUserFromToken();
-            var membershipInstance = new MembershipInstance
-            {
-                MembershipId = membershipId,
-                UserId = user.Id,
-            };
+            //User user = await GetUserFromToken();
+            //var membershipInstance = new MembershipInstance
+            //{
+            //    MembershipId = membershipId,
+            //    UserId = user.Id,
+            //};
 
-            user?.UserMemberships?.Add(membershipInstance);
+            //user?.UserMemberships?.Add(membershipInstance);
 
-            HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
+            //HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+            //HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
             /////
 
 
@@ -647,9 +647,38 @@ namespace Gym.Services
             {
                 throw new SessionExpiredException();
             }
-            else if (!response.IsSuccessStatusCode || !response2.IsSuccessStatusCode)
+            else if (!response.IsSuccessStatusCode)
             {
                 throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        // CHECK STATUS OF PAYMENT
+        public async Task CheckPaymentStatus(int userId, int membershipId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/payment/notification?userId={userId}");
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Debug.WriteLine(await response.Content.ReadAsStringAsync());
+            User user = JsonSerializer.Deserialize<User>((await response.Content.ReadAsStringAsync()), options);
+
+            if (user.Payment.Paid)
+            {
+               
+                var membershipInstance = new MembershipInstance
+                {
+                    MembershipId = membershipId,
+                    UserId = user.Id,
+                };
+
+                user?.UserMemberships?.Add(membershipInstance);
+
+                HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+                HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
+                
+            }
+            else
+            {
+                throw new Exception("Payment not completed");
             }
         }
 

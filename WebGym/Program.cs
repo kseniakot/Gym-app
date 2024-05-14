@@ -182,8 +182,10 @@ app.MapPut("/memberships/buy",
 
 //PAYMENT
 app.MapPost("/users/payment", 
-       async (int membershipId, DBContext dbContext) =>
+       async (int userId, int membershipId, DBContext dbContext) =>
        {
+           // GET USER
+           var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         // GET MEMBERSHIP
         var membership = await dbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
            // CREATE REQUEST
@@ -217,12 +219,36 @@ app.MapPost("/users/payment",
             },
                    Content = content
                };
+
            // SEND REQUEST
            try { 
                var response = await client.SendAsync(request);
                string content_link = await response.Content.ReadAsStringAsync();
                JsonDocument doc = JsonDocument.Parse(content_link);
                string url = doc.RootElement.GetProperty("confirmation").GetProperty("confirmation_url").GetString();
+
+               //SAVE PAYMENT TO USER IN DB
+               var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+               Payment payment = JsonSerializer.Deserialize<Payment>(content_link, options);
+              
+
+               Console.WriteLine();
+               Console.WriteLine();
+               Console.WriteLine(payment.Id);
+
+               //Add or update payment
+               payment.UserId = user.Id;
+               var existingPayment = await dbContext.Payments.FirstOrDefaultAsync(p => p.UserId == user.Id);
+               if(existingPayment != null)
+               {
+                   dbContext.Payments.Add(payment);
+               }
+               else
+               {
+                   dbContext.Payments.Update(payment);
+               }
+               
+               await dbContext.SaveChangesAsync();
 
 
                if (response.IsSuccessStatusCode)
@@ -232,8 +258,6 @@ app.MapPost("/users/payment",
                }
                else
                {
-                   //Console.WriteLine(request.ToString());
-                   //Console.WriteLine("Error: " + response.StatusCode);
                    return Results.Problem("Error occurred while making the payment.");
                }
 
@@ -241,29 +265,54 @@ app.MapPost("/users/payment",
 
            catch (Exception ex)
            {
-               //Console.WriteLine();
-               //Console.WriteLine("PROBLEM!!!");
-               //Console.WriteLine(ex.Message);
                return Results.Problem(ex.Message);
            }
        });
 
 ////CHECK PAYMENT STATUS
-//app.MapPost("/payment/notification", async (PaymentNotification notification, DBContext dbContext) =>
-//{
-//    // Check the status of the payment
-//    if (notification.Object.Status == "succeeded")
-//    {
-//        Console.WriteLine("Payment was successful");
-//    }
-//    else
-//    {
-//        Console.WriteLine("Payment was not successful");
-//    }
+app.MapGet("/payment/notification", 
+    async (int userId, DBContext dbContext) =>
+{
+    var user = await dbContext.Users
+    .Include(u => u.Payment) // Include the Payments navigation property
+    .FirstOrDefaultAsync(u => u.Id == userId);
 
-//    // Always return a 200 OK response to acknowledge receipt of the notification
-//    return Results.Ok();
-//});
+    var cancellationTokenSource = new CancellationTokenSource();
+    cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(10)); // Set the cancellation to 10 minutes
+
+    var httpClient = new HttpClient();
+
+    while (!cancellationTokenSource.IsCancellationRequested)
+    {
+        var response = await httpClient.GetAsync($"https://api.yookassa.ru/v3/payments/{user.Payment.Id}", cancellationTokenSource.Token);
+    
+        if (response.IsSuccessStatusCode)
+        {
+            var statusContent = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Payment payment = JsonSerializer.Deserialize<Payment>(statusContent, options);
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(payment.Status);
+
+
+            if (payment.Status == "succeeded" || payment.Paid)
+            {
+                user.Payment.Paid = true;
+                user.Payment.Status = "succeeded";
+                await dbContext.SaveChangesAsync();
+                break;
+            }
+        }
+
+        await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token); // Wait for 1 minute before the next request
+    }
+
+    Console.WriteLine("Payment status check completed");
+    Console.WriteLine(user.Payment.Status);
+    return Results.Ok(user);
+});
 
 
 // GET ALL USERS

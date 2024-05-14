@@ -14,6 +14,7 @@ namespace Gym.Model
     public class DBContext : DbContext
     {
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Payment> Payments { get; set; } = null!;
         public DbSet<Member> Members { get; set; } = null!;
         public DbSet<Membership> Memberships { get; set; } = null!;
         public DbSet<MembershipInstance> MembershipInstances { get; set; } = null!;

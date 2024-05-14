@@ -3,6 +3,7 @@ using System;
 using Gym.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebGym.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240513184557_CheckPayment1")]
+    partial class CheckPayment1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,9 +187,6 @@ namespace WebGym.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
                     b.ToTable("Payments");
                 });
 
@@ -218,6 +218,12 @@ namespace WebGym.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentId1")
+                        .HasColumnType("text");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
@@ -229,6 +235,8 @@ namespace WebGym.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PaymentId1");
 
                     b.ToTable("Users");
 
@@ -310,13 +318,13 @@ namespace WebGym.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Gym.Model.Payment", b =>
+            modelBuilder.Entity("Gym.Model.User", b =>
                 {
-                    b.HasOne("Gym.Model.User", "User")
-                        .WithOne("Payment")
-                        .HasForeignKey("Gym.Model.Payment", "UserId");
+                    b.HasOne("Gym.Model.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId1");
 
-                    b.Navigation("User");
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Gym.Model.Freeze", b =>
@@ -338,8 +346,6 @@ namespace WebGym.Migrations
 
             modelBuilder.Entity("Gym.Model.User", b =>
                 {
-                    b.Navigation("Payment");
-
                     b.Navigation("UserFreezes");
 
                     b.Navigation("UserMemberships");

@@ -68,8 +68,11 @@ public partial class BuyMembershipViewModel : ObservableObject
     {
         try
         {
-          //  await webService.BuyMembership(Membership);
-          await webService.MakePayment(Membership.Id);
+          // await webService.BuyMembership(Membership);
+          
+          await webService.MakePayment((await webService.GetUserFromToken()).Id, Membership.Id);
+            await webService.CheckPaymentStatus((await webService.GetUserFromToken()).Id, Membership.Id);
+            await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
 
            // await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
            // await CancelAsync();
