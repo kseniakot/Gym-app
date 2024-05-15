@@ -3,6 +3,7 @@ using Gym.Model;
 using Gym.Services;
 using Gym.Exceptions;
 using CommunityToolkit.Mvvm.Input;
+using System.Diagnostics;
 
 namespace Gym.ViewModel;
 
@@ -28,7 +29,7 @@ public partial class BuyMembershipViewModel : ObservableObject
         }
     }
 
-
+    public event Action<string> LoadPaymentPageRequested;
     public BuyMembershipViewModel(WebService webService)
     {
         this.webService = webService;
@@ -66,27 +67,9 @@ public partial class BuyMembershipViewModel : ObservableObject
     [RelayCommand]
     private async Task PayAsync()
     {
-        try
-        {
-          // await webService.BuyMembership(Membership);
-          
-          await webService.MakePayment((await webService.GetUserFromToken()).Id, Membership.Id);
-            await webService.CheckPaymentStatus((await webService.GetUserFromToken()).Id, Membership.Id);
-            await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
-
-           // await Shell.Current.DisplayAlert("Success", "Check membership in your profile", "Ok");
-           // await CancelAsync();
-        }
-        catch (SessionExpiredException)
-        {
-            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
-            await Shell.Current.GoToAsync("SignInView");
-            Application.Current.MainPage = new AppShell();
-        }
-        catch (Exception e)
-        {
-            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
-        }
+        string url = await webService.MakePayment((await webService.GetUserFromToken()).Id, Membership);
+        Debug.WriteLine(url);
+        LoadPaymentPageRequested?.Invoke(url);
     }
 
 }

@@ -21,6 +21,10 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Net.Http.Headers;
+using yoomoney_api.authorize;
+using System.Net.Sockets;
+//using Newtonsoft.Json;
+///using Newtonsoft.Json;
 
 
 var builder = WebApplication.CreateBuilder();
@@ -180,140 +184,6 @@ app.MapPut("/memberships/buy",
     return Results.Ok();
 });
 
-//PAYMENT
-app.MapPost("/users/payment", 
-       async (int userId, int membershipId, DBContext dbContext) =>
-       {
-           // GET USER
-           var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        // GET MEMBERSHIP
-        var membership = await dbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
-           // CREATE REQUEST
-               var client = new HttpClient();
-
-               var byteArray = Encoding.ASCII.GetBytes("385708:test_QjpJqSgi_4o7cPSsSDe667iS9sUBdafzKvBLjmGmdvU");
-               client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-                var content = new StringContent(
-                    $@"{{
-                    ""amount"": {{
-                    ""value"": {membership.Price},
-                    ""currency"": ""RUB""
-                    }},
-                    ""capture"": true,
-                    ""confirmation"": {{
-                    ""type"": ""redirect"",
-                        ""return_url"": ""http://192.168.56.1:5119/users/resetpassword/""
-                    }}
-                    }}", Encoding.UTF8);
-
-               content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-               var request = new HttpRequestMessage
-               {
-                   Method = HttpMethod.Post,
-                   RequestUri = new Uri("https://api.yookassa.ru/v3/payments"),
-                   Headers =
-            {
-                { "Idempotence-Key", DateTime.Now.ToString() },
-            },
-                   Content = content
-               };
-
-           // SEND REQUEST
-           try { 
-               var response = await client.SendAsync(request);
-               string content_link = await response.Content.ReadAsStringAsync();
-               JsonDocument doc = JsonDocument.Parse(content_link);
-               string url = doc.RootElement.GetProperty("confirmation").GetProperty("confirmation_url").GetString();
-
-               //SAVE PAYMENT TO USER IN DB
-               var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-               Payment payment = JsonSerializer.Deserialize<Payment>(content_link, options);
-              
-
-               Console.WriteLine();
-               Console.WriteLine();
-               Console.WriteLine(payment.Id);
-
-               //Add or update payment
-               payment.UserId = user.Id;
-               var existingPayment = await dbContext.Payments.FirstOrDefaultAsync(p => p.UserId == user.Id);
-               if(existingPayment != null)
-               {
-                   dbContext.Payments.Add(payment);
-               }
-               else
-               {
-                   dbContext.Payments.Update(payment);
-               }
-               
-               await dbContext.SaveChangesAsync();
-
-
-               if (response.IsSuccessStatusCode)
-               {
-                   Console.WriteLine("Success: " + url);
-                   return Results.Ok(new { confirmation_url = url });
-               }
-               else
-               {
-                   return Results.Problem("Error occurred while making the payment.");
-               }
-
-           }
-
-           catch (Exception ex)
-           {
-               return Results.Problem(ex.Message);
-           }
-       });
-
-////CHECK PAYMENT STATUS
-app.MapGet("/payment/notification", 
-    async (int userId, DBContext dbContext) =>
-{
-    var user = await dbContext.Users
-    .Include(u => u.Payment) // Include the Payments navigation property
-    .FirstOrDefaultAsync(u => u.Id == userId);
-
-    var cancellationTokenSource = new CancellationTokenSource();
-    cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(10)); // Set the cancellation to 10 minutes
-
-    var httpClient = new HttpClient();
-
-    while (!cancellationTokenSource.IsCancellationRequested)
-    {
-        var response = await httpClient.GetAsync($"https://api.yookassa.ru/v3/payments/{user.Payment.Id}", cancellationTokenSource.Token);
-    
-        if (response.IsSuccessStatusCode)
-        {
-            var statusContent = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Payment payment = JsonSerializer.Deserialize<Payment>(statusContent, options);
-
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(payment.Status);
-
-
-            if (payment.Status == "succeeded" || payment.Paid)
-            {
-                user.Payment.Paid = true;
-                user.Payment.Status = "succeeded";
-                await dbContext.SaveChangesAsync();
-                break;
-            }
-        }
-
-        await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token); // Wait for 1 minute before the next request
-    }
-
-    Console.WriteLine("Payment status check completed");
-    Console.WriteLine(user.Payment.Status);
-    return Results.Ok(user);
-});
-
 
 // GET ALL USERS
 app.MapGet("/users", [Authorize(Policy = "RequireAdminRole")]
@@ -384,6 +254,8 @@ app.MapGet("/memberships",
         .ToListAsync();
         return Results.Ok(memberships);
     });
+
+    
 
 //GET USER ACTIVE MEMBERSHIPS
 app.MapGet("/memberships/active/{id:int}",
@@ -777,11 +649,152 @@ app.MapPost("users/new-password", async (HttpContext context, DBContext db, IPas
 
 
 
+//PAYMENT
+app.MapPost("/users/payment",
+       async (int userId, Order order, DBContext dbContext) =>
+       {
+
+           Console.WriteLine();
+           Console.WriteLine(order.Amount.Currency);
+           // GET USER
+           var user = await dbContext.Users.
+           Include(u => u.Orders)
+           .FirstOrDefaultAsync(u => u.Id == userId);
+
+           // CREATE REQUEST
+           var client = new HttpClient();
+
+           var byteArray = Encoding.ASCII.GetBytes("385708:test_QjpJqSgi_4o7cPSsSDe667iS9sUBdafzKvBLjmGmdvU");
+           client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+           //ADD PAYMENT REQUEST TO DB  
+           user.Orders.Add(order);  
+           //dbContext.Orders.Add(order);
+           dbContext.Users.Update(user);    
+           dbContext.SaveChanges();
+           var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+           string json = System.Text.Json.JsonSerializer.Serialize(order, options);
+           Console.WriteLine();
+           Console.WriteLine(json);
+           HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+           //CREATE REQUEST
+
+           content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+           var request = new HttpRequestMessage
+           {
+               Method = HttpMethod.Post,
+               RequestUri = new Uri("https://api.yookassa.ru/v3/payments"),
+               Headers =
+            {
+                { "Idempotence-Key", DateTime.Now.ToString() },
+            },
+               Content = content
+           };
+
+           // SEND REQUEST
+           
+           var response = await client.SendAsync(request);
+
+           if (response.IsSuccessStatusCode)
+           {
+               var content_with_payment = await response.Content.ReadAsStringAsync();
+               var options_2 = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+               Console.WriteLine();
+               Console.WriteLine(content_with_payment);
+               Payment payment = JsonSerializer.Deserialize<Payment>(content_with_payment, options_2);
+               order.Payment = payment;
+               dbContext.Orders.Update(order);
+               dbContext.SaveChanges();
+               return Results.Ok(payment);
+           }
+           else
+           {
+               Console.WriteLine(response.StatusCode.ToString());
+               return Results.Problem("Error occurred while making the payment.");
+           }
+
+
+       });
+
+
+////
+//app.MapPost("/webhook", async context =>
+// {
+//     var update = await JsonSerializer.DeserializeAsync<PaymentStatusUpdate>(context.Request.Body);
+
+//     if (update.Status == "completed")
+//     {
+//         // The payment is completed, handle it here
+//     }
+//     else if (update.Status == "failed")
+//     {
+//         // The payment failed, handle it here
+//     }
+
+//     context.Response.StatusCode = 200;
+// });
+
+////CHECK PAYMENT STATUS
+//app.MapGet("/payment/notification",
+//    async (int userId, DBContext dbContext) =>
+//{
+//    var user = await dbContext.Users
+//    .Include(u => u.Payment) // Include the Payments navigation property
+//    .FirstOrDefaultAsync(u => u.Id == userId);
+
+//    var cancellationTokenSource = new CancellationTokenSource();
+//    cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(10)); // Set the cancellation to 10 minutes
+
+//    var httpClient = new HttpClient();
+
+//    while (!cancellationTokenSource.IsCancellationRequested)
+//    {
+//        var response = await httpClient.GetAsync($"https://api.yookassa.ru/v3/payments/{user.Payment.Id}", cancellationTokenSource.Token);
+
+//        if (response.IsSuccessStatusCode)
+//        {
+//            var statusContent = await response.Content.ReadAsStringAsync();
+//            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+//            Payment payment = JsonSerializer.Deserialize<Payment>(statusContent, options);
+
+//            Console.WriteLine();
+//            Console.WriteLine();
+//            Console.WriteLine(payment.Status);
+
+
+//            if (payment.Status == "succeeded" || payment.Paid)
+//            {
+//                user.Payment.Paid = true;
+//                user.Payment.Status = "succeeded";
+//                await dbContext.SaveChangesAsync();
+//                break;
+//            }
+//        }
+
+//        await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token); // Wait for 1 minute before the next request
+//    }
+
+//    Console.WriteLine("Payment status check completed");
+//    Console.WriteLine(user.Payment.Status);
+//    return Results.Ok(user);
+//});
+
+
 
 
 
 
 app.Run();
+
+
+
+
+
+
+
+
 
 
 

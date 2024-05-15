@@ -87,7 +87,8 @@ namespace Gym.Services
                 PhoneNumber = tokenS.Claims.First(claim => claim.Type == ClaimTypes.MobilePhone).Value,
                 IsBanned = bool.Parse(tokenS.Claims.First(claim => claim.Type == "IsBanned").Value),
                 UserMemberships = new List<MembershipInstance>(),
-                UserFreezes = new List<FreezeInstance>()
+                UserFreezes = new List<FreezeInstance>(),
+                Orders = new List<Order>()
                
             };
             //Debug.WriteLine("User from token: " + user.Email);
@@ -615,72 +616,76 @@ namespace Gym.Services
         }
 
         //WORK WITH PAYMENTS
-        public async Task MakePayment(int userId, int membershipId)
+        public async Task<string> MakePayment(int userId, Membership membership)
         {
-            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?userId={userId}&membershipId={membershipId}", null);
-            string content = await response.Content.ReadAsStringAsync();
-             JsonDocument doc = JsonDocument.Parse(content);
-           // Debug.WriteLine(content);
-
-
-            // Get the confirmation_url from the JSON
-             string url = doc.RootElement.GetProperty("confirmation_url").GetString();
-             await Launcher.OpenAsync(new Uri(url));
-
-
-            //JUST FOR TESTING
-            //User user = await GetUserFromToken();
-            //var membershipInstance = new MembershipInstance
-            //{
-            //    MembershipId = membershipId,
-            //    UserId = user.Id,
-            //};
-
-            //user?.UserMemberships?.Add(membershipInstance);
-
-            //HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            //HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
-            /////
-
-
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            var order = new Order
             {
-                throw new SessionExpiredException();
-            }
-            else if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception(response.StatusCode.ToString());
-            }
-        }
-
-        // CHECK STATUS OF PAYMENT
-        public async Task CheckPaymentStatus(int userId, int membershipId)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{socket}/payment/notification?userId={userId}");
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            Debug.WriteLine(await response.Content.ReadAsStringAsync());
-            User user = JsonSerializer.Deserialize<User>((await response.Content.ReadAsStringAsync()), options);
-
-            if (user.Payment.Paid)
-            {
-               
-                var membershipInstance = new MembershipInstance
+                UserId = userId,
+                Amount = new Amount
                 {
-                    MembershipId = membershipId,
-                    UserId = user.Id,
-                };
+                    Currency = "RUB",
+                    Value = membership.Price.ToString()
+                },
+                Confirmation = new Redirection
+                {
+                    Type = "redirect",
+                    Return_url = "https://www.paymentgateway.com/paymentfinished"
+                },
+                Capture = true,
 
-                user?.UserMemberships?.Add(membershipInstance);
+            };
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            HttpContent content = new StringContent(JsonSerializer.Serialize(order, options), Encoding.UTF8, "application/json");
 
-                HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-                HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
-                
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?userId={userId}", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content_with_payment = await response.Content.ReadAsStringAsync();
+                Payment payment = JsonSerializer.Deserialize<Payment>(content_with_payment, options);
+                Debug.WriteLine(payment.Confirmation.Confirmation_url);
+                return payment.Confirmation.Confirmation_url;
+
+
             }
             else
             {
-                throw new Exception("Payment not completed");
+                Debug.WriteLine(response.StatusCode.ToString());
+                throw new Exception(response.StatusCode.ToString());
             }
+
         }
+
+
+
+        // CHECK STATUS OF PAYMENT
+        //public async Task CheckPaymentStatus(int userId, int membershipId)
+        //{
+        //    HttpResponseMessage response = await client.GetAsync($"{socket}/payment/notification?userId={userId}");
+        //    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        //    Debug.WriteLine(await response.Content.ReadAsStringAsync());
+        //    User user = JsonSerializer.Deserialize<User>((await response.Content.ReadAsStringAsync()), options);
+
+        //    if (user.Payment.Paid)
+        //    {
+               
+        //        var membershipInstance = new MembershipInstance
+        //        {
+        //            MembershipId = membershipId,
+        //            UserId = user.Id,
+        //        };
+
+        //        user?.UserMemberships?.Add(membershipInstance);
+
+        //        HttpContent content2 = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+        //        HttpResponseMessage response2 = await client.PutAsync($"{socket}/memberships/buy", content2);
+                
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("Payment not completed");
+        //    }
+        //}
 
      
 

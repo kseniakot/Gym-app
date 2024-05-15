@@ -18,8 +18,8 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Cancel" Command="{Binding CancelCommand}"/>
     </ContentPage.ToolbarItems>
-    
-    <VerticalStackLayout>
+
+    <VerticalStackLayout x:Name="MainLayout">
 
     <Label Text="To pay:" FontSize="Small" TextColor="Grey"/>
     

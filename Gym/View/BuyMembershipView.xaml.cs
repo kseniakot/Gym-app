@@ -30,5 +30,37 @@ public partial class BuyMembershipView : ContentPage
         _buyMembershipViewModel = buyMembershipViewModel;
 		InitializeComponent();
         BindingContext = _buyMembershipViewModel;
-	}
-}
+
+        ///
+        var viewModel = (BuyMembershipViewModel)BindingContext;
+
+        // Listen to the LoadPaymentPageRequested event
+        viewModel.LoadPaymentPageRequested += LoadPaymentPage;
+    }
+
+    private void LoadPaymentPage(string url)
+    {
+        // Create a WebView
+        var webView = new WebView()
+        {
+            HeightRequest = Application.Current.MainPage.Height * 0.8,
+        };
+
+        // Handle the Navigating event
+        webView.Navigating += (s, e) =>
+        {
+            if (e.Url.StartsWith("https://www.paymentgateway.com/paymentfinished"))
+            {
+                // Cancel the navigation
+                e.Cancel = true;
+
+                // Navigate back to the previous page
+                Shell.Current.Navigation.PopAsync();
+            }
+           
+        };
+        webView.Source = url;
+        MainLayout.Children.Clear();
+        MainLayout.Children.Add(webView);
+    }
+ }

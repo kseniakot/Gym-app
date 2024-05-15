@@ -14,7 +14,9 @@ namespace Gym.Model
     public class DBContext : DbContext
     {
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Order> Orders { get; set; } = null!;
         public DbSet<Payment> Payments { get; set; } = null!;
+
         public DbSet<Member> Members { get; set; } = null!;
         public DbSet<Membership> Memberships { get; set; } = null!;
         public DbSet<MembershipInstance> MembershipInstances { get; set; } = null!;
@@ -28,23 +30,14 @@ namespace Gym.Model
            // Database.EnsureCreated();   // создаем базу данных при первом обращении
         }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<MembershipInstance>()
-        //         .HasOne(m => m.Member)
-        //         .WithMany(m => m.UserMemberships)
-        //         .HasForeignKey(m => m.MemberId);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Confirmation)
+                .WithOne(c => c.Payment)
+                .HasForeignKey<Confirmation>(c => c.PaymentId);
+        }
 
-        //    modelBuilder.Entity<MembershipInstance>()
-        //        .HasOne(m => m.Membership)
-        //        .WithMany(m => m.MembershipInstances)
-        //        .HasForeignKey(m => m.MembershipId);
-
-        //    modelBuilder.Entity<Freeze>()
-        //        .
-
-
-        //}
 
     }
 }

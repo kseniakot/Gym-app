@@ -19,6 +19,7 @@
 
         // FOR PAYMENT
        // public string? PaymentId { get; set; }
-        public Payment? Payment { get; set; } = null;
+       // public Payment? Payment { get; set; } = null;
+       public List<Order> Orders { get; set; }
     }
 }

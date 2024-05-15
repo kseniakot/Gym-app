@@ -3,6 +3,7 @@ using System;
 using Gym.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebGym.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240515155626_MigrationGetPayment105")]
+    partial class MigrationGetPayment105
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,9 +60,12 @@ namespace WebGym.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Confirmation_url")
+                    b.Property<string>("ConfirmationUrl")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PaymentId")
                         .HasColumnType("text");
@@ -69,6 +75,9 @@ namespace WebGym.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.HasIndex("PaymentId")
                         .IsUnique();
@@ -247,6 +256,9 @@ namespace WebGym.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
@@ -263,33 +275,6 @@ namespace WebGym.Migrations
                         .IsUnique();
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("Gym.Model.Redirection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Return_url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.ToTable("Redirection");
                 });
 
             modelBuilder.Entity("Gym.Model.User", b =>
@@ -359,9 +344,17 @@ namespace WebGym.Migrations
 
             modelBuilder.Entity("Gym.Model.Confirmation", b =>
                 {
+                    b.HasOne("Gym.Model.Order", "Order")
+                        .WithOne("Confirmation")
+                        .HasForeignKey("Gym.Model.Confirmation", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Gym.Model.Payment", "Payment")
                         .WithOne("Confirmation")
                         .HasForeignKey("Gym.Model.Confirmation", "PaymentId");
+
+                    b.Navigation("Order");
 
                     b.Navigation("Payment");
                 });
@@ -448,17 +441,6 @@ namespace WebGym.Migrations
                     b.HasOne("Gym.Model.Order", "Order")
                         .WithOne("Payment")
                         .HasForeignKey("Gym.Model.Payment", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("Gym.Model.Redirection", b =>
-                {
-                    b.HasOne("Gym.Model.Order", "Order")
-                        .WithOne("Confirmation")
-                        .HasForeignKey("Gym.Model.Redirection", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿//using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,27 @@ namespace Gym.Model
 {
     public class Payment
     {
+        //[JsonProperty("id")]
         public string Id { get; set; }
+
+       // [JsonProperty("status")]
         public string Status { get; set; }
-        public bool Paid { get; set; } = false;
+
+       // [JsonProperty("paid")]
+        public bool Paid { get; set; }
+
+     //   [JsonProperty("confirmation")]
+        public Confirmation Confirmation { get; set; }
+
+       // [JsonProperty("created_at")]
+       
+       ///public DateTimeOffset CreatedAt { get; set; }
+       
+
+       [JsonIgnore]
+        public int OrderId { get; set; }
         [JsonIgnore]
-        public int? UserId { get; set; }
-        public User? User { get; set; }
+        public Order? Order { get; set; }    
+
     }
 }
