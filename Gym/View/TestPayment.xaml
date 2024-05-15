@@ -4,8 +4,6 @@
              x:Class="Gym.View.TestPayment"
              Title="TestPayment">
     <StackLayout>
-        <Label Text="Welcome to .NET MAUI!"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
+       
     </StackLayout>
 </ContentPage>

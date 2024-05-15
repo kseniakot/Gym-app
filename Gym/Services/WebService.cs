@@ -629,7 +629,7 @@ namespace Gym.Services
                 Confirmation = new Redirection
                 {
                     Type = "redirect",
-                    Return_url = "https://www.paymentgateway.com/paymentfinished"
+                    Return_url = "https://www.google.com"
                 },
                 Capture = true,
 

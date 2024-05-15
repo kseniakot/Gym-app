@@ -20,7 +20,7 @@
     </ContentPage.ToolbarItems>
 
     <VerticalStackLayout x:Name="MainLayout">
-
+        
     <Label Text="To pay:" FontSize="Small" TextColor="Grey"/>
     
     <Label Text="{Binding Membership.Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />

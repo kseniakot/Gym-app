@@ -1,16 +1,33 @@
+using Gym.Model;
+using System.Diagnostics;
+
 namespace Gym.View;
 
+[QueryProperty(nameof(Url), "Url")]
 public partial class TestPayment : ContentPage
 {
+    string _url;
+    public string Url
+    {
+        set
+        {
+            _url = value;
+            OnPropertyChanged();
+        }
+
+        get => _url;
+
+    }
+   
     public TestPayment()
     {
         var webView = new WebView
         {
-            Source = "https://yoomoney.ru/checkout/payments/v2/contract?orderId=2dd5977c-000f-5000-9000-1fe1555a2673"
+            Source = Url,
         };
         webView.Navigating += (s, e) =>
         {
-            if (e.Url.StartsWith("https://stirred-lightly-cattle.ngrok-free.app/users/resetpassword/"))
+            if (e.Url.StartsWith("https://www.google.com"))
             {
                 // Handle the redirect...
                 e.Cancel = true;
@@ -19,7 +36,8 @@ public partial class TestPayment : ContentPage
                 Shell.Current.Navigation.PopAsync();
             }
         };
-
+        Debug.WriteLine("TestPayment");
+        Debug.WriteLine(Url);
         Content = webView;
     }
 }

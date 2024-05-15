@@ -29,7 +29,7 @@ public partial class BuyMembershipViewModel : ObservableObject
         }
     }
 
-    public event Action<string> LoadPaymentPageRequested;
+    //public event Action<string> LoadPaymentPageRequested;
     public BuyMembershipViewModel(WebService webService)
     {
         this.webService = webService;
@@ -68,8 +68,10 @@ public partial class BuyMembershipViewModel : ObservableObject
     private async Task PayAsync()
     {
         string url = await webService.MakePayment((await webService.GetUserFromToken()).Id, Membership);
+        await Shell.Current.GoToAsync($"TestPayment?Url={url}");
+        
         Debug.WriteLine(url);
-        LoadPaymentPageRequested?.Invoke(url);
+        //LoadPaymentPageRequested?.Invoke(url);
     }
 
 }
