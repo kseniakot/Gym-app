@@ -674,8 +674,8 @@ app.MapPost("/users/payment",
            dbContext.SaveChanges();
            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
            string json = System.Text.Json.JsonSerializer.Serialize(order, options);
-           Console.WriteLine();
-           Console.WriteLine(json);
+          Console.WriteLine();
+          Console.WriteLine(json);
            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
            //CREATE REQUEST

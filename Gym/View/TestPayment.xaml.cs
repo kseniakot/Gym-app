@@ -25,11 +25,11 @@ public partial class TestPayment : ContentPage
             {
                 if (e.Url.StartsWith("https://www.google.com"))
                 {
-                    // Handle the redirect...
+                   
                     e.Cancel = true;
 
-                    // Navigate back to the previous page
-                    Shell.Current.Navigation.PopAsync();
+                    
+                    Shell.Current.GoToAsync("//ShopView");
                 }
             };
             Content = webView;
