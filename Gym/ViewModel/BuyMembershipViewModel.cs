@@ -68,8 +68,8 @@ public partial class BuyMembershipViewModel : ObservableObject
     private async Task PayAsync()
     {
         string url = await webService.MakePayment((await webService.GetUserFromToken()).Id, Membership);
-        await Shell.Current.GoToAsync($"TestPayment?Url={url}");
-        
+        string encodedUrl = Uri.EscapeDataString(url);
+        await Shell.Current.GoToAsync($"TestPayment?Url={encodedUrl}");
         Debug.WriteLine(url);
         //LoadPaymentPageRequested?.Invoke(url);
     }
