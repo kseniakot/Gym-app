@@ -736,6 +736,7 @@ app.MapPost("/users/payment/notification",
                var paymentInDb = await dbContext.Payments
                  .Include(p => p.Order)
                      .ThenInclude(o => o.User)
+                     .ThenInclude(u => u.UserMemberships)
                  .Include(p => p.Order)
                      .ThenInclude(o => o.Membership)
                  .FirstOrDefaultAsync(p => p.Id == notification.Object.Id);
@@ -746,8 +747,14 @@ app.MapPost("/users/payment/notification",
 
                var user = paymentInDb.Order.User;
                var membership = paymentInDb.Order.Membership;
+               var membershipInstance = new MembershipInstance
+               {
+                   MembershipId = membership.Id,
+                   UserId = user.Id,
+               };
 
-
+               user?.UserMemberships?.Add(membershipInstance);
+               dbContext.Users.Update(user);
 
                dbContext.SaveChanges();
            }
