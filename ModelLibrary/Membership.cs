@@ -19,5 +19,7 @@ namespace Gym.Model
         public Freeze? Freeze { get; set; }
         [JsonIgnore]
         public List<MembershipInstance> MembershipInstances { get; set; } = new List<MembershipInstance>();
+        [JsonIgnore]
+        public List<Order> Orders { get; set; } = new List<Order>();
     }
 }

@@ -8,6 +8,19 @@ using System.Threading.Tasks;
 
 namespace Gym.Model
 {
+
+    public class  Notification
+    {
+        [JsonIgnore]
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public string Event { get; set; }
+
+        public Payment Object { get; set; }
+    }
+
+
+
     public class Payment
     {
         //[JsonProperty("id")]
@@ -15,6 +28,7 @@ namespace Gym.Model
 
        // [JsonProperty("status")]
         public string Status { get; set; }
+        public Amount Amount { get; set; }
 
        // [JsonProperty("paid")]
         public bool Paid { get; set; }
@@ -30,7 +44,8 @@ namespace Gym.Model
        [JsonIgnore]
         public int OrderId { get; set; }
         [JsonIgnore]
-        public Order? Order { get; set; }    
+        public Order? Order { get; set; }
+
 
     }
 }

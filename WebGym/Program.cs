@@ -23,6 +23,7 @@ using System.Text.Json;
 using System.Net.Http.Headers;
 using yoomoney_api.authorize;
 using System.Net.Sockets;
+using Microsoft.Extensions.Options;
 //using Newtonsoft.Json;
 ///using Newtonsoft.Json;
 
@@ -651,7 +652,7 @@ app.MapPost("users/new-password", async (HttpContext context, DBContext db, IPas
 
 //PAYMENT
 app.MapPost("/users/payment",
-       async (int userId, Order order, DBContext dbContext) =>
+       async (int userId, int membershipId, Order order, DBContext dbContext) =>
        {
 
            Console.WriteLine();
@@ -661,21 +662,26 @@ app.MapPost("/users/payment",
            Include(u => u.Orders)
            .FirstOrDefaultAsync(u => u.Id == userId);
 
+           //GET MEMBERSHIP
+           var membership = await dbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
+
            // CREATE REQUEST
            var client = new HttpClient();
 
            var byteArray = Encoding.ASCII.GetBytes("385708:test_QjpJqSgi_4o7cPSsSDe667iS9sUBdafzKvBLjmGmdvU");
            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-           //ADD PAYMENT REQUEST TO DB  
+           //ADD PAYMENT REQUEST TO DB
+           membership.Orders.Add(order);
            user.Orders.Add(order);  
            //dbContext.Orders.Add(order);
-           dbContext.Users.Update(user);    
+           dbContext.Users.Update(user); 
+           dbContext.Memberships.Update(membership);
            dbContext.SaveChanges();
            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
            string json = System.Text.Json.JsonSerializer.Serialize(order, options);
-          Console.WriteLine();
-          Console.WriteLine(json);
+            Console.WriteLine();
+            Console.WriteLine(json);
            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
            //CREATE REQUEST
@@ -716,6 +722,36 @@ app.MapPost("/users/payment",
            }
 
 
+       });
+
+//CHECK PAYMENT STATUS
+app.MapPost("/users/payment/notification",
+       async (Notification notification, DBContext dbContext) =>
+       {
+           Console.WriteLine();
+           Console.WriteLine(notification.Object.Status);
+           Console.WriteLine("NOTIFICATION!!!!!!!!");
+           if (notification.Object.Status == "succeeded")
+           {
+               var paymentInDb = await dbContext.Payments
+                 .Include(p => p.Order)
+                     .ThenInclude(o => o.User)
+                 .Include(p => p.Order)
+                     .ThenInclude(o => o.Membership)
+                 .FirstOrDefaultAsync(p => p.Id == notification.Object.Id);
+               if (paymentInDb == null) return Results.NotFound(new { message = "No such payment" });
+               paymentInDb.Status = notification.Object.Status;
+               paymentInDb.Paid = true;
+               dbContext.Payments.Update(paymentInDb);
+
+               var user = paymentInDb.Order.User;
+               var membership = paymentInDb.Order.Membership;
+
+
+
+               dbContext.SaveChanges();
+           }
+           return Results.Ok();
        });
 
 

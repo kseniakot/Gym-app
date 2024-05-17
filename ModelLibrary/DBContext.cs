@@ -32,10 +32,20 @@ namespace Gym.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Confirmation)
-                .WithOne(c => c.Payment)
-                .HasForeignKey<Confirmation>(c => c.PaymentId);
+            //modelBuilder.Entity<Payment>()
+            //    .HasOne(p => p.Confirmation)
+            //    .WithOne(c => c.Payment)
+            //    .HasForeignKey<Confirmation>(c => c.PaymentId);
+
+            //modelBuilder.Entity<Payment>()
+            //       .HasOne(p => p.Amount)
+            //       .WithOne(a => a.Payment)
+            //       .HasForeignKey<Amount>(a => a.PaymentId);
+
+            modelBuilder.Entity<Payment>().OwnsOne(p => p.Amount);
+            modelBuilder.Entity<Payment>().OwnsOne(p => p.Confirmation);
+            modelBuilder.Entity<Order>().OwnsOne(p => p.Confirmation);
+            modelBuilder.Entity<Order>().OwnsOne(p => p.Amount);
         }
 
 

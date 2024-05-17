@@ -11,8 +11,7 @@ namespace Gym.Model
 {
     public class Amount
     {
-        [JsonIgnore]
-        public int Id { get; set; }
+        
 
      //   [JsonProperty("value")]
         public string Value { get; set; }
@@ -20,45 +19,49 @@ namespace Gym.Model
       //  [JsonProperty("currency")]
         public string Currency { get; set; }
 
-        [JsonIgnore]
-        public int OrderId { get; set; }
-        [JsonIgnore]
-        public Order Order { get; set; }
+        //[JsonIgnore]
+        //public int OrderId { get; set; }
+        //[JsonIgnore]
+        //public Order Order { get; set; }
+
+        //[JsonIgnore]
+        //public string PaymentId { get; set; }
+        //[JsonIgnore]
+        //public Payment Payment { get; set; }
 
     }
 
     public class Confirmation
     {
-        [JsonIgnore]
-        public int Id { get; set; }
+       
       //  [JsonProperty("type")]
         public string Type { get; set; }
 
       //  [JsonProperty("confirmation_url")]
         public string Confirmation_url { get; set; }
 
-        [JsonIgnore]
-        public string? PaymentId { get; set; }
-        [JsonIgnore]
-        public Payment? Payment { get; set; }
+        //[JsonIgnore]
+        //public string? PaymentId { get; set; }
+        //[JsonIgnore]
+        //public Payment? Payment { get; set; }
     }
    
     public class Redirection
     {
-        [JsonIgnore]
-        public int Id { get; set; }
+       
         //  [JsonProperty("type")]
         public string Type { get; set; }
 
         //  [JsonProperty("confirmation_url")]
         public string Return_url { get; set; }
-        [JsonIgnore]
-        public int OrderId { get; set; }
-        [JsonIgnore]
-        public Order Order { get; set; }
+        //[JsonIgnore]
+        //public int OrderId { get; set; }
+        //[JsonIgnore]
+        //public Order Order { get; set; }
 
 
     }
+
 
     public class Order
     {
@@ -83,7 +86,11 @@ namespace Gym.Model
         //public string Description { get; set; }
 
         [JsonIgnore]
-        public Payment? Payment { get; set; }  
+        public Payment? Payment { get; set; }
+        [JsonIgnore]
+        public int? MembershipId { get; set; }
+        [JsonIgnore]
+        public Membership? Membership { get; set; }
     }
 
 

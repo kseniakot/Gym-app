@@ -621,6 +621,7 @@ namespace Gym.Services
             var order = new Order
             {
                 UserId = userId,
+                MembershipId = membership.Id,
                 Amount = new Amount
                 {
                     Currency = "RUB",
@@ -637,7 +638,7 @@ namespace Gym.Services
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             HttpContent content = new StringContent(JsonSerializer.Serialize(order, options), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?userId={userId}", content);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/users/payment?userId={userId}&membershipId={membership.Id}", content);
 
             if (response.IsSuccessStatusCode)
             {

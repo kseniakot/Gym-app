@@ -3,6 +3,7 @@ using System;
 using Gym.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebGym.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240517050054_NewMigrNotify")]
+    partial class NewMigrNotify
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,15 +181,10 @@ namespace WebGym.Migrations
                     b.Property<bool>("Capture")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("MembershipId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MembershipId");
 
                     b.HasIndex("UserId");
 
@@ -338,10 +336,6 @@ namespace WebGym.Migrations
 
             modelBuilder.Entity("Gym.Model.Order", b =>
                 {
-                    b.HasOne("Gym.Model.Membership", "Membership")
-                        .WithMany("Orders")
-                        .HasForeignKey("MembershipId");
-
                     b.HasOne("Gym.Model.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
@@ -356,6 +350,9 @@ namespace WebGym.Migrations
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasColumnType("text");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
@@ -372,6 +369,9 @@ namespace WebGym.Migrations
                     b.OwnsOne("Gym.Model.Redirection", "Confirmation", b1 =>
                         {
                             b1.Property<int>("OrderId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Id")
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Return_url")
@@ -396,8 +396,6 @@ namespace WebGym.Migrations
                     b.Navigation("Confirmation")
                         .IsRequired();
 
-                    b.Navigation("Membership");
-
                     b.Navigation("User");
                 });
 
@@ -417,6 +415,9 @@ namespace WebGym.Migrations
                             b1.Property<string>("Confirmation_url")
                                 .IsRequired()
                                 .HasColumnType("text");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Type")
                                 .IsRequired()
@@ -438,6 +439,9 @@ namespace WebGym.Migrations
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasColumnType("text");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
@@ -470,8 +474,6 @@ namespace WebGym.Migrations
             modelBuilder.Entity("Gym.Model.Membership", b =>
                 {
                     b.Navigation("MembershipInstances");
-
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Gym.Model.MembershipInstance", b =>

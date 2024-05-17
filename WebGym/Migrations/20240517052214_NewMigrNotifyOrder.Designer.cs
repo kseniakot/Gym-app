@@ -3,6 +3,7 @@ using System;
 using Gym.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebGym.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20240517052214_NewMigrNotifyOrder")]
+    partial class NewMigrNotifyOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -357,6 +360,9 @@ namespace WebGym.Migrations
                                 .IsRequired()
                                 .HasColumnType("text");
 
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
+
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasColumnType("text");
@@ -372,6 +378,9 @@ namespace WebGym.Migrations
                     b.OwnsOne("Gym.Model.Redirection", "Confirmation", b1 =>
                         {
                             b1.Property<int>("OrderId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Id")
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Return_url")
@@ -418,6 +427,9 @@ namespace WebGym.Migrations
                                 .IsRequired()
                                 .HasColumnType("text");
 
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
+
                             b1.Property<string>("Type")
                                 .IsRequired()
                                 .HasColumnType("text");
@@ -438,6 +450,9 @@ namespace WebGym.Migrations
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasColumnType("text");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
