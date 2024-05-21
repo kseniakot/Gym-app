@@ -171,19 +171,19 @@ async (int id, DBContext db) =>
 });
 
 // BUY MEMBERSHIP
-app.MapPut("/memberships/buy", 
-    async (User user, DBContext dbContext) =>
-{
-    var userInDb = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-    if (userInDb == null) return Results.NotFound(new { message = "No such user" });
-    userInDb.UserMemberships = user.UserMemberships;
+//app.MapPut("/memberships/buy", 
+//    async (User user, DBContext dbContext) =>
+//{
+//    var userInDb = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+//    if (userInDb == null) return Results.NotFound(new { message = "No such user" });
+//    userInDb.UserMemberships = user.UserMemberships;
 
-    dbContext.Users.Update(userInDb);
-    await dbContext.SaveChangesAsync();
+//    dbContext.Users.Update(userInDb);
+//    await dbContext.SaveChangesAsync();
 
    
-    return Results.Ok();
-});
+//    return Results.Ok();
+//});
 
 
 // GET ALL USERS
@@ -736,7 +736,6 @@ app.MapPost("/users/payment/notification",
                var paymentInDb = await dbContext.Payments
                  .Include(p => p.Order)
                      .ThenInclude(o => o.User)
-                     .ThenInclude(u => u.UserMemberships)
                  .Include(p => p.Order)
                      .ThenInclude(o => o.Membership)
                  .FirstOrDefaultAsync(p => p.Id == notification.Object.Id);
@@ -752,9 +751,18 @@ app.MapPost("/users/payment/notification",
                    MembershipId = membership.Id,
                    UserId = user.Id,
                };
-
-               user?.UserMemberships?.Add(membershipInstance);
-               dbContext.Users.Update(user);
+               if (user is Member member)
+               {
+                   member?.UserMemberships?.Add(membershipInstance);
+                   dbContext.Members.Update(member);
+               }
+               else
+               {
+                   Member newMember = new Member(user);
+                   newMember?.UserMemberships?.Add(membershipInstance);
+                   dbContext.Users.Remove(user);
+                   dbContext.Members.Add(newMember);
+               }
 
                dbContext.SaveChanges();
            }

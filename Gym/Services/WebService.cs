@@ -86,8 +86,6 @@ namespace Gym.Services
                 Name = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Name).Value,
                 PhoneNumber = tokenS.Claims.First(claim => claim.Type == ClaimTypes.MobilePhone).Value,
                 IsBanned = bool.Parse(tokenS.Claims.First(claim => claim.Type == "IsBanned").Value),
-                UserMemberships = new List<MembershipInstance>(),
-                UserFreezes = new List<FreezeInstance>(),
                 Orders = new List<Order>()
                
             };
@@ -589,31 +587,31 @@ namespace Gym.Services
         }
 
         //BUY MEMBERSHIP
-        public async Task BuyMembership(Membership membership)
-        {
-           // Debug.WriteLine("Buying membership");
-            var user = await GetUserFromToken();
+        //public async Task BuyMembership(Membership membership)
+        //{
+        //   // Debug.WriteLine("Buying membership");
+        //    var user = await GetUserFromToken();
 
 
 
-            var membershipInstance = new MembershipInstance
-            {
-                MembershipId = membership.Id,
-                UserId = user.Id,
-            };
+        //    var membershipInstance = new MembershipInstance
+        //    {
+        //        MembershipId = membership.Id,
+        //        UserId = user.Id,
+        //    };
 
-            user?.UserMemberships?.Add(membershipInstance);
+        //    user?.UserMemberships?.Add(membershipInstance);
 
-            HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync($"{socket}/memberships/buy", content);
+        //    HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+        //    HttpResponseMessage response = await client.PutAsync($"{socket}/memberships/buy", content);
 
 
-            if (!response.IsSuccessStatusCode)
-            {
-                Debug.WriteLine(response.StatusCode);
-                throw new Exception("Failed to buy membership");
-            }
-        }
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        Debug.WriteLine(response.StatusCode);
+        //        throw new Exception("Failed to buy membership");
+        //    }
+        //}
 
         //WORK WITH PAYMENTS
         public async Task<string> MakePayment(int userId, Membership membership)

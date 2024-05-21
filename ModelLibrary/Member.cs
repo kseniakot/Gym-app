@@ -10,5 +10,27 @@ namespace Gym.Model
     {
         //public List<MembershipInstance>? UserMemberships { get; set; }
         //public List<FreezeInstance>? UserFreezes { get; set;}
+
+        public List<MembershipInstance>? UserMemberships { get; set; }
+        public Member()
+        {
+            UserMemberships = new List<MembershipInstance>();
+        }
+
+        public Member(User user)
+        {
+            this.Id = user.Id;
+            this.Name = user.Name;
+            this.PhoneNumber = user.PhoneNumber;
+            this.Email = user.Email;
+            this.Password = user.Password;
+            this.IsBanned = user.IsBanned;
+            this.ResetToken = user.ResetToken;
+            this.ResetTokenCreationTime = user.ResetTokenCreationTime;
+            this.Orders = user.Orders;
+            UserMemberships = new List<MembershipInstance>();
+        }
     }
+
+   
 }
