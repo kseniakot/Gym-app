@@ -20,5 +20,25 @@
        // public string? PaymentId { get; set; }
        // public Payment? Payment { get; set; } = null;
        public List<Order> Orders { get; set; }
+
+
+        public User()
+        {
+            Orders = new List<Order>();
+        }
+
+        public User(User user)
+        {
+            this.Id = user.Id;
+            this.Name = user.Name;
+            this.PhoneNumber = user.PhoneNumber;
+            this.Email = user.Email;
+            this.Password = user.Password;
+            this.IsBanned = user.IsBanned;
+            this.ResetToken = user.ResetToken;
+            this.ResetTokenCreationTime = user.ResetTokenCreationTime;
+            this.Orders = user.Orders;
+        }
+
     }
 }

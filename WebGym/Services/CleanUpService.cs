@@ -19,6 +19,7 @@ namespace WebGym.Services
                 {
                     var db = scope.ServiceProvider.GetRequiredService<DBContext>();
                     var today = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
+
                     var expiredFreezes = await db.ActiveFreezes
                         .Include(f => f.MembershipInstance)
                         .Where(f => f.EndDate < today)
@@ -32,8 +33,19 @@ namespace WebGym.Services
 
                     // Clear expired memberships
                     var expiredMemberships = await db.MembershipInstances
+                        .Include(m => m.User)
+                        .ThenInclude(u => u.UserMemberships)
                         .Where(m => m.EndDate < today)
                         .ToListAsync();
+                    foreach (var membership in expiredMemberships)
+                    {
+                        if(membership.User.UserMemberships.Count == 1)
+                        {
+                            var user = new User(membership.User);
+                            db.Members.Remove(membership.User);
+                            db.Users.Add(user);
+                        }
+                    }
                    db.MembershipInstances.RemoveRange(expiredMemberships);
 
                     //Activate meberships purchased 30 days ago
@@ -60,8 +72,13 @@ namespace WebGym.Services
                         db.ActiveFreezes.Add(freezeActive);
 
                     }
+
+
                     await db.SaveChangesAsync();
                 }
+
+
+
 
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
