@@ -6,6 +6,7 @@ using Gym.Services;
 using Gym.View;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
+using System.Diagnostics;
 
 namespace Gym.ViewModel;
 
@@ -76,8 +77,14 @@ public partial class SignInViewModel : ObservableObject
                 }
                 else
                 {
+                    Debug.WriteLine("\n");
+                    Debug.WriteLine(await _webService.CheckUserOrMember(User.Email));
                     //await Shell.Current.GoToAsync("//UserMainPage");
-                    Application.Current.MainPage = new UserShell();
+
+                    var userShellViewModel = new UserShellViewModel(_webService);
+                    Application.Current.MainPage = new UserShell(userShellViewModel);
+
+                  
                 }
             }
             catch (Exception ex)

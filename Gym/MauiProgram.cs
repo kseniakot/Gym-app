@@ -29,6 +29,9 @@ namespace Gym
 
             builder.Services.AddSingleton<WebService>();
 
+            builder.Services.AddTransient<UserShellViewModel>();
+            builder.Services.AddTransient<UserShell>();
+
             builder.Services.AddTransient<SignUpViewModel>();
             builder.Services.AddTransient<SignUpView>();
 

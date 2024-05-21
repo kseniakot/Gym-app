@@ -770,6 +770,18 @@ app.MapPost("/users/payment/notification",
        });
 
 
+//USER OR MEMBER BY EMAIL
+app.MapGet("/users/status/{email}",
+          async (string email, DBContext db) =>
+          {
+           var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+           if (user == null) return Results.NotFound(new { message = "No such user" });
+           if(user is Member) return Results.Ok(true);
+           return Results.Ok(false);
+       });
+
+
+
 ////
 //app.MapPost("/webhook", async context =>
 // {

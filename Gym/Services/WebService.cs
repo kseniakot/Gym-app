@@ -731,6 +731,25 @@ namespace Gym.Services
         }
 
 
+        //CHECK USER STATUS
+        public async Task<bool> CheckUserOrMember(string email)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/users/status/{email}");
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception((response.StatusCode.ToString()));
+            }
+        }   
+
+
 
     }
 }

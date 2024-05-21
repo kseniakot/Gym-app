@@ -1,9 +1,12 @@
+using Gym.ViewModel;
+using System.Diagnostics;
 namespace Gym.View;
-//namespace Gym;
+
 
 public partial class UserShell : Shell
 {
-	public UserShell()
+
+    public UserShell(UserShellViewModel userShellViewModel)
 	{
         Routing.RegisterRoute("SignInView", typeof(SignInView));
         Routing.RegisterRoute("ShopView", typeof(ShopView));
@@ -14,8 +17,14 @@ public partial class UserShell : Shell
         Routing.RegisterRoute("FreezeMembershipView", typeof(FreezeMembershipView));
         Routing.RegisterRoute("CancelFreezeView", typeof(CancelFreezeView));
         Routing.RegisterRoute("TestPayment", typeof(TestPayment));
+        BindingContext = userShellViewModel;
         InitializeComponent();
+
+
+
     }
+
+
 
     private async void LogOut_Button(object sender, EventArgs e)
     {

@@ -2,9 +2,14 @@
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        x:Class="Gym.View.UserShell"
+        xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+        x:DataType="viewmodel:UserShellViewModel"
        xmlns:local="clr-namespace:Gym"
        xmlns:view="clr-namespace:Gym.View"
+        xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
        Shell.FlyoutBehavior="Flyout">
+
+
 
     <Shell.FlyoutFooter>
         <Button Text="SIGN OUT"
@@ -13,10 +18,10 @@
                 Clicked="LogOut_Button"/>
     </Shell.FlyoutFooter>
 
-    <FlyoutItem Title="TEST">
+    <FlyoutItem Title="HOME">
         <Tab>
             <ShellContent
-            Title="PROFILE"
+            Title="HOME"
             ContentTemplate="{DataTemplate view:UserMainPage}"
             Route="UserMainPage" />
         </Tab>
@@ -34,9 +39,15 @@
     <FlyoutItem Title="PROFILE">
         <Tab>
             <ShellContent
-      Title="SHOP"
+      Title="PROFILE"
       ContentTemplate="{DataTemplate view:ProfileView}"
       Route="ProfileView" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="TRENERS">
+        <Tab>
+            <ShellContent IsVisible="{Binding IsMember}"  Route="UserMainPage" ContentTemplate="{DataTemplate view:UserMainPage}" />
         </Tab>
     </FlyoutItem>
 

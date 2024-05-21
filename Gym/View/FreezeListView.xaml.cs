@@ -16,7 +16,7 @@ public partial class FreezeListView : ContentPage
     {
         base.OnAppearing();
 
-        // Assuming you have a ViewModel property in your Page class
+       
         _FreezeListViewModel.LoadDataCommand.Execute(null);
     }
 }
