@@ -17,6 +17,9 @@ public partial class UserShell : Shell
         Routing.RegisterRoute("FreezeMembershipView", typeof(FreezeMembershipView));
         Routing.RegisterRoute("CancelFreezeView", typeof(CancelFreezeView));
         Routing.RegisterRoute("TestPayment", typeof(TestPayment));
+        Routing.RegisterRoute("TrenerListView", typeof(TrenerListView));
+        Routing.RegisterRoute("TrenerView", typeof(TrenerView));
+
         BindingContext = userShellViewModel;
         InitializeComponent();
 

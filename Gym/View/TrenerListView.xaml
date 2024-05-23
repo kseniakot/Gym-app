@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.TrenerListView"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+            xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             x:DataType="viewmodel:TrenerListViewModel"   
+              xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+              x:Name="TrenerListPage"
+             Shell.FlyoutBehavior="Disabled">
+    
+    <ScrollView>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Text="SELECT TRENER" FontSize="Large"/>
+
+
+
+            <Frame Grid.Row="1" BorderColor="Black" CornerRadius="5">
+                <ListView 
+    ItemsSource="{Binding Treners}"
+    SelectedItem="{Binding SelectedTrener}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="{x:Type model:Trener}">
+                        <ViewCell>
+                            <StackLayout>
+
+
+                                <VerticalStackLayout>
+
+                                    <Label Text="{Binding Name}" FontSize="Medium"/>
+                                    <Label Text="{Binding PhoneNumber}" FontSize="Small" TextColor="LightGray" />
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.SelectTrenerCommand, Source={x:Reference Name=TrenerListPage}}" 
+               CommandParameter="{Binding .}" />
+                                    </VerticalStackLayout.GestureRecognizers>
+                                </VerticalStackLayout>
+
+                                <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+</Frame>
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

@@ -255,24 +255,24 @@ app.MapGet("/treners",
 
 
 //GET TRENERS WORKDAYS PER WEEK
-app.MapGet("/treners/workload/{id:int}",
-          async (int id, DBContext db) =>
-          {
-              Trener trener = db.Treners
-                  .Include(t => t.WorkDays)
-                      .ThenInclude(wd => wd.WorkHours)
-                  .Single(t => t.Id == id);
+//app.MapGet("/treners/workload/{id:int}",
+//          async (int id, DBContext db) =>
+//          {
+//              Trener trener = db.Treners
+//                  .Include(t => t.WorkDays)
+//                      .ThenInclude(wd => wd.WorkHours)
+//                  .Single(t => t.Id == id);
 
-              var workDaysAndHoursPerWeek = trener.WorkDays
-                    .GroupBy(wd => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(wd.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday))
-                    .Select(g => new
-                    {
-                        Week = g.Key,
-                        WorkDaysCount = g.Count(),
-                        WorkHoursCount = g.SelectMany(wd => wd.WorkHours).Count()
-                    })
-                    .ToList();
-          });
+//              var workDaysAndHoursPerWeek = trener.WorkDays
+//                    .GroupBy(wd => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(wd.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday))
+//                    .Select(g => new
+//                    {
+//                        Week = g.Key,
+//                        WorkDaysCount = g.Count(),
+//                        WorkHoursCount = g.SelectMany(wd => wd.WorkHours).Count()
+//                    })
+//                    .ToList();
+//          });
 
 
 //GET USER ACTIVE MEMBERSHIPS
@@ -394,6 +394,39 @@ app.MapGet("/membershipinstances/{id:int}",
 
         return Results.Ok(membershipInstance);
     });
+
+
+//GET TRENER BY ID
+app.MapGet("/treners/{id:int}",
+          async (int id, DBContext db) =>
+          {
+        var trener = await db.Treners
+            .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        return Results.Ok(trener);
+    });
+
+//GET TRENER AVAILABLE HOURS BY DATE BY TRENER ID
+app.MapGet("/treners/{id:int}/workhours/{date:DateTime}",
+             async (int id, DateTime date, DBContext db) =>
+             {
+        var trener = await db.Treners
+            .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        
+        var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
+        if (workDay == null) return Results.NotFound(new { message = "No such work day" });
+
+        var workHours = workDay.WorkHours.Where(w => w.IsAvailable).ToList();
+        return Results.Ok(workDay.WorkHours);
+    });
+
 
 //DOES MEMBERSHIP EXIST
 app.MapPost("/memberships/exist", [Authorize(Policy = "RequireAdminRole")]

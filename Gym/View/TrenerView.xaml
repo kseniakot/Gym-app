@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.TrenerView"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+              xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+            xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             x:DataType="viewmodel:TrenerViewModel"    
+             Shell.FlyoutBehavior="Disabled">
+
+    <Grid VerticalOptions="FillAndExpand">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+           
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+            <VerticalStackLayout Grid.Row="1" Grid.Column="1" Padding="10">
+
+            <Label Text="{Binding Trener.Name}" FontSize="Large"/>
+            <Label Text="{Binding Trener.Email}" FontSize="Medium" />
+            <Label Text="{Binding Trener.PhoneNumber}" FontSize="Medium" />
+
+
+        </VerticalStackLayout>
+        <VerticalStackLayout Grid.Row="2" Grid.ColumnSpan="3">
+            <DatePicker Date="{Binding SelectedDate}" MinimumDate="{x:Static sys:DateTime.Today}">
+                <DatePicker.Behaviors>
+                    <xct:EventToCommandBehavior EventName="DateSelected" 
+                                     Command="{Binding DateSelectedCommand}"  />
+                </DatePicker.Behaviors>
+            </DatePicker>
+
+            <Frame BorderColor="Black" CornerRadius="5">
+                <ListView 
+    ItemsSource="{Binding Workhours}"
+    SelectedItem="{Binding SelectedHour}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:WorkHour}">
+                            <ViewCell>
+                                <StackLayout>
+
+
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Start}" FontSize="Medium"/>
+                                    </VerticalStackLayout>
+
+                                    <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Frame>
+            <Button IsVisible="{Binding IsButtonVisible}" Text="SET WORKOUT"></Button>
+        </VerticalStackLayout>
+        
+       
+    </Grid>
+
+
+</ContentPage>

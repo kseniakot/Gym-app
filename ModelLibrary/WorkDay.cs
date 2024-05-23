@@ -11,6 +11,7 @@ namespace Gym.Model
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
+        public string Name { get; set; } 
         public int TrenerId { get; set; }
         [JsonIgnore]
         public Trener Trener { get; set; } = null!;

@@ -116,7 +116,7 @@ public partial class TrenerListAdminViewModel : ObservableObject
         {
             try
             {
-                Treners = new ObservableCollection<Trener>((await webService.GetAllTreners()).Where(Trener => Trener.Name.ToLower().Contains(SearchText.ToLower())));
+                Treners = new ObservableCollection<Trener>((await webService.GetAllTreners()).Where(Trener => Trener.Email.ToLower().Contains(SearchText.ToLower())));
             }
             catch (SessionExpiredException)
             {

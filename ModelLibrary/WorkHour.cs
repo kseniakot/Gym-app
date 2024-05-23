@@ -18,5 +18,6 @@ namespace Gym.Model
         public int WorkDayId { get; set; }
         [JsonIgnore]
         public WorkDay WorkDay { get; set; } = null!;
+        public bool IsAvailable { get; set; } = true;
     }
 }
