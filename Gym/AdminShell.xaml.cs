@@ -7,8 +7,8 @@ public partial class AdminShell : Shell
 	{
         InitializeComponent();
         Routing.RegisterRoute("SignInView", typeof(SignInView));
-      //  Routing.RegisterRoute("SignUpPage", typeof(SignUpView));
         Routing.RegisterRoute("AddUserView", typeof(AddUserView));
+        Routing.RegisterRoute("AddTrenerView", typeof(AddTrenerView));
         Routing.RegisterRoute("BannedListView", typeof(BannedListView));
         Routing.RegisterRoute("AddMembershipView", typeof(AddMembershipView));
         Routing.RegisterRoute("AddFreezeView", typeof(AddFreezeView));

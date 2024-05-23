@@ -54,5 +54,14 @@
         </Tab>
     </FlyoutItem>
 
+    <FlyoutItem Title="TRENER LIST">
+        <Tab>
+            <ShellContent
+     Title="TRENER LIST"
+     ContentTemplate="{DataTemplate view:TrenerListAdminView}"
+     Route="TrenerListAdminView" />
+        </Tab>
+    </FlyoutItem>
+
 
 </Shell>

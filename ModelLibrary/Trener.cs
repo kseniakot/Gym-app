@@ -9,5 +9,6 @@ namespace Gym.Model
 {
     public class Trener : User
     {
+        public List<WorkDay> WorkDays { get; set; } = new List<WorkDay>();
     }
 }

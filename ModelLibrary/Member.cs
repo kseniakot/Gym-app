@@ -12,6 +12,7 @@ namespace Gym.Model
         //public List<FreezeInstance>? UserFreezes { get; set;}
 
         public List<MembershipInstance>? UserMemberships { get; set; }
+        public List<WorkHour> Workouts { get; set; }
         public Member()
         {
             UserMemberships = new List<MembershipInstance>();
@@ -29,6 +30,7 @@ namespace Gym.Model
             this.ResetTokenCreationTime = user.ResetTokenCreationTime;
             this.Orders = user.Orders;
             UserMemberships = new List<MembershipInstance>();
+            Workouts = new List<WorkHour>();
         }
     }
 

@@ -17,9 +17,6 @@ public partial class UserShellViewModel : ObservableObject
      
         _webService = webService;
        SetIsMember();
-        Debug.WriteLine("\n");
-        Debug.WriteLine("UserShellViewModel created");
-        Debug.WriteLine("IsMember: " + IsMember);
         
     }
 

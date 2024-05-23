@@ -92,6 +92,12 @@ namespace Gym
             builder.Services.AddTransient<CancelFreezeViewModel>();
             builder.Services.AddTransient<CancelFreezeView>();
 
+            builder.Services.AddTransient<TrenerListAdminViewModel>();
+            builder.Services.AddTransient<TrenerListAdminView>();
+
+            builder.Services.AddTransient<AddTrenerViewModel>();
+            builder.Services.AddTransient<AddTrenerView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

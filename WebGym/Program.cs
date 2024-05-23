@@ -24,6 +24,7 @@ using System.Net.Http.Headers;
 using yoomoney_api.authorize;
 using System.Net.Sockets;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 //using Newtonsoft.Json;
 ///using Newtonsoft.Json;
 
@@ -170,21 +171,6 @@ async (int id, DBContext db) =>
     return Results.Ok(user);
 });
 
-// BUY MEMBERSHIP
-//app.MapPut("/memberships/buy", 
-//    async (User user, DBContext dbContext) =>
-//{
-//    var userInDb = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-//    if (userInDb == null) return Results.NotFound(new { message = "No such user" });
-//    userInDb.UserMemberships = user.UserMemberships;
-
-//    dbContext.Users.Update(userInDb);
-//    await dbContext.SaveChangesAsync();
-
-   
-//    return Results.Ok();
-//});
-
 
 // GET ALL USERS
 app.MapGet("/users", [Authorize(Policy = "RequireAdminRole")]
@@ -256,7 +242,38 @@ app.MapGet("/memberships",
         return Results.Ok(memberships);
     });
 
-    
+//GET ALL TRENERS
+app.MapGet("/treners",
+       async (DBContext db) =>
+       {
+        var treners = await db.Treners
+           .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+        .ToListAsync();
+        return Results.Ok(treners);
+    });
+
+
+//GET TRENERS WORKDAYS PER WEEK
+app.MapGet("/treners/workload/{id:int}",
+          async (int id, DBContext db) =>
+          {
+              Trener trener = db.Treners
+                  .Include(t => t.WorkDays)
+                      .ThenInclude(wd => wd.WorkHours)
+                  .Single(t => t.Id == id);
+
+              var workDaysAndHoursPerWeek = trener.WorkDays
+                    .GroupBy(wd => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(wd.Date, CalendarWeekRule.FirstDay, DayOfWeek.Monday))
+                    .Select(g => new
+                    {
+                        Week = g.Key,
+                        WorkDaysCount = g.Count(),
+                        WorkHoursCount = g.SelectMany(wd => wd.WorkHours).Count()
+                    })
+                    .ToList();
+          });
+
 
 //GET USER ACTIVE MEMBERSHIPS
 app.MapGet("/memberships/active/{id:int}",
@@ -312,6 +329,20 @@ async (int id, DBContext db) =>
         await db.SaveChangesAsync();
         return Results.NoContent();
     });
+
+//DELLETE TRENERS BY ID
+app.MapDelete("/treners/{id:int}", [Authorize(Policy = "RequireAdminRole")]
+async (int id, DBContext db) =>
+{
+    var trener = await db.Treners.FirstOrDefaultAsync(m => m.Id == id);
+    if (trener == null) return Results.NotFound(new { message = "No such membership" });
+
+    db.Treners.Remove(trener);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+
 
 //DELETE FREEZE BY ID
 app.MapDelete("/freezes/{id:int}", [Authorize(Policy = "RequireAdminRole")]
@@ -390,6 +421,16 @@ async (Membership membership, DBContext db) =>
         return Results.Created($"/api/memberships/{membership.Id}", membership);
     });
 
+//ADD TRENER
+app.MapPost("/treners", [Authorize(Policy = "RequireAdminRole")]
+async (Trener trener, DBContext db, IPasswordHasher<User> passwordHasher) =>
+{
+    trener.Password = passwordHasher.HashPassword(trener, trener.Password);
+    await db.Treners.AddAsync(trener);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/memberships/{trener.Id}", trener);
+});
+
 //ADD FREEZE
 app.MapPost("/freezes", [Authorize(Policy = "RequireAdminRole")]
 async (Freeze freeze, DBContext db) =>
@@ -413,6 +454,27 @@ async (Membership membership, DBContext db) =>
         await db.SaveChangesAsync();
         return Results.Ok(membershipInDb);
     });
+
+
+////EDIT TRENER
+//app.MapPut("/treners", [Authorize(Policy = "RequireAdminRole")]
+//async (Trener trener, DBContext db) =>
+//{
+//    var trenerInDb = await db.Treners.FirstOrDefaultAsync(m => m.Id == trener.Id);
+//    if (trenerInDb == null) return Results.NotFound(new { message = "No such membership" });
+
+//    trenerInDb.Name = trener.Name;
+//    trenerInDb.PhoneNumber = trener.PhoneNumber;
+//    trenerInDb.Email = trener.Email;
+//    trenerInDb.Password = trener.Password;
+//    trenerInDb.IsBanned = trener.IsBanned;
+//    trenerInDb.ResetToken = trener.ResetToken;
+//    trenerInDb.ResetTokenCreationTime = trener.ResetTokenCreationTime;
+//    trenerInDb.Orders = trener.Orders;
+//    trenerInDb.WorkDays = trener.WorkDays;
+//    await db.SaveChangesAsync();
+//    return Results.Ok(trener);
+//    });
 
 // EDTI FREEZE
 app.MapPut("/freezes", [Authorize(Policy = "RequireAdminRole")]

@@ -18,6 +18,10 @@ namespace Gym.Model
         public DbSet<Payment> Payments { get; set; } = null!;
 
         public DbSet<Member> Members { get; set; } = null!;
+        public DbSet<Trener> Treners { get; set; } = null!;
+        public DbSet<WorkDay> WorkDays { get; set; } = null!;
+        public DbSet<WorkHour> WorkHours { get; set; } = null!;
+
         public DbSet<Membership> Memberships { get; set; } = null!;
         public DbSet<MembershipInstance> MembershipInstances { get; set; } = null!;
         public DbSet<Freeze> Freezes { get; set; } = null!;

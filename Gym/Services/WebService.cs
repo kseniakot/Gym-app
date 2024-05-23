@@ -246,6 +246,58 @@ namespace Gym.Services
             }
         }
 
+        // GET ALL TRENERS
+        public async Task<List<Trener>> GetAllTreners()
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/treners");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<Trener>>(content, options);
+
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //DELETE TRENER
+        public async Task DeleteTrener(Trener trener)
+        {
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/treners/{trener.Id}");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        //ADD TRENER
+        public async Task AddTrener(Trener trener)
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(trener), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync($"{socket}/treners", content);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+
         //GET ACTIVE MEMBERSHIPS BY USER ID
         public async Task<List<MembershipInstance>> GetActiveMembershipsByUserId(int id)
         {
