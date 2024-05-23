@@ -495,6 +495,25 @@ namespace Gym.Services
                 throw new Exception(response.StatusCode.ToString());
             }
         }
+
+        //CHECK IF USER IS TRENER BY EMAIL
+       public async Task<bool> IsTrenerAsync(string email)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/treners/exist/{email}");
+            if (response.IsSuccessStatusCode)
+            {
+                return bool.Parse(await response.Content.ReadAsStringAsync());
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception((response.StatusCode.ToString()));
+            }
+        }
+
       
 
         //GET FREEZE BY ID

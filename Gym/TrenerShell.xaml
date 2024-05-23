@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       x:Class="Gym.View.TrenerShell"
+        xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+        x:DataType="viewmodel:UserShellViewModel"
+       xmlns:local="clr-namespace:Gym"
+       xmlns:view="clr-namespace:Gym.View"
+        xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+       Shell.FlyoutBehavior="Flyout">
+
+
+
+    <Shell.FlyoutFooter>
+        <Button Text="SIGN OUT"
+                TextColor="Black"
+                BackgroundColor="DarkGoldenrod"
+                Clicked="LogOut_Button"/>
+    </Shell.FlyoutFooter>
+
+    <FlyoutItem Title="HOME">
+        <Tab>
+            <ShellContent
+            Title="HOME"
+            ContentTemplate="{DataTemplate view:UserMainPage}"
+            Route="UserMainPage" />
+        </Tab>
+    </FlyoutItem>
+
+   
+
+
+
+</Shell>

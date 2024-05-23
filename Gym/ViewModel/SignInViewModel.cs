@@ -77,14 +77,15 @@ public partial class SignInViewModel : ObservableObject
                 }
                 else
                 {
-                    Debug.WriteLine("\n");
-                    Debug.WriteLine(await _webService.CheckUserOrMember(User.Email));
-                    //await Shell.Current.GoToAsync("//UserMainPage");
-
-                    var userShellViewModel = new UserShellViewModel(_webService);
-                    Application.Current.MainPage = new UserShell(userShellViewModel);
-
-                  
+                    if (await _webService.IsTrenerAsync(User.Email))
+                    {
+                        Application.Current.MainPage = new TrenerShell();
+                    }
+                    else
+                    {
+                        var userShellViewModel = new UserShellViewModel(_webService);
+                        Application.Current.MainPage = new UserShell(userShellViewModel);
+                    }
                 }
             }
             catch (Exception ex)

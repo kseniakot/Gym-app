@@ -74,7 +74,7 @@ public partial class TrenerViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            await Shell.Current.DisplayAlert("Sorry","No time available for this date :(", "Ok");
             Workhours = new ObservableCollection<WorkHour>();
             IsButtonVisible = false;
         }

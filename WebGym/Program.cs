@@ -427,6 +427,13 @@ app.MapGet("/treners/{id:int}/workhours/{date:DateTime}",
         return Results.Ok(workDay.WorkHours);
     });
 
+//CHECK IF USER IS TRENER
+app.MapGet("/treners/exist/{email}",
+             async (string email, DBContext db) =>
+             {
+        var isExist = await db.Treners.AnyAsync(u => u.Email == email);
+        return Results.Ok(isExist);
+    });
 
 //DOES MEMBERSHIP EXIST
 app.MapPost("/memberships/exist", [Authorize(Policy = "RequireAdminRole")]

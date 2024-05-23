@@ -120,6 +120,9 @@
 	  <MauiXaml Update="AdminShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="TrenerShell.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="UserShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
