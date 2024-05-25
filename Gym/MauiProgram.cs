@@ -102,7 +102,13 @@ namespace Gym
             builder.Services.AddTransient<TrenerListView>();
 
             builder.Services.AddTransient<TrenerViewModel>();
-            builder.Services.AddTransient<TrenerView>();
+            builder.Services.AddTransient<TrenerView>();    
+
+            builder.Services.AddTransient<TrenerScheduleViewModel>();
+            builder.Services.AddTransient<TrenerScheduleView>();
+
+            builder.Services.AddTransient<SelectTimeViewModel>();
+            builder.Services.AddTransient<SelectTimeView>();
 
 #if DEBUG
             builder.Logging.AddDebug();

@@ -27,7 +27,16 @@
         </Tab>
     </FlyoutItem>
 
-   
+    <FlyoutItem Title="SCHEDULE">
+        <Tab>
+            <ShellContent
+         Title="SCHEDULE"
+         ContentTemplate="{DataTemplate view:TrenerScheduleView}"
+         Route="TrenerScheduleView" />
+        </Tab>
+    </FlyoutItem>
+
+
 
 
 

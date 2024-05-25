@@ -27,7 +27,7 @@
         <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" />
         <HorizontalStackLayout>
             <Label Text="Enter promo code: " FontSize="Small" TextColor="Grey"></Label>
-            <Entry Text="{Binding PromoCode}" Placeholder="PROMO CODE" FontSize="Small" TextColor="Black" />
+            <!--<Entry Text="{Binding PromoCode}" Placeholder="PROMO CODE" FontSize="Small" TextColor="Black" />-->
         </HorizontalStackLayout>
 
         <Label Text="Payment by card" FontSize="Body" TextColor="Black"></Label>

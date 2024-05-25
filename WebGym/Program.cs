@@ -25,6 +25,7 @@ using yoomoney_api.authorize;
 using System.Net.Sockets;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using Microsoft.AspNetCore.Components.Web;
 //using Newtonsoft.Json;
 ///using Newtonsoft.Json;
 
@@ -409,23 +410,6 @@ app.MapGet("/treners/{id:int}",
         return Results.Ok(trener);
     });
 
-//GET TRENER AVAILABLE HOURS BY DATE BY TRENER ID
-app.MapGet("/treners/{id:int}/workhours/{date:DateTime}",
-             async (int id, DateTime date, DBContext db) =>
-             {
-        var trener = await db.Treners
-            .Include(t => t.WorkDays)
-            .ThenInclude(wd => wd.WorkHours)
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (trener == null) return Results.NotFound(new { message = "No such trener" });
-
-        
-        var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
-        if (workDay == null) return Results.NotFound(new { message = "No such work day" });
-
-        var workHours = workDay.WorkHours.Where(w => w.IsAvailable).ToList();
-        return Results.Ok(workDay.WorkHours);
-    });
 
 //CHECK IF USER IS TRENER
 app.MapGet("/treners/exist/{email}",
@@ -883,68 +867,131 @@ app.MapGet("/users/status/{email}",
        });
 
 
+//GET TRENER WORKHOURS BY DATE
+app.MapGet("/treners/workhours/{id:int}",
+             async (string dateString, int id, DBContext db) =>
+             {
+                 DateTime date = DateTime.Parse(dateString);
+                 date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
 
-////
-//app.MapPost("/webhook", async context =>
-// {
-//     var update = await JsonSerializer.DeserializeAsync<PaymentStatusUpdate>(context.Request.Body);
+                 var trener = await db.Treners
+            .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
-//     if (update.Status == "completed")
-//     {
-//         // The payment is completed, handle it here
-//     }
-//     else if (update.Status == "failed")
-//     {
-//         // The payment failed, handle it here
-//     }
+        var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
+        if (workDay == null) return Results.NotFound(new { message = "No such work day" });
 
-//     context.Response.StatusCode = 200;
-// });
+        var workHours = workDay.WorkHours.OrderBy(wh => wh.Start);
+                 return Results.Ok(workHours);
+    });
 
-////CHECK PAYMENT STATUS
-//app.MapGet("/payment/notification",
-//    async (int userId, DBContext dbContext) =>
-//{
-//    var user = await dbContext.Users
-//    .Include(u => u.Payment) // Include the Payments navigation property
-//    .FirstOrDefaultAsync(u => u.Id == userId);
+//GET TRENER AVAILABLE HOURS BY DATE BY TRENER ID
+app.MapGet("/treners/workhours/available/{id:int}",
+             async (int id, string dateString, DBContext db) =>
+             {
+                 DateTime date = DateTime.Parse(dateString);
+                 date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
 
-//    var cancellationTokenSource = new CancellationTokenSource();
-//    cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(10)); // Set the cancellation to 10 minutes
-
-//    var httpClient = new HttpClient();
-
-//    while (!cancellationTokenSource.IsCancellationRequested)
-//    {
-//        var response = await httpClient.GetAsync($"https://api.yookassa.ru/v3/payments/{user.Payment.Id}", cancellationTokenSource.Token);
-
-//        if (response.IsSuccessStatusCode)
-//        {
-//            var statusContent = await response.Content.ReadAsStringAsync();
-//            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-//            Payment payment = JsonSerializer.Deserialize<Payment>(statusContent, options);
-
-//            Console.WriteLine();
-//            Console.WriteLine();
-//            Console.WriteLine(payment.Status);
+                 var trener = await db.Treners
+                     .Include(t => t.WorkDays)
+                     .ThenInclude(wd => wd.WorkHours)
+                     .FirstOrDefaultAsync(m => m.Id == id);
+                 if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
 
-//            if (payment.Status == "succeeded" || payment.Paid)
-//            {
-//                user.Payment.Paid = true;
-//                user.Payment.Status = "succeeded";
-//                await dbContext.SaveChangesAsync();
-//                break;
-//            }
-//        }
+                 var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
+                 if (workDay == null) return Results.NotFound(new { message = "No such work day" });
 
-//        await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token); // Wait for 1 minute before the next request
-//    }
+                 var workHours = workDay.WorkHours.Where(w => w.IsAvailable).OrderBy(wh => wh.Start);
+                 return Results.Ok(workHours);
+             });
 
-//    Console.WriteLine("Payment status check completed");
-//    Console.WriteLine(user.Payment.Status);
-//    return Results.Ok(user);
-//});
+
+
+//ADD WORKHOUR TO TRENER'S WORKDAY BY ID
+app.MapPost("/treners/{id:int}/workday",
+    async(int id, string dateString, DBContext db) =>
+    {
+        DateTime date = DateTime.Parse(dateString);
+        date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        Console.WriteLine(date);
+
+        var trener = await db.Treners
+           .Include(t => t.WorkDays)
+           .ThenInclude(wd => wd.WorkHours)
+           .FirstOrDefaultAsync(m => m.Id == id);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        var workDay = await db.WorkDays
+        .Include(wd => wd.WorkHours)
+        .Include(wd => wd.Trener)
+        .FirstOrDefaultAsync(m => m.TrenerId == id && m.Date.Date == date.Date);
+        if (workDay == null)
+        {
+            workDay = new WorkDay
+            {
+                TrenerId = id,
+                Date = date.Date
+
+            };
+            trener.WorkDays.Add(workDay);
+        }
+
+        bool workHourExists = workDay.WorkHours.Any(wh => wh.Start == date);
+        if (workHourExists)
+        {
+            return Results.Conflict(new { message = "WorkHour already exists for the specified WorkDay." });
+        }
+        
+        workDay.WorkHours.Add(
+                new WorkHour
+                {
+                    Start = date,
+                    WorkDayId = workDay.Id
+                }
+                );
+
+        db.SaveChanges();
+        return Results.Ok(workDay);
+    });
+
+
+//REMOVE WORKHOUR FROM WORKDAY
+app.MapDelete("/treners/{id:int}/workday",
+    async (int id, string dateString, DBContext db) =>
+    {
+        DateTime date = DateTime.Parse(dateString);
+        date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        Console.WriteLine(date);
+
+        var trener = await db.Treners
+           .Include(t => t.WorkDays)
+           .ThenInclude(wd => wd.WorkHours)
+           .FirstOrDefaultAsync(m => m.Id == id);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        var workDay = await db.WorkDays
+        .Include(wd => wd.WorkHours)
+        .Include(wd => wd.Trener)
+        .FirstOrDefaultAsync(m => m.TrenerId == id && m.Date.Date == date.Date);
+
+        if (workDay == null) return Results.NotFound(new { message = "No such workday" });
+
+        WorkHour workHour = workDay.WorkHours.FirstOrDefault(m => m.Start == date);
+        if (workHour != null)
+        {
+            workDay.WorkHours.Remove(workHour);
+            db.SaveChanges();
+            return Results.Ok();
+        }
+
+        return Results.NotFound(new { message = "No such workhour" });
+
+    });
+
+
 
 
 
@@ -958,247 +1005,3 @@ app.Run();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//var builder = WebApplication.CreateBuilder();
-//string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-//// добавляем контекст ApplicationContext в качестве сервиса в приложение
-//builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connection));
-//var app = builder.Build();
-
-//app.MapGet("/", (DBContext db) => db.Users.ToList());
-
-//app.MapGet("/api/users/{id:int}", async (int id, DBContext db) =>
-//{
-//    // получаем пользователя по id
-//    User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, отправляем его
-//    return Results.Json(user);
-//});
-
-//app.MapDelete("/api/users/{id:int}", async (int id, DBContext db) =>
-//{
-//    // получаем пользователя по id
-//    User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, удаляем его
-//    db.Users.Remove(user);
-//    await db.SaveChangesAsync();
-//    return Results.Json(user);
-//});
-
-//app.MapPost("/api/users", async (User user, DBContext db) =>
-//{
-//    // добавляем пользователя в массив
-//    await db.Users.AddAsync(user);
-//    await db.SaveChangesAsync();
-//    return user;
-//});
-
-//app.MapPut("/api/users", async (User userData, DBContext db) =>
-//{
-//    // получаем пользователя по id
-//    var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userData.Id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, изменяем его данные и отправляем обратно клиенту
-//    user.IsBanned = userData.IsBanned;
-
-
-//    await db.SaveChangesAsync();
-//    return Results.Json(user);
-//});
-
-//app.Run();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//app.Run(async (context) =>
-//{
-//    var response = context.Response;
-//    var request = context.Request;
-//    var path = request.Path;
-
-//    string expressionForGuid = @"^/api/users/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$";
-//    if (path == "/api/users" && request.Method == "GET")
-//    {
-//        await GetAllPeople(response);
-//    }
-//    else if (Regex.IsMatch(path, expressionForGuid) && request.Method == "GET")
-//    {
-//        // получаем id из адреса url
-//        string? id = path.Value?.Split("/")[3];
-//        await GetPerson(id, response);
-//    }
-//    else if (path == "/api/users" && request.Method == "POST")
-//    {
-//        await CreatePerson(response, request);
-//    }
-//    else if (path == "/api/users" && request.Method == "PUT")
-//    {
-//        await UpdatePerson(response, request);
-//    }
-//    else if (Regex.IsMatch(path, expressionForGuid) && request.Method == "DELETE")
-//    {
-//        string? id = path.Value?.Split("/")[3];
-//        await DeletePerson(id, response);
-//    }
-//    else
-//    {
-//      //  response.ContentType = "text/html; charset=utf-8";
-//       /// await response.SendFileAsync("html/index.html");
-//        await response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
-//        // await response.WriteAsJsonAsync(new { message = "GGGGGGGG" });
-//    }
-//});
-
-//app.Run();
-
-
-
-//// получение всех пользователей
-//async Task GetAllPeople(HttpResponse response)
-//{
-//    await response.WriteAsJsonAsync(users);
-//}
-//// получение одного пользователя по id
-//async Task GetPerson(string? id, HttpResponse response)
-//{
-//    // получаем пользователя по id
-//    User? user = users.FirstOrDefault((u) => u.Id == id);
-//    // если пользователь найден, отправляем его
-//    if (user != null)
-//        await response.WriteAsJsonAsync(user);
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    else
-//    {
-//        response.StatusCode = 404;
-//        await response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
-//    }
-//}
-
-//async Task DeletePerson(string? id, HttpResponse response)
-//{
-//    // получаем пользователя по id
-//    User? user = users.FirstOrDefault((u) => u.Id == id);
-//    // если пользователь найден, удаляем его
-//    if (user != null)
-//    {
-//        users.Remove(user);
-//        await response.WriteAsJsonAsync(user);
-//    }
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    else
-//    {
-//        response.StatusCode = 404;
-//        await response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
-//    }
-//}
-
-//async Task CreatePerson(HttpResponse response, HttpRequest request)
-//{
-//    try
-//    {
-//        // получаем данные пользователя
-//        var user = await request.ReadFromJsonAsync<User>();
-//        if (user != null)
-//        {
-//            // устанавливаем id для нового пользователя
-//            user.Id = Guid.NewGuid().ToString();
-//            // добавляем пользователя в список
-//            users.Add(user);
-//            await response.WriteAsJsonAsync(user);
-//        }
-//        else
-//        {
-//            throw new Exception("Некорректные данные");
-//        }
-//    }
-//    catch (Exception)
-//    {
-//        response.StatusCode = 400;
-//        await response.WriteAsJsonAsync(new { message = "Некорректные данные" });
-//    }
-//}
-
-//async Task UpdatePerson(HttpResponse response, HttpRequest request)
-//{
-//    try
-//    {
-//        // получаем данные пользователя
-//        User? userData = await request.ReadFromJsonAsync<User>();
-//        if (userData != null)
-//        {
-//            // получаем пользователя по id
-//            var user = users.FirstOrDefault(u => u.Id == userData.Id);
-//            // если пользователь найден, изменяем его данные и отправляем обратно клиенту
-//            if (user != null)
-//            {
-//                user.Age = userData.Age;
-//                user.Name = userData.Name;
-//                await response.WriteAsJsonAsync(user);
-//            }
-//            else
-//            {
-//                response.StatusCode = 404;
-//                await response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
-//            }
-//        }
-//        else
-//        {
-//            throw new Exception("Некорректные данные");
-//        }
-//    }
-//    catch (Exception)
-//    {
-//        response.StatusCode = 400;
-//        await response.WriteAsJsonAsync(new { message = "Некорректные данные" });
-//    }
-//}

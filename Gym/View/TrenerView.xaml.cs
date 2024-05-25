@@ -31,5 +31,13 @@ public partial class TrenerView : ContentPage
 
     }
 
-   
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Assuming you have a ViewModel property in your Page class
+        _trenerViewModel.LoadDataCommand.Execute(null);
+    }
+
+
 }

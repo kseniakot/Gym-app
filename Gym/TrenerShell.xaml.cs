@@ -9,6 +9,7 @@ public partial class TrenerShell : Shell
     public TrenerShell()
     {
         Routing.RegisterRoute("SignInView", typeof(SignInView));
+        Routing.RegisterRoute("SelectTime", typeof(SelectTimeView));
         InitializeComponent();
 
 

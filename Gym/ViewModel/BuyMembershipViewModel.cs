@@ -11,8 +11,8 @@ public partial class BuyMembershipViewModel : ObservableObject
 {
     [ObservableProperty]
     private Membership? _membership;
-    [ObservableProperty]
-    private string _promoCode;
+    //[ObservableProperty]
+    //private string _promoCode;
     private int _membershipId;
     readonly WebService webService;
 

@@ -26,10 +26,6 @@ public partial class SignInViewModel : ObservableObject
     [ObservableProperty]
     string _imageSource = "eyeopen.png";
 
-    //public SignInViewModel(DataBaseService dbService)
-    //{
-    //    _dbService = dbService;
-    //}
 
     public SignInViewModel(WebService webService)
     {

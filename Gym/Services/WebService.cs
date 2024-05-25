@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Gym.Exceptions;
 using System.Net;
 using Microsoft.Maui.Controls;
+using System.Xml;
 
 
 namespace Gym.Services
@@ -456,45 +457,6 @@ namespace Gym.Services
             }
         }
 
-        //GET TRENER BY ID
-        public async Task<Trener> GetTrenerById(int id)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{socket}/treners/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                string content = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                return JsonSerializer.Deserialize<Trener>(content, options);
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                throw new SessionExpiredException();
-            }
-            else
-            {
-                throw new Exception("Something went wrong");
-            }
-        }
-
-        //GET AVAILABLE WORKHOURS BY DATE BY TRENER ID
-        public async Task<List<WorkHour>> GetAvailableWorkHoursByDateByTrenerId(int trenerId, DateTime date)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{socket}/workhours/available/{trenerId}/{date}");
-            if (response.IsSuccessStatusCode)
-            {
-                string content = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                throw new SessionExpiredException();
-            }
-            else
-            {
-                throw new Exception(response.StatusCode.ToString());
-            }
-        }
 
         //CHECK IF USER IS TRENER BY EMAIL
        public async Task<bool> IsTrenerAsync(string email)
@@ -698,32 +660,7 @@ namespace Gym.Services
             }
         }
 
-        //BUY MEMBERSHIP
-        //public async Task BuyMembership(Membership membership)
-        //{
-        //   // Debug.WriteLine("Buying membership");
-        //    var user = await GetUserFromToken();
 
-
-
-        //    var membershipInstance = new MembershipInstance
-        //    {
-        //        MembershipId = membership.Id,
-        //        UserId = user.Id,
-        //    };
-
-        //    user?.UserMemberships?.Add(membershipInstance);
-
-        //    HttpContent content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-        //    HttpResponseMessage response = await client.PutAsync($"{socket}/memberships/buy", content);
-
-
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        Debug.WriteLine(response.StatusCode);
-        //        throw new Exception("Failed to buy membership");
-        //    }
-        //}
 
         //WORK WITH PAYMENTS
         public async Task<string> MakePayment(int userId, Membership membership)
@@ -859,8 +796,126 @@ namespace Gym.Services
             {
                 throw new Exception((response.StatusCode.ToString()));
             }
-        }   
+        }
 
+
+        //GET TRENER BY ID
+        public async Task<Trener> GetTrenerById(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/treners/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<Trener>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+      
+
+        //ADD WORKHOUR TO TRENER'S WORKDAY BY DATE AND ID
+        public async Task AddWorkHour(int trenerId, DateTime date, TimeSpan time)
+        {
+            date = date.Date.Add(time);
+            string dateString = date.ToString("g");
+            // HttpContent content = new StringContent(JsonSerializer.Serialize(dateString), Encoding.UTF8, "application/json");
+            // Debug.WriteLine(JsonSerializer.Serialize(date));
+            Debug.WriteLine(dateString);
+            HttpResponseMessage response = await client.PostAsync($"{socket}/treners/{trenerId}/workday?dateString={dateString}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+
+                throw new Exception("This hour has already been set");
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+
+        //GET TRENER WOKHOURS BY ID AND DATE
+        public async Task<List<WorkHour>> GetTrenerWorkHours(int trenerId, DateTime date)
+        {
+            string dateString = date.ToString("g");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/treners/workhours/{trenerId}?dateString={dateString}");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                Debug.WriteLine(response.StatusCode.ToString());
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        //GET AVAILABLE WORKHOURS BY DATE BY TRENER ID
+        public async Task<List<WorkHour>> GetAvailableWorkHoursByDateByTrenerId(int trenerId, DateTime date)
+        {
+            string dateString = date.ToString("g");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/treners/workhours/available/{trenerId}?dateString={dateString}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        //REMOVE WORKHOUR FROM WORKDAY
+        public async Task RemoveWorkHour(int trenerId, DateTime date)
+        {
+            
+            string dateString = date.ToString("g");
+            // HttpContent content = new StringContent(JsonSerializer.Serialize(dateString), Encoding.UTF8, "application/json");
+            // Debug.WriteLine(JsonSerializer.Serialize(date));
+            Debug.WriteLine(dateString);
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/treners/{trenerId}/workday?dateString={dateString}");
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
 
 
     }

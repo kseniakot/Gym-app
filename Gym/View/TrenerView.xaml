@@ -49,7 +49,7 @@
 
 
                                     <VerticalStackLayout>
-                                        <Label Text="{Binding Start}" FontSize="Medium"/>
+                                        <Label Text="{Binding Start,  StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
                                     </VerticalStackLayout>
 
                                     <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
@@ -59,7 +59,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Frame>
-            <Button IsVisible="{Binding IsButtonVisible}" Text="SET WORKOUT"></Button>
+            <Button IsVisible="{Binding IsButtonVisible}" IsEnabled="{Binding IsButtonEnabled}" Text="SET WORKOUT" TextColor="Black" Grid.Column="1"></Button>
         </VerticalStackLayout>
         
        

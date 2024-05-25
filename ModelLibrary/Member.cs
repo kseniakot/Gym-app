@@ -12,7 +12,7 @@ namespace Gym.Model
         //public List<FreezeInstance>? UserFreezes { get; set;}
 
         public List<MembershipInstance>? UserMemberships { get; set; }
-        public List<WorkHour> Workouts { get; set; }
+        public List<WorkHour>? Workouts { get; set; }
         public Member()
         {
             UserMemberships = new List<MembershipInstance>();

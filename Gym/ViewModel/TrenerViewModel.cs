@@ -14,13 +14,33 @@ public partial class TrenerViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isButtonVisible = false;
+    [ObservableProperty]
+    private bool isButtonEnabled = false;
 
     [ObservableProperty]
-    private DateTime _SelectedDate;
-    [ObservableProperty] 
-    private DateTime _SelectedHour;
+    private DateTime _selectedDate = DateTime.UtcNow;
 
-    [ObservableProperty]
+   
+    private WorkHour _selectedHour;
+
+    public WorkHour SelectedHour
+    {
+        get { return _selectedHour; }
+        set
+        {
+            if (_selectedHour != value)
+            {
+                _selectedHour = value;
+                OnPropertyChanged(nameof(SelectedHour));
+                IsButtonEnabled = true;
+
+            }
+        }
+    }
+
+
+
+        [ObservableProperty]
     private ObservableCollection<WorkHour> _workhours;
 
 
@@ -65,6 +85,12 @@ public partial class TrenerViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task LoadData()
+    {
+        await DateSelectedAsync();
+    }
+
+    [RelayCommand]
     public async Task DateSelectedAsync()
     {
         try
@@ -72,9 +98,8 @@ public partial class TrenerViewModel : ObservableObject
             Workhours = new ObservableCollection<WorkHour>((await webService.GetAvailableWorkHoursByDateByTrenerId(TrenerId, SelectedDate)));
             IsButtonVisible = true;
         }
-        catch (Exception e)
+        catch
         {
-            await Shell.Current.DisplayAlert("Sorry","No time available for this date :(", "Ok");
             Workhours = new ObservableCollection<WorkHour>();
             IsButtonVisible = false;
         }
