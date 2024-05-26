@@ -36,14 +36,14 @@ namespace Gym.ViewModel
         [RelayCommand]
         private async Task LoadData()
         {
-            try
-            {
-                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts((await webService.GetUserFromToken()).Id, DateTime.UtcNow));
-            }
-            catch (Exception ex)
-            {
-                Workouts = new ObservableCollection<WorkHour>();
-            }
+            //try
+            //{
+            //    Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts((await webService.GetUserFromToken()).Id, DateTime.UtcNow));
+            //}
+            //catch (Exception ex)
+            //{
+            //    Workouts = new ObservableCollection<WorkHour>();
+            //}
         }
     }
 }

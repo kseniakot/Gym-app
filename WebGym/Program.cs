@@ -1009,18 +1009,25 @@ async (int trenerId, int memberId, string dateString, DBContext db) =>
     var trener = await db.Treners
           .Include(t => t.WorkDays)
           .ThenInclude(wd => wd.WorkHours)
+          .ThenInclude(wh => wh.WorkHourClients)
           .FirstOrDefaultAsync(m => m.Id == trenerId);
     if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
 
-    var workHour = trener.WorkDays.FirstOrDefault(m=>m.Date.Date ==  date.Date).WorkHours.FirstOrDefault(w=>w.Start == date);
+    var workDay = trener.WorkDays.FirstOrDefault(m => m.Date.Date == date.Date);
+    if (workDay == null) return Results.NotFound(new { message = "No work day" });
+
+
+    var workHour = workDay.WorkHours.FirstOrDefault(w=>w.Start == date);
 
     bool hasWorkout = workHour.WorkDay.WorkHours.Any(o => o.WorkHourClients.Any(o => o.Id == memberId));
 
     if (hasWorkout) return Results.Conflict();
 
     workHour.WorkHourClients.Add(member);
-    foreach(var w in workHour.WorkHourClients)
+    Console.WriteLine();
+    Console.WriteLine();
+    foreach (var w in workHour.WorkHourClients)
     {
         Console.WriteLine(w.Name);
     }
@@ -1029,7 +1036,9 @@ async (int trenerId, int memberId, string dateString, DBContext db) =>
         workHour.IsAvailable = false;
     }
 
-   
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine(workHour.WorkHourClients.Count);
 
     await db.SaveChangesAsync();
     return Results.Ok();

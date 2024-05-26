@@ -61,7 +61,7 @@ namespace Gym.Services
             }
             else
             {
-                throw new Exception("Something went wrong");
+                throw new Exception(response.StatusCode.ToString());
             }
            
         }
@@ -982,6 +982,11 @@ namespace Gym.Services
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+
+                throw new Exception("Date is not empty");
             }
             else
             {
