@@ -13,7 +13,7 @@ namespace Gym.Model
         public DateTime Date { get; set; }
         // public string Name { get; set; } 
         public int TrenerId { get; set; }
-        [JsonIgnore]
+        
         public Trener Trener { get; set; } = null!;
         [JsonIgnore]
         public List<WorkHour> WorkHours { get; set; } = new List<WorkHour>();

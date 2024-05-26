@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Gym.Services;
 using Gym.Model;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 
 namespace Gym.ViewModel
 {
@@ -14,6 +16,12 @@ namespace Gym.ViewModel
         readonly WebService webService;
         [ObservableProperty]
         private User _user;
+
+        [ObservableProperty]
+        private WorkHour selectedWorkout;
+
+        [ObservableProperty]
+        private ObservableCollection<WorkHour> workouts;
         public UserMainViewModel(WebService webService)
         {
             this.webService = webService;
@@ -23,6 +31,19 @@ namespace Gym.ViewModel
         private async Task InitializeAsync()
         {
             User = await webService.GetUserFromToken();
+        }
+
+        [RelayCommand]
+        private async Task LoadData()
+        {
+            try
+            {
+                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts((await webService.GetUserFromToken()).Id, DateTime.UtcNow));
+            }
+            catch (Exception ex)
+            {
+                Workouts = new ObservableCollection<WorkHour>();
+            }
         }
     }
 }

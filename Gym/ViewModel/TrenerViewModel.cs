@@ -106,6 +106,26 @@ public partial class TrenerViewModel : ObservableObject
 
     }
 
+    [RelayCommand]
+    private async Task BookWorkout()
+
+    {
+        try
+        {
+            await webService.ApplyWorkout(Trener.Id, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
+            await Shell.Current.DisplayAlert("Success", "Time has been booked successfully", "OK");
+        }
+        catch (SessionExpiredException)
+        {
+            await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
+            await Shell.Current.GoToAsync("SignInView");
+            Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
 
 
 }

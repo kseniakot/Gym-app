@@ -18,15 +18,6 @@
                 Clicked="LogOut_Button"/>
     </Shell.FlyoutFooter>
 
-    <FlyoutItem Title="HOME">
-        <Tab>
-            <ShellContent
-            Title="HOME"
-            ContentTemplate="{DataTemplate view:UserMainPage}"
-            Route="UserMainPage" />
-        </Tab>
-    </FlyoutItem>
-
     <FlyoutItem Title="SCHEDULE">
         <Tab>
             <ShellContent

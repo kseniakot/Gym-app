@@ -59,7 +59,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Frame>
-            <Button IsVisible="{Binding IsButtonVisible}" IsEnabled="{Binding IsButtonEnabled}" Text="SET WORKOUT" TextColor="Black" Grid.Column="1"></Button>
+            <Button IsVisible="{Binding IsButtonVisible}" IsEnabled="{Binding IsButtonEnabled}" Text="SET WORKOUT" TextColor="Black" Grid.Column="1" Command="{Binding BookWorkoutCommand}"></Button>
         </VerticalStackLayout>
         
        

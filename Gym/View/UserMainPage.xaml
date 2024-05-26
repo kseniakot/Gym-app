@@ -4,12 +4,38 @@
              x:Class="Gym.View.UserMainPage"
               xmlns:viewmodel="clr-namespace:Gym.ViewModel"
               x:DataType="viewmodel:UserMainViewModel"
-              xmlns:model="clr-namespace:Gym.Model"
-             Title="UserMainPage">
+               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+                xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui">
     <VerticalStackLayout>
         <Label 
-        Text="{Binding User.Email, StringFormat='Welcome to .NET MAUI, {0}!'}"
+        Text="{Binding User.Name, StringFormat='Welcome, {0}!'}"
         VerticalOptions="Center" 
         HorizontalOptions="Center" />
+        <ScrollView>
+            <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1">
+            <ListView 
+        ItemsSource="{Binding Workouts}"
+        SelectedItem="{Binding SelectedWorkout}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="{x:Type model:WorkHour}">
+                        <ViewCell>
+                            <StackLayout>
+
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
+                                    <Label Text="{Binding WorkDay.Trener.Name}" FontSize="Small" TextColor="Grey"/>
+                                    <Label Text="{Binding WorkDay.Trener.Name}" FontSize="Small" TextColor="Grey"/>
+
+                                </VerticalStackLayout>
+
+                                <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </Frame>
+        </ScrollView>
     </VerticalStackLayout>
 </ContentPage>

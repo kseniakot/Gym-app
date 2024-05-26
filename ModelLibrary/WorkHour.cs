@@ -11,9 +11,9 @@ namespace Gym.Model
     {
         public int Id { get; set; }
         public DateTime Start { get; set; }
-        
         [JsonIgnore]
-       public List<Member>? WorkHourClients { get; set; }
+        public List<Member> WorkHourClients { get; set; } = new List<Member>();
+        public int Capacity { get; set; } = 2;
         [JsonIgnore]
         public int WorkDayId { get; set; }
         [JsonIgnore]

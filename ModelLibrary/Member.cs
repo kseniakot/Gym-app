@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 
 namespace Gym.Model
 {
@@ -12,7 +14,8 @@ namespace Gym.Model
         //public List<FreezeInstance>? UserFreezes { get; set;}
 
         public List<MembershipInstance>? UserMemberships { get; set; }
-        public List<WorkHour>? Workouts { get; set; }
+        
+        public List<WorkHour> Workouts { get; set; } = new List<WorkHour>();
         public Member()
         {
             UserMemberships = new List<MembershipInstance>();

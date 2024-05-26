@@ -26,6 +26,7 @@ using System.Net.Sockets;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Http.HttpResults;
 //using Newtonsoft.Json;
 ///using Newtonsoft.Json;
 
@@ -877,6 +878,7 @@ app.MapGet("/treners/workhours/{id:int}",
                  var trener = await db.Treners
             .Include(t => t.WorkDays)
             .ThenInclude(wd => wd.WorkHours)
+             .ThenInclude(wh => wh.WorkHourClients)
             .FirstOrDefaultAsync(m => m.Id == id);
         if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
@@ -992,9 +994,121 @@ app.MapDelete("/treners/{id:int}/workday",
     });
 
 
+//BOOK WORKOUT BY CLIENT ID AND TRENER ID
+app.MapPost("/treners/{trenerId:int}/workday/{memberId:int}",
+async (int trenerId, int memberId, string dateString, DBContext db) =>
+{
+    DateTime date = DateTime.Parse(dateString);
+    date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+   
+    var member = await db.Members
+    .Include(t=>t.UserMemberships)
+    .Include(t=>t.Workouts).FirstOrDefaultAsync(m => m.Id == memberId);
+    if (member == null) return Results.NotFound(new { message = "No such member" });
+
+    var trener = await db.Treners
+          .Include(t => t.WorkDays)
+          .ThenInclude(wd => wd.WorkHours)
+          .FirstOrDefaultAsync(m => m.Id == trenerId);
+    if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
 
+    var workHour = trener.WorkDays.FirstOrDefault(m=>m.Date.Date ==  date.Date).WorkHours.FirstOrDefault(w=>w.Start == date);
 
+    bool hasWorkout = workHour.WorkDay.WorkHours.Any(o => o.WorkHourClients.Any(o => o.Id == memberId));
+
+    if (hasWorkout) return Results.Conflict();
+
+    workHour.WorkHourClients.Add(member);
+    foreach(var w in workHour.WorkHourClients)
+    {
+        Console.WriteLine(w.Name);
+    }
+   if(workHour.WorkHourClients.Count >= workHour.Capacity)
+    {
+        workHour.IsAvailable = false;
+    }
+
+   
+
+    await db.SaveChangesAsync();
+    return Results.Ok();
+});
+
+
+//GET USER WORKOUTS BY ID AND DATE
+app.MapGet("/member/{id:int}/workouts",
+             async (int id, string dateString, DBContext db) =>
+             {
+                 DateTime date = DateTime.Parse(dateString);
+                 date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+
+                 var member = await db.Members
+                     .Include(t => t.Workouts)
+                     .ThenInclude(t=>t.WorkDay)
+                     .ThenInclude(wd=>wd.Trener)
+                     .FirstOrDefaultAsync(m => m.Id == id);
+                 if (member == null) return Results.NotFound(new { message = "member" });
+
+
+                 var workouts = member.Workouts.Where(wd=>wd.Start.Date == date);
+                 return Results.Ok(workouts);
+             });
+
+
+app.MapPost("/trener/{trenerId:int}/workdays/copy",
+             async (int trenerId, string dateStringFrom, string dateStringTo, DBContext db) =>
+             {
+                 DateTime dateFrom = DateTime.Parse(dateStringFrom);
+                 dateFrom = DateTime.SpecifyKind(dateFrom, DateTimeKind.Utc);
+
+                 DateTime dateTo = DateTime.Parse(dateStringTo);
+                 dateTo = DateTime.SpecifyKind(dateTo, DateTimeKind.Utc);
+
+                 var trener = await db.Treners
+                   .Include(t => t.WorkDays)
+                   .ThenInclude(wd => wd.WorkHours)
+                   .FirstOrDefaultAsync(m => m.Id == trenerId);
+                 if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+                 var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateFrom.Date);
+                 if (workDay == null) return Results.NotFound(new { message = "No such workDay" });
+
+                 var targetDay = db.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date);
+                 if (targetDay != null)
+                 {
+                     if (targetDay.WorkHours.Any())
+                     {
+                         return Results.Conflict();
+                     }
+                 }
+                 else
+                 {
+
+                     targetDay = new WorkDay
+                     {
+                         Date = dateTo,
+                         TrenerId = workDay.TrenerId,
+                     };
+                     db.WorkDays.Add(targetDay);
+                     await db.SaveChangesAsync();
+                 }
+
+                 foreach (var workHour in workDay.WorkHours)
+                 {
+                     targetDay.WorkHours.Add(new WorkHour
+                     {
+                         Start = workHour.Start,
+                         WorkDayId = workHour.WorkDayId
+                     });
+                 }
+
+                 db.WorkDays.Update(targetDay);
+
+                 await db.SaveChangesAsync();
+
+                 return Results.Ok();
+             });
 
 
 

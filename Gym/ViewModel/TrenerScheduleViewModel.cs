@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Gym.Exceptions;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 namespace Gym.ViewModel;
 
 public partial class TrenerScheduleViewModel : ObservableObject
@@ -14,8 +15,15 @@ public partial class TrenerScheduleViewModel : ObservableObject
 
     [ObservableProperty]
     private DateTime _selectedDate = DateTime.UtcNow;
-   // [ObservableProperty]
+
+    [ObservableProperty]
+    private DateTime _selectedDateCopy;
+
+    // [ObservableProperty]
     private WorkHour _selectedHour;
+
+    
+
 
     public WorkHour SelectedHour
     {
@@ -34,12 +42,14 @@ public partial class TrenerScheduleViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<WorkHour> _workHours;
 
-   
     [ObservableProperty]
     private bool isButtonEnabled = false;
 
+    [ObservableProperty]
+    private bool isCopyEnabled = false;
 
- 
+
+
     readonly WebService webService;
     public TrenerScheduleViewModel(WebService webService)
     {
@@ -74,22 +84,37 @@ public partial class TrenerScheduleViewModel : ObservableObject
         await DateSelectedAsync();
     }
 
+  
+
     [RelayCommand]
     public async Task DateSelectedAsync()
     {
         try
         {
+            IsButtonEnabled = false;
             WorkHours = new ObservableCollection<WorkHour>(await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate));
+            //foreach (WorkHour workHour in WorkHours)
+            //{
+            //    foreach(var cl in workHour.WorkHourClients)
+            //    {
+            //        Debug.WriteLine(cl.Email);
+            //        Debug.WriteLine(cl.PhoneNumber);
+            //    }
+            //}
+            IsCopyEnabled = true;
+
 
         }
-        catch (Exception e)
+        catch
         {
             WorkHours = new ObservableCollection<WorkHour>();
+            IsCopyEnabled= false;   
         }
 
     }
 
-
+    [ObservableProperty]
+    private bool isSelectVisible = false;
 
     [RelayCommand]
     private async void AddTime()
@@ -99,17 +124,46 @@ public partial class TrenerScheduleViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async void CopyTo()
+    {
+        IsSelectVisible = true;
+    }
+
+    [RelayCommand]
+    private async Task CopyToSelected()
+    {
+        if (SelectedDate<SelectedDateCopy)
+        {
+            try
+            {
+                await webService.CopyWorkDay((await webService.GetUserFromToken()).Id, SelectedDate, SelectedDateCopy);
+                await Shell.Current.DisplayAlert("Success", "Data has been copied successfully", "Ok");
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+                
+            }
+
+            IsSelectVisible = false;
+        }
+    }
+
+    [RelayCommand]
     private async Task RemoveHour()
     {
         IsButtonEnabled = false;
-        try
+        if (SelectedHour != null)
         {
-            await webService.RemoveWorkHour((await webService.GetUserFromToken()).Id, SelectedHour.Start);
-            WorkHours = new ObservableCollection<WorkHour>(await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate));
-        }
-        catch(Exception e)
-        {
-            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            try
+            {
+                await webService.RemoveWorkHour((await webService.GetUserFromToken()).Id, SelectedHour.Start);
+                WorkHours = new ObservableCollection<WorkHour>(await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate));
+            }
+            catch (Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+            }
         }
     }
 

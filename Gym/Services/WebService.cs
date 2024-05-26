@@ -867,7 +867,7 @@ namespace Gym.Services
             }
             else
             {
-                Debug.WriteLine(response.StatusCode.ToString());
+               // Debug.WriteLine(response.StatusCode.ToString());
                 throw new Exception(response.StatusCode.ToString());
             }
         }
@@ -917,6 +917,76 @@ namespace Gym.Services
             }
         }
 
+        //APPLY FOR WORKOUT
+        public async Task ApplyWorkout(int trenerId, int memberId, DateTime date)
+        {
+            
+            string dateString = date.ToString("g");
+            
+            HttpResponseMessage response = await client.PostAsync($"{socket}/treners/{trenerId}/workday/{memberId}?dateString={dateString}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
 
+                throw new Exception("You already have a workout for today");
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        //GET USER WORKOUTS
+
+        public async Task<List<WorkHour>> GetUserWorkouts(int memberId, DateTime date)
+        {
+            string dateString = date.ToString("g");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/member/{memberId:int}/workouts?dateString={dateString}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+        //COPY WORKDAY HOURS
+
+        public async Task CopyWorkDay(int trenerId, DateTime dateFrom, DateTime dateTo)
+        {
+
+            string dateStringFrom = dateFrom.ToString("s");
+            string dateStringTo = dateTo.ToString("s");
+
+            HttpResponseMessage response = await client.PostAsync($"{socket}/trener/{trenerId}/workdays/copy?dateStringFrom={dateStringFrom}&dateStringTo={dateStringTo}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
     }
 }

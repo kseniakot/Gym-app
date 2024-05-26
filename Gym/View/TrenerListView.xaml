@@ -7,8 +7,7 @@
             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
              x:DataType="viewmodel:TrenerListViewModel"   
               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
-              x:Name="TrenerListPage"
-             Shell.FlyoutBehavior="Disabled">
+              x:Name="TrenerListPage">
     
     <ScrollView>
         <Grid>
