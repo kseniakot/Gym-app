@@ -114,6 +114,7 @@ public partial class TrenerViewModel : ObservableObject
         {
             await webService.ApplyWorkout(Trener.Id, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
             await Shell.Current.DisplayAlert("Success", "Time has been booked successfully", "OK");
+            await DateSelectedAsync();
         }
         catch (SessionExpiredException)
         {

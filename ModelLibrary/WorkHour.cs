@@ -11,12 +11,13 @@ namespace Gym.Model
     {
         public int Id { get; set; }
         public DateTime Start { get; set; }
-        [JsonIgnore]
+   
+      ///  [JsonIgnore]
         public List<Member> WorkHourClients { get; set; } = new List<Member>();
         public int Capacity { get; set; } = 2;
-        [JsonIgnore]
+       
         public int WorkDayId { get; set; }
-        [JsonIgnore]
+       
         public WorkDay WorkDay { get; set; } = null!;
         public bool IsAvailable { get; set; } = true;
     }

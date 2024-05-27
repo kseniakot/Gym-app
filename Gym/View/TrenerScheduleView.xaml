@@ -6,8 +6,16 @@
              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             xmlns:converters="clr-namespace:Gym.ValueConverters"
            
              x:DataType="viewmodel:TrenerScheduleViewModel">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ImportanceToColorValueConverter x:Key="ColorValueConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
 
     <ScrollView>
         <Grid VerticalOptions="FillAndExpand">
@@ -46,10 +54,11 @@
 
                                         <VerticalStackLayout>
                                                 <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
+                                                <Label Text="{Binding WorkHourClients.Count, StringFormat='Clients applied: {0}'}" FontSize="Small" 
+                                                       TextColor="Grey"/>
 
 
-
-                                                <ListView 
+                                                <!--<ListView 
                                                    ItemsSource="{Binding WorkHourClients}">
 
                                                     <ListView.ItemTemplate>
@@ -58,7 +67,7 @@
                                                                 <StackLayout>
 
                                                                     <VerticalStackLayout>
-                                                                        <!--<Label Text="{Binding Email}" FontSize="Medium"/>-->
+                                                                        <Label Text="{Binding Email}" FontSize="Medium"/>
                                                                         <Label Text="dfghj" FontSize="Small" TextColor="Grey"/>
                                                                     </VerticalStackLayout>
 
@@ -67,10 +76,7 @@
                                                             </ViewCell>
                                                         </DataTemplate>
                                                     </ListView.ItemTemplate>
-                                                </ListView>
-
-
-
+                                                </ListView>-->
 
                                             </VerticalStackLayout>
 

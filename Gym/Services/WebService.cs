@@ -911,6 +911,10 @@ namespace Gym.Services
             {
                 throw new SessionExpiredException();
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                throw new Exception("You have clients here");
+            }
             else
             {
                 throw new Exception(response.StatusCode.ToString());
@@ -945,16 +949,21 @@ namespace Gym.Services
 
         //GET USER WORKOUTS
 
-        public async Task<List<WorkHour>> GetUserWorkouts(int memberId, DateTime date)
+        public async Task<List<WorkHour>> GetUserWorkouts(int id, DateTime date)
         {
             string dateString = date.ToString("g");
-            HttpResponseMessage response = await client.GetAsync($"{socket}/member/{memberId:int}/workouts?dateString={dateString}");
+            HttpResponseMessage response = await client.GetAsync($"{socket}/member/{id}/workouts?dateString={dateString}");
 
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+                List<WorkHour> workouts = JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+                foreach(var workout in workouts)
+                {
+                    Debug.WriteLine(workout.Start);
+                }
+                return workouts;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

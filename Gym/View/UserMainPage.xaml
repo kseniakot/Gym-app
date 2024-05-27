@@ -24,7 +24,7 @@
                                 <VerticalStackLayout>
                                     <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
                                     <Label Text="{Binding WorkDay.Trener.Name}" FontSize="Small" TextColor="Grey"/>
-                                    <Label Text="{Binding WorkDay.Trener.Name}" FontSize="Small" TextColor="Grey"/>
+                                    <Label Text="{Binding WorkDay.Trener.PhoneNumber}" FontSize="Small" TextColor="Grey"/>
 
                                 </VerticalStackLayout>
 

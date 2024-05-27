@@ -976,6 +976,7 @@ app.MapDelete("/treners/{id:int}/workday",
 
         var workDay = await db.WorkDays
         .Include(wd => wd.WorkHours)
+        .ThenInclude(wh => wh.WorkHourClients)
         .Include(wd => wd.Trener)
         .FirstOrDefaultAsync(m => m.TrenerId == id && m.Date.Date == date.Date);
 
@@ -984,6 +985,7 @@ app.MapDelete("/treners/{id:int}/workday",
         WorkHour workHour = workDay.WorkHours.FirstOrDefault(m => m.Start == date);
         if (workHour != null)
         {
+            if (workHour.WorkHourClients.Any()) { return Results.Conflict(new { message = "WorkHour has clients" });}
             workDay.WorkHours.Remove(workHour);
             db.SaveChanges();
             return Results.Ok();
@@ -1057,10 +1059,13 @@ app.MapGet("/member/{id:int}/workouts",
                      .ThenInclude(t=>t.WorkDay)
                      .ThenInclude(wd=>wd.Trener)
                      .FirstOrDefaultAsync(m => m.Id == id);
+                 Console.WriteLine();
+                 Console.WriteLine();
+                
                  if (member == null) return Results.NotFound(new { message = "member" });
+                 Console.WriteLine(member.Id);
 
-
-                 var workouts = member.Workouts.Where(wd=>wd.Start.Date == date);
+                 var workouts = member.Workouts.Where(wd=>wd.Start.Date == date.Date);
                  return Results.Ok(workouts);
              });
 
@@ -1105,10 +1110,13 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy",
 
                  foreach (var workHour in workDay.WorkHours)
                  {
+                     var newStart = new DateTime(dateTo.Year, dateTo.Month, dateTo.Day,
+                               workHour.Start.Hour, workHour.Start.Minute, workHour.Start.Second);
+
                      targetDay.WorkHours.Add(new WorkHour
                      {
-                         Start = workHour.Start,
-                         WorkDayId = workHour.WorkDayId
+                         Start = DateTime.SpecifyKind(newStart, DateTimeKind.Utc),
+                     WorkDayId = workHour.WorkDayId
                      });
                  }
 

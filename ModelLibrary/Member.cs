@@ -14,7 +14,7 @@ namespace Gym.Model
         //public List<FreezeInstance>? UserFreezes { get; set;}
 
         public List<MembershipInstance>? UserMemberships { get; set; }
-        
+        [JsonIgnore]
         public List<WorkHour> Workouts { get; set; } = new List<WorkHour>();
         public Member()
         {

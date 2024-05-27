@@ -7,7 +7,10 @@ using Gym.Exceptions;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using MimeKit.Cryptography;
 namespace Gym.ViewModel;
+
+
 
 public partial class TrenerScheduleViewModel : ObservableObject
 {
@@ -22,7 +25,7 @@ public partial class TrenerScheduleViewModel : ObservableObject
     // [ObservableProperty]
     private WorkHour _selectedHour;
 
-    
+
 
 
     public WorkHour SelectedHour
@@ -92,22 +95,17 @@ public partial class TrenerScheduleViewModel : ObservableObject
         try
         {
             IsButtonEnabled = false;
-            WorkHours = new ObservableCollection<WorkHour>(await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate));
-            //foreach (WorkHour workHour in WorkHours)
-            //{
-            //    foreach(var cl in workHour.WorkHourClients)
-            //    {
-            //        Debug.WriteLine(cl.Email);
-            //        Debug.WriteLine(cl.PhoneNumber);
-            //    }
-            //}
+           
+                var workHours = await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate);
+                WorkHours = new ObservableCollection<WorkHour>(workHours);
+           
             IsCopyEnabled = true;
 
 
         }
         catch
         {
-            WorkHours = new ObservableCollection<WorkHour>();
+            WorkHours = [];
             IsCopyEnabled= false;   
         }
 
@@ -132,6 +130,7 @@ public partial class TrenerScheduleViewModel : ObservableObject
     [RelayCommand]
     private async Task CopyToSelected()
     {
+        IsCopyEnabled = false;
         if (SelectedDate<SelectedDateCopy)
         {
             try
@@ -147,6 +146,7 @@ public partial class TrenerScheduleViewModel : ObservableObject
 
             IsSelectVisible = false;
         }
+        
     }
 
     [RelayCommand]

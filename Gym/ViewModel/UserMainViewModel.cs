@@ -25,7 +25,6 @@ namespace Gym.ViewModel
         public UserMainViewModel(WebService webService)
         {
             this.webService = webService;
-           InitializeAsync();
         }
 
         private async Task InitializeAsync()
@@ -36,14 +35,15 @@ namespace Gym.ViewModel
         [RelayCommand]
         private async Task LoadData()
         {
-            //try
-            //{
-            //    Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts((await webService.GetUserFromToken()).Id, DateTime.UtcNow));
-            //}
-            //catch (Exception ex)
-            //{
-            //    Workouts = new ObservableCollection<WorkHour>();
-            //}
+            try
+            {
+                await InitializeAsync();
+                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts(User.Id, DateTime.UtcNow));
+            }
+            catch (Exception ex)
+            {
+                Workouts = new ObservableCollection<WorkHour>();
+            }
         }
     }
 }

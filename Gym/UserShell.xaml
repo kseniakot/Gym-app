@@ -18,7 +18,16 @@
                 Clicked="LogOut_Button"/>
     </Shell.FlyoutFooter>
 
-    <FlyoutItem Title="HOME">
+    <FlyoutItem Title="PROFILE">
+        <Tab>
+            <ShellContent
+   Title="PROFILE"
+   ContentTemplate="{DataTemplate view:ProfileView}"
+   Route="ProfileView" />
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="MY WORKOUTS">
         <Tab>
             <ShellContent
             Title="HOME"
@@ -36,14 +45,7 @@
         </Tab>
     </FlyoutItem>
 
-    <FlyoutItem Title="PROFILE">
-        <Tab>
-            <ShellContent
-      Title="PROFILE"
-      ContentTemplate="{DataTemplate view:ProfileView}"
-      Route="ProfileView" />
-        </Tab>
-    </FlyoutItem>
+   
 
     <FlyoutItem Title="TRENERS">
         <Tab>
