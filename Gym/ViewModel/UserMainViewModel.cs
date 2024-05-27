@@ -17,6 +17,13 @@ namespace Gym.ViewModel
         [ObservableProperty]
         private User _user;
 
+        [ObservableProperty]
+        private DateTime _selectedDate = DateTime.UtcNow;
+
+        [ObservableProperty]
+        bool isButtonEnabled = false;
+
+
         //[ObservableProperty]
         //private WorkHour selectedWorkout;
 
@@ -30,9 +37,7 @@ namespace Gym.ViewModel
                 {
                     _selectedWorkout = value;
                     OnPropertyChanged();
-
-                   
-                    SelectedWorkout = null;
+                    IsButtonEnabled = true;
                 }
             }
         }
@@ -56,11 +61,49 @@ namespace Gym.ViewModel
             try
             {
                 await InitializeAsync();
-                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts(User.Id, DateTime.UtcNow));
+                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts(User.Id, SelectedDate));
             }
             catch (Exception ex)
             {
                 Workouts = new ObservableCollection<WorkHour>();
+            }
+        }
+
+        [RelayCommand]
+        public async Task DateSelectedAsync()
+        {
+            try
+            {
+
+
+                Workouts = new ObservableCollection<WorkHour>(await webService.GetUserWorkouts(User.Id, SelectedDate));
+
+            }
+            catch
+            {
+                Workouts = [];
+            }
+
+        }
+
+        [RelayCommand]
+        public async Task CancelWorkoutAsync()
+        {
+            if(SelectedWorkout == null)
+            {
+                await Shell.Current.DisplayAlert("Error", "Please select a workout to cancel", "Ok");
+                return;
+            }
+            try
+            {
+                await webService.RemoveWorkHourClient(SelectedWorkout.Id, User.Id);
+                Workouts.Remove(SelectedWorkout);
+                SelectedWorkout = null;
+                isButtonEnabled = false;
+            }
+            catch(Exception e)
+            {
+                await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
             }
         }
     }

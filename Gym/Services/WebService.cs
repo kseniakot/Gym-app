@@ -1028,5 +1028,27 @@ namespace Gym.Services
                 throw new Exception(response.StatusCode.ToString());
             }
         }
+
+        //REMOVE WORKHOUR CLIENT BY WORKHOUR ID AND USER ID
+        public async Task RemoveWorkHourClient(int workHourId, int userId)
+        {
+            HttpResponseMessage response = await client.DeleteAsync($"{socket}/workhour/{workHourId}/client/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception("Cannot cancel a workout that has already started");
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
     }
 }

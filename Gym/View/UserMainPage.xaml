@@ -5,13 +5,20 @@
               xmlns:viewmodel="clr-namespace:Gym.ViewModel"
               x:DataType="viewmodel:UserMainViewModel"
                xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
                 xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui">
     <VerticalStackLayout>
-        <Label 
+        <!--<Label 
         Text="{Binding User.Name, StringFormat='Welcome, {0}!'}"
         VerticalOptions="Center" 
-        HorizontalOptions="Center" />
-        <ScrollView>
+        HorizontalOptions="Center" />-->
+       
+            <DatePicker Date="{Binding SelectedDate}" MinimumDate="{x:Static sys:DateTime.Today}" Grid.Row="0">
+                <DatePicker.Behaviors>
+                    <xct:EventToCommandBehavior EventName="DateSelected" 
+                         Command="{Binding DateSelectedCommand}"  />
+                </DatePicker.Behaviors>
+            </DatePicker>
             <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1" BackgroundColor="Black">
             <ListView 
         ItemsSource="{Binding Workouts}"
@@ -43,6 +50,7 @@
             </ListView>
 
         </Frame>
-        </ScrollView>
+        <Button IsEnabled="{Binding IsButtonEnabled}" Text="CANCEL" BackgroundColor="AliceBlue" TextColor="Black" Command="{Binding CancelWorkoutCommand}" />
+
     </VerticalStackLayout>
 </ContentPage>

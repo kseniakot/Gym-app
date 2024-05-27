@@ -1132,9 +1132,7 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy",
 app.MapGet("/workhour/{id:int}/clients",
              async (int id, DBContext db) =>
              {
-                 Console.WriteLine();
-                 Console.WriteLine();
-                Console.WriteLine(id);
+                 
                 var workHour = await db.WorkHours
                  .Include(wh => wh.WorkHourClients)
                  .FirstOrDefaultAsync(wh => wh.Id == id);
@@ -1144,6 +1142,33 @@ app.MapGet("/workhour/{id:int}/clients",
              });
 
 
+//CANCEL WORKOUT BY WORKOUT ID AND CLIENT ID
+app.MapDelete("/workhour/{workHourId:int}/client/{clientId:int}",
+    async (int workHourId, int clientId, DBContext db) =>
+    {
+        var workHour = await db.WorkHours
+        .Include(wh => wh.WorkHourClients)
+        .FirstOrDefaultAsync(wh => wh.Id == workHourId);
+
+        if (workHour == null) return Results.NotFound(new { message = "No such workhour" });
+
+        // Проверка, что время тренировки еще не наступило
+        if (workHour.Start <= DateTime.UtcNow)
+        {
+            return Results.BadRequest(new { message = "Cannot cancel a workout that has already started" });
+        }
+
+        var client = workHour.WorkHourClients.FirstOrDefault(c => c.Id == clientId);
+        if (client == null) return Results.NotFound(new { message = "No such client" });
+
+        workHour.WorkHourClients.Remove(client);
+        if (workHour.IsAvailable == false)
+        {
+            workHour.IsAvailable = true;
+        }
+        await db.SaveChangesAsync();
+        return Results.Ok();
+    });
 
 
 app.Run();
