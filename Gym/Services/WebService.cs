@@ -1007,5 +1007,26 @@ namespace Gym.Services
                 throw new Exception(response.StatusCode.ToString());
             }
         }
+
+        //GET WORKHOUR CLIENTS BY  WORKHOUR ID
+
+        public async Task<List<User>> GetWorkHourClients(int workHourId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{socket}/workhour/{workHourId}/clients");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<List<User>>(content, options);
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
     }
 }

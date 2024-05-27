@@ -110,6 +110,9 @@ namespace Gym
             builder.Services.AddTransient<SelectTimeViewModel>();
             builder.Services.AddTransient<SelectTimeView>();
 
+            builder.Services.AddTransient<ClientsInfoViewModel>();
+            builder.Services.AddTransient<ClientsInfoView>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

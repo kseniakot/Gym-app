@@ -46,7 +46,11 @@
                     <ListView 
             ItemsSource="{Binding WorkHours}"
             SelectedItem="{Binding SelectedHour}">
-                        <ListView.ItemTemplate>
+                            <ListView.Behaviors>
+                                <xct:EventToCommandBehavior EventName="ItemTapped" 
+                                Command="{Binding ClientsInfoCommand}"></xct:EventToCommandBehavior>
+                            </ListView.Behaviors>
+                            <ListView.ItemTemplate>
                             <DataTemplate x:DataType="{x:Type model:WorkHour}">
                                 <ViewCell>
                                     <StackLayout>

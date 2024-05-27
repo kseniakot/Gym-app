@@ -167,6 +167,18 @@ public partial class TrenerScheduleViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    public async Task ClientsInfo()
+    {
+        if(SelectedHour.WorkHourClients.Count==0)
+        {
+            return;
+        }
+        await Shell.Current.GoToAsync($"ClientsInfoView?WorkHourId={SelectedHour.Id}");
+        Debug.WriteLine(SelectedHour.Id);
+        SelectedHour = null;
+    }
+
 
 
 

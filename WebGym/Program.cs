@@ -1128,6 +1128,23 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy",
              });
 
 
+//GET WORKHOUR CLIENTS BY  WORKHOUR ID
+app.MapGet("/workhour/{id:int}/clients",
+             async (int id, DBContext db) =>
+             {
+                 Console.WriteLine();
+                 Console.WriteLine();
+                Console.WriteLine(id);
+                var workHour = await db.WorkHours
+                 .Include(wh => wh.WorkHourClients)
+                 .FirstOrDefaultAsync(wh => wh.Id == id);
+
+                 if (workHour == null) return Results.NotFound(new { message = "No such workhour" });
+                 return Results.Ok(workHour.WorkHourClients);
+             });
+
+
+
 
 app.Run();
 

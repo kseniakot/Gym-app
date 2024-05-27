@@ -153,6 +153,9 @@
 	  <MauiXaml Update="View\CancelFreezeView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\ClientsInfoView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\EditFreezeView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

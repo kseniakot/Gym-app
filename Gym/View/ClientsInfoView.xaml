@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gym.View.ClientsInfoView"
+              xmlns:viewmodel="clr-namespace:Gym.ViewModel"
+              x:DataType="viewmodel:ClientsInfoViewModel"
+               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+                xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui">
+    <VerticalStackLayout>
+       
+        
+          
+                <ListView 
+        ItemsSource="{Binding Clients}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type model:User}">
+                            <ViewCell>
+                                <StackLayout>
+
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}"  FontSize="Medium"/>
+                                        <Label FontSize="Small" TextColor="Grey">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="'{0}: {1}'">
+                                                    <Binding Path="Email" />
+                                                    <Binding Path="PhoneNumber" />
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                        <!--<Label Text="{Binding WorkDay.Trener.PhoneNumber}" FontSize="Small" TextColor="Grey"/>-->
+
+                                    </VerticalStackLayout>
+
+                                    <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            
+       
+    </VerticalStackLayout>
+</ContentPage>
