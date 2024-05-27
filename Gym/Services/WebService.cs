@@ -1008,6 +1008,30 @@ namespace Gym.Services
             }
         }
 
+
+        //COPY TO A PARTICULAR DAY
+        public async Task CopyByWeekDays(int trenerId, DateTime dateFrom)
+        {
+
+            string dateStringFrom = dateFrom.ToString("s");
+           
+
+            HttpResponseMessage response = await client.PostAsync($"{socket}/trener/{trenerId}/workdays/copy/weekday?dateStringFrom={dateStringFrom}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+
         //GET WORKHOUR CLIENTS BY  WORKHOUR ID
 
         public async Task<List<User>> GetWorkHourClients(int workHourId)
@@ -1050,5 +1074,6 @@ namespace Gym.Services
                 throw new Exception(response.StatusCode.ToString());
             }
         }
+
     }
 }

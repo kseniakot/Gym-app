@@ -179,6 +179,20 @@ public partial class TrenerScheduleViewModel : ObservableObject
         SelectedHour = null;
     }
 
+    [RelayCommand]
+    async Task CopyWeekday()
+    {
+        try
+        {
+            await webService.CopyByWeekDays((await webService.GetUserFromToken()).Id, SelectedDate);
+            await Shell.Current.DisplayAlert("Success", "Data has been copied successfully", "Ok");
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }   
+
 
 
 

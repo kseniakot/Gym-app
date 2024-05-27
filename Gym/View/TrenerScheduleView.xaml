@@ -102,7 +102,10 @@
             </HorizontalStackLayout>
 
                 <VerticalStackLayout Grid.Row="3">
-                    <Button Text="COPY TO" TextColor="Black" Command="{Binding CopyToCommand}" IsEnabled="{Binding IsCopyEnabled}" Margin="10"></Button>
+                    <HorizontalStackLayout>
+                        <Button Text="COPY TO" TextColor="Black" Command="{Binding CopyToCommand}" IsEnabled="{Binding IsCopyEnabled}" Margin="10"></Button>
+                        <Button Text="{Binding SelectedDate.DayOfWeek, StringFormat='Copy to all {0}s'}" IsEnabled="{Binding IsCopyEnabled}" Command="{Binding CopyWeekdayCommand}" TextColor="Black"></Button>
+                    </HorizontalStackLayout>
                     <DatePicker IsVisible="{Binding IsSelectVisible}" Date="{Binding SelectedDateCopy}" MinimumDate="{Binding SelectedDate}">
                         <DatePicker.Behaviors>
                             <xct:EventToCommandBehavior EventName="DateSelected" 

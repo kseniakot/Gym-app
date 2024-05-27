@@ -1171,6 +1171,66 @@ app.MapDelete("/workhour/{workHourId:int}/client/{clientId:int}",
     });
 
 
+//COPY WORKOUTS TO PARTICAULAR DAYS
+app.MapPost("/trener/{trenerId:int}/workdays/copy/weekday",
+    async (int trenerId, string dateStringFrom, DBContext db) =>
+    {
+        DateTime dateFrom = DateTime.Parse(dateStringFrom);
+        dateFrom = DateTime.SpecifyKind(dateFrom, DateTimeKind.Utc);
+
+        var trener = await db.Treners
+            .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+            .FirstOrDefaultAsync(m => m.Id == trenerId);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateFrom.Date);
+        if (workDay == null) return Results.NotFound(new { message = "No such workDay" });
+
+        for (int i = 1; i < 28; i++)
+        {
+            DateTime dateTo = dateFrom.AddDays(i);
+            if (dateTo.DayOfWeek == dateFrom.DayOfWeek)
+            {
+                var targetDay = db.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date);
+                if (targetDay != null)
+                {
+                    if (targetDay.WorkHours.Any())
+                    {
+                        continue; // Skip this day if it already has work hours
+                    }
+                }
+                else
+                {
+                    targetDay = new WorkDay
+                    {
+                        Date = dateTo,
+                        TrenerId = workDay.TrenerId,
+                    };
+                    db.WorkDays.Add(targetDay);
+                    await db.SaveChangesAsync();
+                }
+
+                foreach (var workHour in workDay.WorkHours)
+                {
+                    var newStart = new DateTime(dateTo.Year, dateTo.Month, dateTo.Day,
+                        workHour.Start.Hour, workHour.Start.Minute, workHour.Start.Second);
+
+                    targetDay.WorkHours.Add(new WorkHour
+                    {
+                        Start = DateTime.SpecifyKind(newStart, DateTimeKind.Utc),
+                        WorkDayId = workHour.WorkDayId
+                    });
+                }
+
+                db.WorkDays.Update(targetDay);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        return Results.Ok();
+    });
+
 app.Run();
 
 
