@@ -952,6 +952,28 @@ namespace Gym.Services
             }
         }
 
+        //APPLY FOR WORKOUT BY WEEKDAY
+        public async Task ApplyWorkoutByWeekday(int trenerId, int memberId, DateTime date)
+        {
+
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
+
+            HttpResponseMessage response = await client.PostAsync($"{socket}/treners/{trenerId}/workday/{memberId}/weekday?dateStringFrom={dateString}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new SessionExpiredException();
+            }
+            else
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
+
+
         //GET USER WORKOUTS
 
         public async Task<List<WorkHour>> GetUserWorkouts(int id, DateTime date)

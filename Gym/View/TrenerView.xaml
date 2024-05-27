@@ -59,7 +59,10 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Frame>
-            <Button IsVisible="{Binding IsButtonVisible}" IsEnabled="{Binding IsButtonEnabled}" Text="SET WORKOUT" TextColor="Black" Grid.Column="1" Command="{Binding BookWorkoutCommand}"></Button>
+            <HorizontalStackLayout>
+                <Button IsVisible="{Binding IsButtonVisible}" IsEnabled="{Binding IsButtonEnabled}" Text="SET WORKOUT" TextColor="Black" Grid.Column="1" Command="{Binding BookWorkoutCommand}"></Button>
+                <Button Command="{Binding ApplyWeekdaysCommand}" IsEnabled="{Binding IsButtonEnabled}" Text="{Binding SelectedDate.DayOfWeek, StringFormat='Apply to all {0}s'}" TextColor="Black" BackgroundColor="AliceBlue"></Button>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
         
        

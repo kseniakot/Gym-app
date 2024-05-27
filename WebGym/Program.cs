@@ -1008,6 +1008,8 @@ async (int trenerId, int memberId, string dateString, DBContext db) =>
     .Include(t=>t.Workouts).FirstOrDefaultAsync(m => m.Id == memberId);
     if (member == null) return Results.NotFound(new { message = "No such member" });
 
+    if (member.Workouts.Any(w => w.Start == date)) return Results.Conflict(new { message = "You already have a workout for this time" });
+
     var trener = await db.Treners
           .Include(t => t.WorkDays)
           .ThenInclude(wd => wd.WorkHours)
@@ -1224,6 +1226,53 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy/weekday",
                 }
 
                 db.WorkDays.Update(targetDay);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        return Results.Ok();
+    });
+
+//APPLY TO PARTICULAR WEEKDAYS
+app.MapPost("/treners/{trenerId:int}/workday/{memberId:int}/weekday",
+    async (int trenerId, int memberId, string dateStringFrom, DBContext db) =>
+    {
+        DateTime dateFrom = DateTime.Parse(dateStringFrom);
+        dateFrom = DateTime.SpecifyKind(dateFrom, DateTimeKind.Utc);
+
+        var member = await db.Members
+            .Include(t => t.UserMemberships)
+            .Include(t => t.Workouts).FirstOrDefaultAsync(m => m.Id == memberId);
+        if (member == null) return Results.NotFound(new { message = "No such member" });
+
+        var trener = await db.Treners
+            .Include(t => t.WorkDays)
+            .ThenInclude(wd => wd.WorkHours)
+            .ThenInclude(wh => wh.WorkHourClients)
+            .FirstOrDefaultAsync(m => m.Id == trenerId);
+        if (trener == null) return Results.NotFound(new { message = "No such trener" });
+
+        for (DateTime date = dateFrom; date <= dateFrom.AddMonths(1); date = date.AddDays(1))
+        {
+            if (date.DayOfWeek == dateFrom.DayOfWeek)
+            {
+                var workDay = trener.WorkDays.FirstOrDefault(m => m.Date.Date == date.Date);
+                if (workDay == null) continue; // Skip if there's no work day on this date
+
+                var workHour = workDay.WorkHours.FirstOrDefault(w => w.Start == date);
+
+                bool hasWorkout = workHour.WorkDay.WorkHours.Any(o => o.WorkHourClients.Any(o => o.Id == memberId));
+
+                if (hasWorkout) continue; // Skip if the member already has a workout at this time
+                if(!workHour.IsAvailable) continue; // Skip if the work hour is not available
+
+                workHour.WorkHourClients.Add(member);
+
+                if (workHour.WorkHourClients.Count >= workHour.Capacity)
+                {
+                    workHour.IsAvailable = false;
+                }
+
                 await db.SaveChangesAsync();
             }
         }

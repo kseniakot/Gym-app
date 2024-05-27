@@ -12,6 +12,7 @@ public partial class TrenerViewModel : ObservableObject
     [ObservableProperty]
     private Trener? _Trener;
 
+
     [ObservableProperty]
     private bool isButtonVisible = false;
     [ObservableProperty]
@@ -118,6 +119,7 @@ public partial class TrenerViewModel : ObservableObject
         {
             await webService.ApplyWorkout(Trener.Id, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
             await Shell.Current.DisplayAlert("Success", "Time has been booked successfully", "OK");
+           
             await DateSelectedAsync();
         }
         catch (SessionExpiredException)
@@ -125,6 +127,26 @@ public partial class TrenerViewModel : ObservableObject
             await Shell.Current.DisplayAlert("Session Expired", "Your session has expired. Please sign in again.", "Ok");
             await Shell.Current.GoToAsync("SignInView");
             Application.Current.MainPage = new AppShell();
+        }
+        catch (Exception e)
+        {
+            await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
+        }
+    }
+
+    [RelayCommand]
+    private async Task ApplyWeekdays()
+    {
+        if (SelectedHour == null)
+        {
+            await Shell.Current.DisplayAlert("Error", "Please select a workout to cancel", "Ok");
+            return;
+        }
+        try
+        {
+            await webService.ApplyWorkoutByWeekday(TrenerId, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
+            SelectedHour = null;
+           
         }
         catch (Exception e)
         {
