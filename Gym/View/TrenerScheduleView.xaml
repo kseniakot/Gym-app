@@ -41,8 +41,8 @@
                                      Command="{Binding DateSelectedCommand}"  />
                 </DatePicker.Behaviors>
             </DatePicker>
-            <ScrollView>
-                <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1">
+            <ScrollView BackgroundColor="Transparent" WidthRequest="300">
+                <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1" BackgroundColor="Transparent" Grid.ColumnSpan="3">
                     <ListView 
             ItemsSource="{Binding WorkHours}"
             SelectedItem="{Binding SelectedHour}">
@@ -53,9 +53,10 @@
 
 
                                         <VerticalStackLayout>
-                                                <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
+                                                <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium" TextColor="AliceBlue"/>
                                                 <Label Text="{Binding WorkHourClients.Count, StringFormat='Clients applied: {0}'}" FontSize="Small" 
                                                        TextColor="Grey"/>
+                                                
 
 
                                                 <!--<ListView 

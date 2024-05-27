@@ -28,13 +28,13 @@
         </Grid.RowDefinitions>
         
        
-            <Frame BorderColor="AliceBlue"  Grid.Column="1" Grid.Row="1">
-                <StackLayout>
+            <Frame BorderColor="AliceBlue"  Grid.Column="1" Grid.Row="1"  BackgroundColor="Black">
+                <StackLayout BackgroundColor="Black">
                     <Label Text="{Binding Date, StringFormat='{0:dd MMMM}'}" FontSize="Large" Margin="5"></Label>
                     
                     <TimePicker   Time="{Binding SelectedTime}" Margin="5"/>
 
-                <HorizontalStackLayout>
+                <HorizontalStackLayout Background="Black">
                     <Button Text="SAVE" BackgroundColor="AliceBlue" TextColor="Black" Command="{Binding AddCommand}"></Button>
                     <Button Text="CANCEL" BackgroundColor="AliceBlue" TextColor="Black" Command="{Binding BackCommand}"></Button>
                 </HorizontalStackLayout>

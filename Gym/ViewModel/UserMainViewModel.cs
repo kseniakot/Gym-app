@@ -17,8 +17,26 @@ namespace Gym.ViewModel
         [ObservableProperty]
         private User _user;
 
-        [ObservableProperty]
-        private WorkHour selectedWorkout;
+        //[ObservableProperty]
+        //private WorkHour selectedWorkout;
+
+        private WorkHour _selectedWorkout;
+        public WorkHour SelectedWorkout
+        {
+            get { return _selectedWorkout; }
+            set
+            {
+                if (_selectedWorkout != value)
+                {
+                    _selectedWorkout = value;
+                    OnPropertyChanged();
+
+                   
+                    SelectedWorkout = null;
+                }
+            }
+        }
+
 
         [ObservableProperty]
         private ObservableCollection<WorkHour> workouts;

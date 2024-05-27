@@ -825,7 +825,7 @@ namespace Gym.Services
         public async Task AddWorkHour(int trenerId, DateTime date, TimeSpan time)
         {
             date = date.Date.Add(time);
-            string dateString = date.ToString("g");
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
             // HttpContent content = new StringContent(JsonSerializer.Serialize(dateString), Encoding.UTF8, "application/json");
             // Debug.WriteLine(JsonSerializer.Serialize(date));
             Debug.WriteLine(dateString);
@@ -853,12 +853,17 @@ namespace Gym.Services
         //GET TRENER WOKHOURS BY ID AND DATE
         public async Task<List<WorkHour>> GetTrenerWorkHours(int trenerId, DateTime date)
         {
-            string dateString = date.ToString("g");
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
             HttpResponseMessage response = await client.GetAsync($"{socket}/treners/workhours/{trenerId}?dateString={dateString}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var workouts = JsonSerializer.Deserialize<List<WorkHour>>(content, options);
+                foreach (var workout in workouts)
+                {
+                    Debug.WriteLine(workout.Start);
+                }
                 return JsonSerializer.Deserialize<List<WorkHour>>(content, options);
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -875,7 +880,7 @@ namespace Gym.Services
         //GET AVAILABLE WORKHOURS BY DATE BY TRENER ID
         public async Task<List<WorkHour>> GetAvailableWorkHoursByDateByTrenerId(int trenerId, DateTime date)
         {
-            string dateString = date.ToString("g");
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
             HttpResponseMessage response = await client.GetAsync($"{socket}/treners/workhours/available/{trenerId}?dateString={dateString}");
 
             if (response.IsSuccessStatusCode)
@@ -898,7 +903,7 @@ namespace Gym.Services
         public async Task RemoveWorkHour(int trenerId, DateTime date)
         {
             
-            string dateString = date.ToString("g");
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
             // HttpContent content = new StringContent(JsonSerializer.Serialize(dateString), Encoding.UTF8, "application/json");
             // Debug.WriteLine(JsonSerializer.Serialize(date));
             Debug.WriteLine(dateString);
@@ -925,8 +930,8 @@ namespace Gym.Services
         public async Task ApplyWorkout(int trenerId, int memberId, DateTime date)
         {
             
-            string dateString = date.ToString("g");
-            
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
+
             HttpResponseMessage response = await client.PostAsync($"{socket}/treners/{trenerId}/workday/{memberId}?dateString={dateString}", null);
             if (response.IsSuccessStatusCode)
             {
@@ -951,7 +956,7 @@ namespace Gym.Services
 
         public async Task<List<WorkHour>> GetUserWorkouts(int id, DateTime date)
         {
-            string dateString = date.ToString("g");
+            string dateString = date.ToString("yyyy.MM.dd HH:mm"); 
             HttpResponseMessage response = await client.GetAsync($"{socket}/member/{id}/workouts?dateString={dateString}");
 
             if (response.IsSuccessStatusCode)

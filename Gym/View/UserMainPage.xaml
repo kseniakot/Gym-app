@@ -12,7 +12,7 @@
         VerticalOptions="Center" 
         HorizontalOptions="Center" />
         <ScrollView>
-            <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1">
+            <Frame BorderColor="AliceBlue" CornerRadius="5" Grid.Row="1" BackgroundColor="Black">
             <ListView 
         ItemsSource="{Binding Workouts}"
         SelectedItem="{Binding SelectedWorkout}">
@@ -22,9 +22,16 @@
                             <StackLayout>
 
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium"/>
-                                    <Label Text="{Binding WorkDay.Trener.Name}" FontSize="Small" TextColor="Grey"/>
-                                    <Label Text="{Binding WorkDay.Trener.PhoneNumber}" FontSize="Small" TextColor="Grey"/>
+                                    <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}"  FontSize="Medium"/>
+                                        <Label FontSize="Small" TextColor="Grey">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="'{0}: {1}'">
+                                                    <Binding Path="WorkDay.Trener.Name" />
+                                                    <Binding Path="WorkDay.Trener.PhoneNumber" />
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                        <!--<Label Text="{Binding WorkDay.Trener.PhoneNumber}" FontSize="Small" TextColor="Grey"/>-->
 
                                 </VerticalStackLayout>
 

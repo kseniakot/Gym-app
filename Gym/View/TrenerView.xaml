@@ -38,7 +38,7 @@
                 </DatePicker.Behaviors>
             </DatePicker>
 
-            <Frame BorderColor="Black" CornerRadius="5">
+            <Frame BorderColor="Black" CornerRadius="5" BackgroundColor="Black">
                 <ListView 
     ItemsSource="{Binding Workhours}"
     SelectedItem="{Binding SelectedHour}">

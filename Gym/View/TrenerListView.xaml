@@ -20,11 +20,18 @@
 
 
 
-            <Frame Grid.Row="1" BorderColor="Black" CornerRadius="5">
+            <Frame Grid.Row="1" BorderColor="Black" CornerRadius="5" BackgroundColor="Black">
                 <ListView 
     ItemsSource="{Binding Treners}"
     SelectedItem="{Binding SelectedTrener}">
-                <ListView.ItemTemplate>
+
+                    <ListView.Behaviors>
+                        <xct:EventToCommandBehavior EventName="ItemTapped" 
+                  Command="{Binding SelectTrenerCommand}" 
+                 />
+                    </ListView.Behaviors>
+                    
+                    <ListView.ItemTemplate>
                     <DataTemplate x:DataType="{x:Type model:Trener}">
                         <ViewCell>
                             <StackLayout>
@@ -34,10 +41,10 @@
 
                                     <Label Text="{Binding Name}" FontSize="Medium"/>
                                     <Label Text="{Binding PhoneNumber}" FontSize="Small" TextColor="LightGray" />
-                                    <VerticalStackLayout.GestureRecognizers>
+                                    <!--<VerticalStackLayout.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding BindingContext.SelectTrenerCommand, Source={x:Reference Name=TrenerListPage}}" 
                CommandParameter="{Binding .}" />
-                                    </VerticalStackLayout.GestureRecognizers>
+                                    </VerticalStackLayout.GestureRecognizers>-->
                                 </VerticalStackLayout>
 
                                 <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>

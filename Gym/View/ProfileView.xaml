@@ -5,6 +5,7 @@
              x:DataType="viewmodel:ProfileViewModel"   
              xmlns:avatarview="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
               xmlns:model="clr-namespace:Gym.Model;assembly=ModelLibrary"
+             xmlns:xct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
               x:Name="ProfileViewPage"
              x:Class="Gym.View.ProfileView"
              Title="PROFILE">
@@ -63,8 +64,8 @@
                 <Label VerticalOptions="End" Grid.Row="2" Grid.Column="1" Text="{Binding User.Email}" FontAttributes="Bold"/>
                 </Grid>
                 <BoxView Grid.Row="4" HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
-                <Frame  Grid.Row="3">
-                    <Label Text="MEMBERSHIPS" FontSize="Medium" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Frame  Grid.Row="3" BackgroundColor="Black">
+                    <Label TextColor="White" Text="MEMBERSHIPS" FontSize="Medium" FontAttributes="Bold" HorizontalOptions="Center"/>
                 </Frame>
                 <Grid
                         Grid.Row="5">
@@ -77,8 +78,11 @@
                         <ListView Grid.Row="0" 
              ItemsSource="{Binding ActiveMemberships}"
              SelectedItem="{Binding SelectedMembership}">
-                            
-                                <ListView.ItemTemplate>
+                        <ListView.Behaviors>
+                            <xct:EventToCommandBehavior EventName="ItemTapped" 
+                            Command="{Binding FreezeMembershipCommand}"></xct:EventToCommandBehavior>
+                        </ListView.Behaviors>
+                        <ListView.ItemTemplate>
                             <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
                                 <ViewCell>
                                     <StackLayout>
@@ -88,10 +92,10 @@
 
                                             <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
                                             <Label Text="{Binding EndDate, StringFormat='ACTIVE UNTIL: {0}'}" FontSize="Small" TextColor="LightGray" />
-                                            <VerticalStackLayout.GestureRecognizers>
+                                            <!--<VerticalStackLayout.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding BindingContext.FreezeMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
                                             CommandParameter="{Binding .}" />
-                                            </VerticalStackLayout.GestureRecognizers>
+                                            </VerticalStackLayout.GestureRecognizers>-->
                                         </VerticalStackLayout>
 
                                         <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
@@ -103,7 +107,13 @@
                     <ListView Grid.Row="1" 
                     ItemsSource="{Binding NotActiveMemberships}"
                     SelectedItem="{Binding SelectedMembership}">
-                    <ListView.ItemTemplate>
+                        
+                        <ListView.Behaviors>
+                            <xct:EventToCommandBehavior EventName="ItemTapped" 
+                        Command="{Binding ActivateMembershipCommand}"></xct:EventToCommandBehavior>
+                        </ListView.Behaviors>
+                        
+                            <ListView.ItemTemplate>
                         <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
                             <ViewCell>
                                 <StackLayout>
@@ -113,10 +123,10 @@
 
                                         <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
                                         <Label Text="NOT ACTIVE" FontSize="Small" TextColor="LightGray" />
-                                        <VerticalStackLayout.GestureRecognizers>
+                                        <!--<VerticalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding BindingContext.ActivateMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
                                CommandParameter="{Binding .}" />
-                                        </VerticalStackLayout.GestureRecognizers>
+                                        </VerticalStackLayout.GestureRecognizers>-->
                                     </VerticalStackLayout>
 
                                     <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
@@ -127,8 +137,13 @@
                 </ListView>
 
                     <ListView Grid.Row="2" 
-ItemsSource="{Binding FrozenMemberships}"
-SelectedItem="{Binding SelectedMembership}">
+                ItemsSource="{Binding FrozenMemberships}"
+                SelectedItem="{Binding SelectedMembership}">
+                        <ListView.Behaviors>
+                            <xct:EventToCommandBehavior EventName="ItemTapped" 
+                 Command="{Binding DefrostMembershipCommand}" 
+                />
+                        </ListView.Behaviors>
 
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="{x:Type model:MembershipInstance}">
@@ -140,10 +155,10 @@ SelectedItem="{Binding SelectedMembership}">
 
                                             <Label Text="{Binding Membership.Name}" FontSize="Medium"/>
                                             <Label Text="{Binding ActiveFreeze.EndDate, StringFormat='FROZEN UNTIL: {0}'}" FontSize="Small" TextColor="LightGray" />
-                                            <VerticalStackLayout.GestureRecognizers>
+                                            <!--<VerticalStackLayout.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding BindingContext.DefrostMembershipCommand, Source={x:Reference Name=ProfileViewPage}}" 
                                CommandParameter="{Binding .}" />
-                                            </VerticalStackLayout.GestureRecognizers>
+                                            </VerticalStackLayout.GestureRecognizers>-->
                                         </VerticalStackLayout>
 
                                         <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>

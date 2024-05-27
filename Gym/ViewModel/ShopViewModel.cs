@@ -81,7 +81,9 @@ public partial class ShopViewModel : ObservableObject
     [RelayCommand]
     private async Task ViewMembershipAsync()
     {
-       if (SelectedMembership == null) return;
+        if (SelectedMembership == null) { 
+            await Shell.Current.DisplayAlert("Error", "Please select a membership", "Ok");
+            return; }
         await Shell.Current.GoToAsync($"MembershipView?MembershipId={SelectedMembership.Id}");
         Debug.WriteLine(SelectedMembership.Id);
            // SelectedMembership = null;

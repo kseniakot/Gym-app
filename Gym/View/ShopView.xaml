@@ -19,7 +19,13 @@
 
                 <ListView IsVisible="{Binding IsMembershipPickerVisible}"
                       ItemsSource="{Binding Memberships}"
-                      SelectedItem="{Binding SelectedMembership}">  
+                      SelectedItem="{Binding SelectedMembership}">
+                    <ListView.Behaviors>
+                        <xct:EventToCommandBehavior EventName="ItemTapped" 
+                                    Command="{Binding ViewMembershipCommand}" 
+                                   />
+                    </ListView.Behaviors>
+
                     <ListView.ItemTemplate>
                     <DataTemplate x:DataType="{x:Type model:Membership}">
                             <ViewCell>
@@ -30,10 +36,10 @@
 
                                         <Label Text="{Binding Name}" FontSize="Medium"/>
                                             <Label Text="{Binding Price, StringFormat='{0} Br'}" FontSize="Small" TextColor="LightGray" />
-                                        <VerticalStackLayout.GestureRecognizers>
+                                        <!--<VerticalStackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding BindingContext.ViewMembershipCommand, Source={x:Reference Name=ShopViewPage}}" 
                                                      CommandParameter="{Binding .}" />
-                                        </VerticalStackLayout.GestureRecognizers>
+                                        </VerticalStackLayout.GestureRecognizers>-->
                                     </VerticalStackLayout>
                                    
                                     <BoxView HeightRequest="1" BackgroundColor="DarkGoldenrod"/>
