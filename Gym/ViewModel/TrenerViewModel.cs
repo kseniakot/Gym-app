@@ -20,6 +20,9 @@ public partial class TrenerViewModel : ObservableObject
     [ObservableProperty]
     private DateTime _selectedDate = DateTime.UtcNow;
 
+    [ObservableProperty]
+    private DateTime _maxDate;
+
    
     private WorkHour _selectedHour;
 
@@ -87,6 +90,7 @@ public partial class TrenerViewModel : ObservableObject
     [RelayCommand]
     private async Task LoadData()
     {
+        MaxDate = DateTime.UtcNow.AddDays(6);
         await DateSelectedAsync();
     }
 

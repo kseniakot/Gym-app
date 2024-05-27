@@ -31,7 +31,7 @@
 
         </VerticalStackLayout>
         <VerticalStackLayout Grid.Row="2" Grid.ColumnSpan="3">
-            <DatePicker Date="{Binding SelectedDate}" MinimumDate="{x:Static sys:DateTime.Today}">
+            <DatePicker Date="{Binding SelectedDate}" MinimumDate="{x:Static sys:DateTime.Today}" MaximumDate="{Binding MaxDate}">
                 <DatePicker.Behaviors>
                     <xct:EventToCommandBehavior EventName="DateSelected" 
                                      Command="{Binding DateSelectedCommand}"  />
