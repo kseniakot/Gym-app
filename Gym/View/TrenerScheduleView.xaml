@@ -58,9 +58,12 @@
 
                                         <VerticalStackLayout>
                                                 <Label Text="{Binding Start, StringFormat='{0:HH:mm}'}" FontSize="Medium" TextColor="AliceBlue"/>
-                                                <Label Text="{Binding WorkHourClients.Count, StringFormat='Clients applied: {0}'}" FontSize="Small" 
-                                                       TextColor="Grey"/>
-                                                
+                                                <Label Text="{Binding WorkHourClients.Count, StringFormat='Clients applied: {0}'}" FontSize="Small">
+                                                    <Label.TextColor>
+                                                        <Binding Path="WorkHourClients.Count" Converter="{StaticResource ColorValueConverter}"/>
+                                                    </Label.TextColor>
+                                                </Label>
+                                               
 
 
                                                 <!--<ListView 
