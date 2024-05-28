@@ -953,7 +953,7 @@ namespace Gym.Services
         }
 
         //APPLY FOR WORKOUT BY WEEKDAY
-        public async Task ApplyWorkoutByWeekday(int trenerId, int memberId, DateTime date)
+        public async Task<string> ApplyWorkoutByWeekday(int trenerId, int memberId, DateTime date)
         {
 
             string dateString = date.ToString("yyyy.MM.dd HH:mm"); ;
@@ -961,7 +961,9 @@ namespace Gym.Services
             HttpResponseMessage response = await client.PostAsync($"{socket}/treners/{trenerId}/workday/{memberId}/weekday?dateStringFrom={dateString}", null);
             if (response.IsSuccessStatusCode)
             {
-                return;
+                string result = await response.Content.ReadAsStringAsync();
+                
+                return result;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

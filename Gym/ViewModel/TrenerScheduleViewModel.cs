@@ -21,6 +21,7 @@ public partial class TrenerScheduleViewModel : ObservableObject
 
     [ObservableProperty]
     private DateTime _selectedDateCopy;
+   
 
     // [ObservableProperty]
     private WorkHour _selectedHour;
@@ -94,6 +95,7 @@ public partial class TrenerScheduleViewModel : ObservableObject
     {
         try
         {
+            IsSelectVisible = false;
             IsButtonEnabled = false;
            
                 var workHours = await webService.GetTrenerWorkHours((await webService.GetUserFromToken()).Id, SelectedDate);
@@ -135,16 +137,20 @@ public partial class TrenerScheduleViewModel : ObservableObject
         {
             try
             {
+             
                 await webService.CopyWorkDay((await webService.GetUserFromToken()).Id, SelectedDate, SelectedDateCopy);
                 await Shell.Current.DisplayAlert("Success", "Data has been copied successfully", "Ok");
+               
             }
             catch (Exception e)
             {
                 await Shell.Current.DisplayAlert("Error", e.Message, "Ok");
                 
             }
+            SelectedDateCopy = SelectedDate;
 
             IsSelectVisible = false;
+            IsCopyEnabled = true;
         }
         
     }

@@ -906,7 +906,7 @@ app.MapGet("/treners/workhours/available/{id:int}",
                  var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
                  if (workDay == null) return Results.NotFound(new { message = "No such work day" });
 
-                 var workHours = workDay.WorkHours.Where(w => w.IsAvailable).OrderBy(wh => wh.Start);
+                 var workHours = workDay.WorkHours.Where(w => w.IsAvailable && w.Start > DateTime.UtcNow).OrderBy(wh => wh.Start);
                  return Results.Ok(workHours);
              });
 
@@ -1075,6 +1075,7 @@ app.MapGet("/member/{id:int}/workouts",
 app.MapPost("/trener/{trenerId:int}/workdays/copy",
              async (int trenerId, string dateStringFrom, string dateStringTo, DBContext db) =>
              {
+
                  DateTime dateFrom = DateTime.Parse(dateStringFrom);
                  dateFrom = DateTime.SpecifyKind(dateFrom, DateTimeKind.Utc);
 
@@ -1087,10 +1088,10 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy",
                    .FirstOrDefaultAsync(m => m.Id == trenerId);
                  if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
-                 var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateFrom.Date);
+                 var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateFrom.Date && wd.TrenerId == trenerId);
                  if (workDay == null) return Results.NotFound(new { message = "No such workDay" });
 
-                 var targetDay = db.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date);
+                 var targetDay = db.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date && wd.TrenerId==trenerId);
                  if (targetDay != null)
                  {
                      if (targetDay.WorkHours.Any())
@@ -1118,11 +1119,12 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy",
                      targetDay.WorkHours.Add(new WorkHour
                      {
                          Start = DateTime.SpecifyKind(newStart, DateTimeKind.Utc),
-                     WorkDayId = workHour.WorkDayId
+                         WorkDayId = targetDay.Id   
                      });
+                     db.WorkDays.Update(targetDay);
                  }
 
-                 db.WorkDays.Update(targetDay);
+                
 
                  await db.SaveChangesAsync();
 
@@ -1237,6 +1239,7 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy/weekday",
 app.MapPost("/treners/{trenerId:int}/workday/{memberId:int}/weekday",
     async (int trenerId, int memberId, string dateStringFrom, DBContext db) =>
     {
+        string result = ""; 
         DateTime dateFrom = DateTime.Parse(dateStringFrom);
         dateFrom = DateTime.SpecifyKind(dateFrom, DateTimeKind.Utc);
 
@@ -1252,22 +1255,32 @@ app.MapPost("/treners/{trenerId:int}/workday/{memberId:int}/weekday",
             .FirstOrDefaultAsync(m => m.Id == trenerId);
         if (trener == null) return Results.NotFound(new { message = "No such trener" });
 
+        int i = 0;
         for (DateTime date = dateFrom; date <= dateFrom.AddMonths(1); date = date.AddDays(1))
         {
             if (date.DayOfWeek == dateFrom.DayOfWeek)
             {
+                i++;
                 var workDay = trener.WorkDays.FirstOrDefault(m => m.Date.Date == date.Date);
-                if (workDay == null) continue; // Skip if there's no work day on this date
+                if (workDay == null) {
+                    result += $"Week {i}: It is not trener's workday; ";
+                    continue; 
+                }// Skip if there's no work day on this date
 
                 var workHour = workDay.WorkHours.FirstOrDefault(w => w.Start == date);
 
                 bool hasWorkout = workHour.WorkDay.WorkHours.Any(o => o.WorkHourClients.Any(o => o.Id == memberId));
 
-                if (hasWorkout) continue; // Skip if the member already has a workout at this time
-                if(!workHour.IsAvailable) continue; // Skip if the work hour is not available
+                if (hasWorkout) {
+                    result += $"Week {i}: You already have a workout here; ";
+                    continue; 
+                }// Skip if the member already has a workout at this time
+                if (!workHour.IsAvailable) {
+                    result += $"Week {i}: This time is not available; ";
+                    continue; } // Skip if the work hour is not available
 
                 workHour.WorkHourClients.Add(member);
-
+                result += $"Week {i}: Success; ";
                 if (workHour.WorkHourClients.Count >= workHour.Capacity)
                 {
                     workHour.IsAvailable = false;
@@ -1277,7 +1290,7 @@ app.MapPost("/treners/{trenerId:int}/workday/{memberId:int}/weekday",
             }
         }
 
-        return Results.Ok();
+        return Results.Ok(result);
     });
 
 app.Run();

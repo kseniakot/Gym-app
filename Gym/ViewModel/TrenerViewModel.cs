@@ -139,13 +139,14 @@ public partial class TrenerViewModel : ObservableObject
     {
         if (SelectedHour == null)
         {
-            await Shell.Current.DisplayAlert("Error", "Please select a workout to cancel", "Ok");
+            await Shell.Current.DisplayAlert("Error", "Please select a worktime", "Ok");
             return;
         }
         try
         {
-            await webService.ApplyWorkoutByWeekday(TrenerId, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
+            string result = await webService.ApplyWorkoutByWeekday(TrenerId, (await webService.GetUserFromToken()).Id, SelectedHour.Start);
             SelectedHour = null;
+            await Shell.Current.DisplayAlert("Result", $"{result.Trim('"')}", "OK");
            
         }
         catch (Exception e)
