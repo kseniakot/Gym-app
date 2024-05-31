@@ -896,6 +896,9 @@ app.MapGet("/treners/workhours/available/{id:int}",
                  DateTime date = DateTime.Parse(dateString);
                  date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
 
+                 DateTime now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+
+
                  var trener = await db.Treners
                      .Include(t => t.WorkDays)
                      .ThenInclude(wd => wd.WorkHours)
@@ -906,7 +909,7 @@ app.MapGet("/treners/workhours/available/{id:int}",
                  var workDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == date.Date);
                  if (workDay == null) return Results.NotFound(new { message = "No such work day" });
 
-                 var workHours = workDay.WorkHours.Where(w => w.IsAvailable && w.Start > DateTime.UtcNow).OrderBy(wh => wh.Start);
+                 var workHours = workDay.WorkHours.Where(w => w.IsAvailable && w.Start > now).OrderBy(wh => wh.Start);
                  return Results.Ok(workHours);
              });
 
@@ -1196,7 +1199,7 @@ app.MapPost("/trener/{trenerId:int}/workdays/copy/weekday",
             DateTime dateTo = dateFrom.AddDays(i);
             if (dateTo.DayOfWeek == dateFrom.DayOfWeek)
             {
-                var targetDay = db.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date);
+                var targetDay = trener.WorkDays.FirstOrDefault(wd => wd.Date.Date == dateTo.Date);
                 if (targetDay != null)
                 {
                     if (targetDay.WorkHours.Any())
